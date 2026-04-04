@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import BottomNav from "@/components/layout/BottomNav";
 
 export const metadata: Metadata = {
-  title: "SHOKUNIN - 職人のスキルシェアプラットフォーム",
+  title: "SHOKUNIN 人工見積AI - 建設人材会社のための見積作成ツール",
   description:
-    "建築・建設・設備系の職人が技術や施工サービスを直接販売できるプラットフォーム。多重下請けから脱却し、あなたの技術を正当に評価します。",
+    "建設人材会社向けの人工見積作成SaaS。職種別単価管理、AI単価提案、粗利シミュレーション、見積書PDF出力。",
   openGraph: {
-    title: "SHOKUNIN - 職人のスキルシェアプラットフォーム",
-    description: "職人の技術を直接販売。施工パッケージ・技術動画の販売プラットフォーム。",
+    title: "SHOKUNIN 人工見積AI",
+    description: "建設人材会社のための見積作成ツール。人工計算からPDF出力まで30秒。",
     locale: "ja_JP",
     type: "website",
   },
@@ -22,6 +23,7 @@ export default function RootLayout({
     <html lang="ja">
       <body className="bg-[var(--color-bg)] text-gray-900 antialiased">
         <main className="mx-auto max-w-lg min-h-screen">{children}</main>
+        <BottomNav />
       </body>
     </html>
   );

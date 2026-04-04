@@ -104,3 +104,81 @@ export interface CoursePurchase {
   stripe_payment_intent_id: string;
   created_at: string;
 }
+
+// =============================================
+// 人工見積AI 型定義
+// =============================================
+
+/** 職種別単価マスタ */
+export interface UnitPrice {
+  id: string;
+  user_id: string;
+  job_type: string;
+  base_price: number;
+  cost_price: number;
+  night_multiplier: number;
+  overtime_multiplier: number;
+  notes: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/** 案件 */
+export interface Project {
+  id: string;
+  user_id: string;
+  name: string;
+  client_name: string;
+  site_address: string;
+  start_date: string | null;
+  end_date: string | null;
+  status: ProjectStatus;
+  notes: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type ProjectStatus = "draft" | "submitted" | "accepted" | "rejected" | "completed";
+
+/** 見積書 */
+export interface Estimate {
+  id: string;
+  user_id: string;
+  project_id: string | null;
+  estimate_number: string;
+  title: string;
+  client_name: string;
+  issue_date: string;
+  valid_until: string | null;
+  subtotal: number;
+  tax_rate: number;
+  tax_amount: number;
+  total_amount: number;
+  cost_total: number;
+  gross_profit: number;
+  gross_margin: number;
+  notes: string;
+  status: EstimateStatus;
+  created_at: string;
+  updated_at: string;
+  items?: EstimateItem[];
+}
+
+export type EstimateStatus = "draft" | "submitted" | "accepted" | "rejected";
+
+/** 見積明細行 */
+export interface EstimateItem {
+  id: string;
+  estimate_id: string;
+  sort_order: number;
+  job_type: string;
+  workers: number;
+  days: number;
+  unit_price: number;
+  cost_price: number;
+  amount: number;
+  cost_amount: number;
+  notes: string;
+  created_at: string;
+}

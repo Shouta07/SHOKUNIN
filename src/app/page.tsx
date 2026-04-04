@@ -3,28 +3,28 @@ import Card from "@/components/ui/Card";
 
 const features = [
   {
-    href: "/services",
-    title: "施工パッケージ",
-    description: "エアコン設置、電気工事など施工サービスを探す",
-    icon: "🔧",
+    href: "/estimates/new",
+    title: "見積書を作成",
+    description: "人工計算 → 粗利シミュレーション → PDF出力",
+    icon: "📝",
   },
   {
-    href: "/courses",
-    title: "技術動画で学ぶ",
-    description: "現場のプロから直接技術を学ぶ",
-    icon: "🎬",
+    href: "/estimates",
+    title: "見積一覧",
+    description: "作成した見積の管理・検索・ステータス確認",
+    icon: "📋",
   },
   {
-    href: "/search",
-    title: "近くの職人を探す",
-    description: "今すぐ動ける設備屋を地図で検索",
-    icon: "📍",
+    href: "/master",
+    title: "単価マスタ",
+    description: "職種別の出し値・原価を管理",
+    icon: "💰",
   },
   {
-    href: "/dashboard",
-    title: "職人ダッシュボード",
-    description: "出品・注文管理・売上確認",
-    icon: "📊",
+    href: "/projects",
+    title: "案件管理",
+    description: "元請からの案件情報を一元管理",
+    icon: "🏗️",
   },
 ];
 
@@ -35,8 +35,11 @@ export default function HomePage() {
         <h1 className="text-3xl font-black text-[var(--color-primary)]">
           SHOKUNIN
         </h1>
+        <p className="mt-1 text-base font-bold text-[var(--color-accent)]">
+          人工見積AI
+        </p>
         <p className="mt-2 text-sm text-gray-600">
-          職人の技術を、正当に評価する。
+          建設人材会社のための見積作成ツール
         </p>
       </header>
 
@@ -53,26 +56,6 @@ export default function HomePage() {
           </Link>
         ))}
       </div>
-
-      {/* 構造化データ: トップページ */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            name: "SHOKUNIN",
-            description:
-              "建築・建設・設備系の職人が技術や施工サービスを直接販売できるプラットフォーム",
-            url: "https://shokunin.jp",
-            potentialAction: {
-              "@type": "SearchAction",
-              target: "https://shokunin.jp/search?q={search_term_string}",
-              "query-input": "required name=search_term_string",
-            },
-          }),
-        }}
-      />
     </div>
   );
 }
