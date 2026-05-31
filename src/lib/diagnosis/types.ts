@@ -34,12 +34,14 @@ export interface DiagnosisIntro {
 export interface FashionItem {
   item: string;
   reason: string;
+  stat: string;
 }
 
 export interface DiagnosisResult {
   type: string;
   label: string;
   description: string;
+  stats: Record<string, number>;
   features: string[];
   fashion: FashionItem[];
   ngItems: FashionItem[];
