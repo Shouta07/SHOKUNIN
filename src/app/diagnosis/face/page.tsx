@@ -7,6 +7,7 @@ export default function FaceDiagnosisPage() {
   return (
     <DiagnosisFlow
       title="顔タイプ診断"
+      diagnosisKey="face"
       intro={faceIntro}
       questions={faceQuestions}
       results={faceResults}

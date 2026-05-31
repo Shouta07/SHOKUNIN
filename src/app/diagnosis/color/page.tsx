@@ -7,6 +7,7 @@ export default function ColorDiagnosisPage() {
   return (
     <DiagnosisFlow
       title="パーソナルカラー診断"
+      diagnosisKey="color"
       intro={colorIntro}
       questions={colorQuestions}
       results={colorResults}

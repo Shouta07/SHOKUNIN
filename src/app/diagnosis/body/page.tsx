@@ -7,6 +7,7 @@ export default function BodyDiagnosisPage() {
   return (
     <DiagnosisFlow
       title="骨格診断"
+      diagnosisKey="body"
       intro={bodyIntro}
       questions={bodyQuestions}
       results={bodyResults}
