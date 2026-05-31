@@ -8,6 +8,21 @@ export interface Question {
   }[];
 }
 
+export interface ProductRecommendation {
+  name: string;
+  description: string;
+  price: string;
+  affiliateUrl: string;
+  tag: string;
+}
+
+export interface SalonCta {
+  heading: string;
+  description: string;
+  buttonLabel: string;
+  url: string;
+}
+
 export interface DiagnosisResult {
   type: string;
   label: string;
@@ -16,4 +31,6 @@ export interface DiagnosisResult {
   fashion: string[];
   ngItems: string[];
   celebrities: string[];
+  products: ProductRecommendation[];
+  salonCta: SalonCta;
 }

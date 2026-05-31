@@ -87,6 +87,35 @@ export const faceResults: Record<string, DiagnosisResult> = {
       "ドレッシーすぎるスーツスタイル",
     ],
     celebrities: ["佐藤健", "竹内涼真", "中村倫也"],
+    products: [
+      {
+        name: "オックスフォード カジュアルシャツ",
+        description: "爽やかな印象を引き立てる定番オックスフォードシャツ。洗いざらしの風合いが清潔感を演出。",
+        price: "¥5,990〜",
+        affiliateUrl: "https://example.com/affiliate/fresh-oxford-shirt",
+        tag: "定番",
+      },
+      {
+        name: "デニムジャケット（ライトブルー）",
+        description: "フレッシュタイプの爽やかさを最大限に活かすライトブルーのGジャン。カジュアルからきれいめまで万能。",
+        price: "¥8,900〜",
+        affiliateUrl: "https://example.com/affiliate/fresh-denim-jacket",
+        tag: "人気",
+      },
+      {
+        name: "ホワイトレザースニーカー",
+        description: "清潔感のある白スニーカーはフレッシュタイプの必須アイテム。どんなコーデにも合わせやすい。",
+        price: "¥7,500〜",
+        affiliateUrl: "https://example.com/affiliate/fresh-white-sneakers",
+        tag: "おすすめ",
+      },
+    ],
+    salonCta: {
+      heading: "プロの顔タイプ診断で似合うスタイルを極める",
+      description: "フレッシュタイプの爽やかさを最大限に活かすヘアスタイル・ファッションを、プロのスタイリストが提案します。",
+      buttonLabel: "近くのサロンを探す",
+      url: "https://example.com/salon/face-diagnosis",
+    },
   },
   cute: {
     type: "cute",
@@ -111,6 +140,35 @@ export const faceResults: Record<string, DiagnosisResult> = {
       "ゴツいアクセサリー",
     ],
     celebrities: ["千葉雄大", "神木隆之介", "吉沢亮"],
+    products: [
+      {
+        name: "丸首コットンスウェット",
+        description: "キュートタイプの柔らかい雰囲気にぴったりの丸首スウェット。リラックス感がありつつも上品な印象。",
+        price: "¥4,990〜",
+        affiliateUrl: "https://example.com/affiliate/cute-crewneck-sweat",
+        tag: "定番",
+      },
+      {
+        name: "ニットカーディガン",
+        description: "優しい印象を引き立てるミドルゲージのカーディガン。羽織るだけでこなれた雰囲気に。",
+        price: "¥6,500〜",
+        affiliateUrl: "https://example.com/affiliate/cute-cardigan",
+        tag: "人気",
+      },
+      {
+        name: "ローカットキャンバススニーカー",
+        description: "カジュアルで親しみやすいローカットスニーカー。キュートタイプの可愛らしさを足元から演出。",
+        price: "¥5,500〜",
+        affiliateUrl: "https://example.com/affiliate/cute-lowcut-sneakers",
+        tag: "おすすめ",
+      },
+    ],
+    salonCta: {
+      heading: "プロの顔タイプ診断で似合うスタイルを極める",
+      description: "キュートタイプの柔らかさと親しみやすさを活かすヘアスタイル・ファッションを、プロのスタイリストが提案します。",
+      buttonLabel: "近くのサロンを探す",
+      url: "https://example.com/salon/face-diagnosis",
+    },
   },
   cool: {
     type: "cool",
@@ -135,6 +193,35 @@ export const faceResults: Record<string, DiagnosisResult> = {
       "かわいい系の柄物",
     ],
     celebrities: ["山下智久", "福山雅治", "玉木宏"],
+    products: [
+      {
+        name: "ダブルライダースレザージャケット",
+        description: "クールタイプの男らしさを際立たせるレザージャケット。無骨でありながら洗練された存在感。",
+        price: "¥19,800〜",
+        affiliateUrl: "https://example.com/affiliate/cool-leather-jacket",
+        tag: "定番",
+      },
+      {
+        name: "ハイゲージタートルネックニット",
+        description: "シャープな顔立ちをさらに引き立てるタートルネック。モノトーンで合わせれば知的な印象に。",
+        price: "¥6,900〜",
+        affiliateUrl: "https://example.com/affiliate/cool-turtleneck",
+        tag: "人気",
+      },
+      {
+        name: "サイドジップレザーブーツ",
+        description: "クールタイプの足元を引き締めるレザーブーツ。全身のシルエットを一段格上げする。",
+        price: "¥15,800〜",
+        affiliateUrl: "https://example.com/affiliate/cool-leather-boots",
+        tag: "おすすめ",
+      },
+    ],
+    salonCta: {
+      heading: "プロの顔タイプ診断で似合うスタイルを極める",
+      description: "クールタイプのシャープさと存在感を活かすヘアスタイル・ファッションを、プロのスタイリストが提案します。",
+      buttonLabel: "近くのサロンを探す",
+      url: "https://example.com/salon/face-diagnosis",
+    },
   },
   elegant: {
     type: "elegant",
@@ -159,5 +246,34 @@ export const faceResults: Record<string, DiagnosisResult> = {
       "派手なストリート系",
     ],
     celebrities: ["斎藤工", "ディーン・フジオカ", "及川光博"],
+    products: [
+      {
+        name: "ウールチェスターコート",
+        description: "エレガントタイプの上品さを格上げするチェスターコート。洗練されたシルエットでフォーマルにもカジュアルにも。",
+        price: "¥24,800〜",
+        affiliateUrl: "https://example.com/affiliate/elegant-chester-coat",
+        tag: "定番",
+      },
+      {
+        name: "カシミヤVネックニット",
+        description: "上質なカシミヤ素材が品格を演出。エレガントタイプの大人の色気を引き出すVネックシルエット。",
+        price: "¥12,800〜",
+        affiliateUrl: "https://example.com/affiliate/elegant-cashmere-knit",
+        tag: "人気",
+      },
+      {
+        name: "スエードローファー",
+        description: "上品な足元を完成させるスエードローファー。ドレスにもカジュアルにも対応する万能シューズ。",
+        price: "¥14,500〜",
+        affiliateUrl: "https://example.com/affiliate/elegant-suede-loafer",
+        tag: "おすすめ",
+      },
+    ],
+    salonCta: {
+      heading: "プロの顔タイプ診断で似合うスタイルを極める",
+      description: "エレガントタイプの上品さと華やかさを活かすヘアスタイル・ファッションを、プロのスタイリストが提案します。",
+      buttonLabel: "近くのサロンを探す",
+      url: "https://example.com/salon/face-diagnosis",
+    },
   },
 };

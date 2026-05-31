@@ -91,6 +91,35 @@ export const bodyResults: Record<string, DiagnosisResult> = {
       "チュニックなど長い着丈のトップス",
     ],
     celebrities: ["EXILE TAKAHIRO", "鈴木亮平", "阿部寛"],
+    products: [
+      {
+        name: "テーラードジャケット（ネイビー）",
+        description: "ジャストサイズで上半身の厚みを活かす王道アイテム",
+        price: "¥12,800〜",
+        affiliateUrl: "https://example.com/affiliate/straight-jacket",
+        tag: "定番",
+      },
+      {
+        name: "Vネックニット（グレー）",
+        description: "首元をすっきり見せてストレート体型を最大限に活かす",
+        price: "¥5,980〜",
+        affiliateUrl: "https://example.com/affiliate/straight-vneck",
+        tag: "人気",
+      },
+      {
+        name: "センタープレスパンツ",
+        description: "Iラインシルエットで脚長効果。ストレートの鉄板",
+        price: "¥7,980〜",
+        affiliateUrl: "https://example.com/affiliate/straight-pants",
+        tag: "おすすめ",
+      },
+    ],
+    salonCta: {
+      heading: "プロの骨格診断で似合う服をもっと詳しく",
+      description: "セルフ診断の結果をベースに、プロのスタイリストが対面であなたの骨格を分析。似合う素材・シルエット・ブランドまで具体的にアドバイス。",
+      buttonLabel: "近くのサロンを探す",
+      url: "https://example.com/salon/body-diagnosis",
+    },
   },
   wave: {
     type: "wave",
@@ -116,6 +145,35 @@ export const bodyResults: Record<string, DiagnosisResult> = {
       "硬い素材のアウター",
     ],
     celebrities: ["田中圭", "向井理", "星野源"],
+    products: [
+      {
+        name: "リブニット（ブラック）",
+        description: "体のラインに沿うタイトフィットで華奢な体型を綺麗に見せる",
+        price: "¥4,980〜",
+        affiliateUrl: "https://example.com/affiliate/wave-knit",
+        tag: "定番",
+      },
+      {
+        name: "テーパードパンツ（ダークグレー）",
+        description: "下半身をすっきり見せるシルエット。ウェーブの味方",
+        price: "¥6,980〜",
+        affiliateUrl: "https://example.com/affiliate/wave-pants",
+        tag: "人気",
+      },
+      {
+        name: "ショート丈MA-1ジャケット",
+        description: "着丈が短いから重心が上がり、スタイルアップ効果",
+        price: "¥9,800〜",
+        affiliateUrl: "https://example.com/affiliate/wave-ma1",
+        tag: "おすすめ",
+      },
+    ],
+    salonCta: {
+      heading: "プロの骨格診断で似合う服をもっと詳しく",
+      description: "ウェーブタイプは素材選びが特に重要。プロが似合うテクスチャー・フィット感まで丁寧にアドバイスします。",
+      buttonLabel: "近くのサロンを探す",
+      url: "https://example.com/salon/body-diagnosis",
+    },
   },
   natural: {
     type: "natural",
@@ -141,5 +199,34 @@ export const bodyResults: Record<string, DiagnosisResult> = {
       "きっちりしすぎたコーデ",
     ],
     celebrities: ["窪田正孝", "綾野剛", "オダギリジョー"],
+    products: [
+      {
+        name: "オーバーサイズリネンシャツ",
+        description: "天然素材のざっくり感がナチュラル体型にぴったりハマる",
+        price: "¥5,980〜",
+        affiliateUrl: "https://example.com/affiliate/natural-shirt",
+        tag: "定番",
+      },
+      {
+        name: "ワイドカーゴパンツ",
+        description: "骨格のフレーム感を活かすゆったりシルエット",
+        price: "¥7,480〜",
+        affiliateUrl: "https://example.com/affiliate/natural-cargo",
+        tag: "人気",
+      },
+      {
+        name: "ローゲージニット",
+        description: "ざっくり編みがナチュラルの骨感をカバーしつつオシャレに",
+        price: "¥6,980〜",
+        affiliateUrl: "https://example.com/affiliate/natural-knit",
+        tag: "おすすめ",
+      },
+    ],
+    salonCta: {
+      heading: "プロの骨格診断で似合う服をもっと詳しく",
+      description: "ナチュラルタイプは着こなしの「抜け感」がカギ。プロが素材・サイズ感・コーデの黄金バランスを教えます。",
+      buttonLabel: "近くのサロンを探す",
+      url: "https://example.com/salon/body-diagnosis",
+    },
   },
 };

@@ -89,13 +89,60 @@ export default function DiagnosisFlow({ title, questions, results, accentColor }
           </ul>
         </Card>
 
-        <Card className="p-5 mb-6">
+        <Card className="p-5 mb-4">
           <h3 className="font-bold mb-3">同じタイプの有名人</h3>
           <div className="flex flex-wrap gap-2">
             {result.celebrities.map((c, i) => (
               <span key={i} className="text-sm px-3 py-1 rounded-full bg-gray-100">{c}</span>
             ))}
           </div>
+        </Card>
+
+        {/* おすすめアイテム（アフィリエイト） */}
+        <div className="mb-4">
+          <h3 className="font-bold mb-3 px-1">あなたにおすすめのアイテム</h3>
+          <div className="space-y-3">
+            {result.products.map((product, i) => (
+              <a
+                key={i}
+                href={product.affiliateUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Card className="p-4 border-2 border-transparent hover:border-[var(--color-accent)] active:scale-[0.98] transition-all">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-bold text-sm flex-1">{product.name}</h4>
+                    <span
+                      className="text-xs px-2 py-0.5 rounded-full text-white ml-2 whitespace-nowrap"
+                      style={{ backgroundColor: accentColor }}
+                    >
+                      {product.tag}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[var(--color-text-muted)] mb-2">{product.description}</p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-bold" style={{ color: accentColor }}>{product.price}</span>
+                    <span className="text-xs text-[var(--color-accent)]">詳しく見る →</span>
+                  </div>
+                </Card>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* サロン送客CTA */}
+        <Card className="p-5 mb-6 gradient-accent text-white">
+          <h3 className="font-bold text-lg mb-2">{result.salonCta.heading}</h3>
+          <p className="text-sm opacity-90 mb-4">{result.salonCta.description}</p>
+          <a
+            href={result.salonCta.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full text-center py-3 rounded-xl bg-white text-[var(--color-accent)] font-bold text-sm touch-target active:scale-[0.98] transition-transform"
+          >
+            {result.salonCta.buttonLabel}
+          </a>
         </Card>
 
         <div className="flex gap-3">
