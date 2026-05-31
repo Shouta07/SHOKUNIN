@@ -18,6 +18,7 @@ export default function DiagnosisFlow({ title, intro, questions, results, accent
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useState<Record<string, number>>({});
   const [result, setResult] = useState<DiagnosisResult | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const handleAnswer = useCallback((optionScore: Record<string, number>) => {
     const newScores = { ...scores };
@@ -144,8 +145,52 @@ export default function DiagnosisFlow({ title, intro, questions, results, accent
           </div>
         </Card>
 
+        {/* ギフトガイド導線 */}
+        <Card className="p-5 mb-4" style={{ borderLeft: `4px solid ${accentColor}` }}>
+          <h3 className="font-bold mb-2">似合うものがわかった。次は「手に入れる」だけ。</h3>
+          <p className="text-sm text-[var(--color-text-muted)] leading-relaxed">
+            誕生日・記念日・クリスマス——大切な人からのプレゼントは、
+            自分では買わない「本当に似合うもの」を贈ってもらうチャンス。
+            この結果をシェアして、あなたの骨格に合ったギフトを届けてもらおう。
+          </p>
+        </Card>
+
+        {/* シェアボタン */}
+        <div className="flex gap-3 mb-6">
+          <button
+            onClick={() => {
+              const text = `${title}の結果「${result.label}」だった！\n似合う服がわかったから、プレゼント選びの参考にしてほしい\n${window.location.href}`;
+              const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`;
+              window.open(lineUrl, "_blank", "noopener,noreferrer");
+            }}
+            className="flex-1 py-3 rounded-xl bg-[#06C755] text-white font-bold text-sm touch-target active:scale-[0.98] transition-transform"
+          >
+            LINEで贈り先にシェア
+          </button>
+          <button
+            onClick={async () => {
+              const text = `${title}の結果「${result.label}」だった！\n似合う服がわかったから、プレゼント選びの参考にしてほしい\n${window.location.href}`;
+              if (navigator.share) {
+                await navigator.share({ title: `${title}の結果`, text });
+              } else {
+                await navigator.clipboard.writeText(text);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }
+            }}
+            className="flex-1 py-3 rounded-xl border-2 font-bold text-sm touch-target active:scale-[0.98] transition-transform"
+            style={{ borderColor: accentColor, color: accentColor }}
+          >
+            {copied ? "コピーしました" : "リンクをコピー"}
+          </button>
+        </div>
+
+        {/* 骨格特化ギフトアイテム */}
         <div className="mb-4">
-          <h3 className="font-bold mb-3 px-1">あなたにおすすめのアイテム</h3>
+          <h3 className="font-bold mb-1 px-1">あなたの体型に合うギフトアイテム</h3>
+          <p className="text-xs text-[var(--color-text-muted)] px-1 mb-3">
+            骨格タイプに基づいて厳選。贈る側も選びやすい。
+          </p>
           <div className="space-y-3">
             {result.products.map((product, i) => (
               <a
@@ -176,6 +221,7 @@ export default function DiagnosisFlow({ title, intro, questions, results, accent
           </div>
         </div>
 
+        {/* サロン送客CTA */}
         <Card className="p-5 mb-6 gradient-accent text-white">
           <h3 className="font-bold text-lg mb-2">{result.salonCta.heading}</h3>
           <p className="text-sm opacity-90 mb-4">{result.salonCta.description}</p>
