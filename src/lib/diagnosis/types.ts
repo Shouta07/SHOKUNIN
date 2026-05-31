@@ -31,13 +31,18 @@ export interface DiagnosisIntro {
   closingHook: string;
 }
 
+export interface FashionItem {
+  item: string;
+  reason: string;
+}
+
 export interface DiagnosisResult {
   type: string;
   label: string;
   description: string;
   features: string[];
-  fashion: string[];
-  ngItems: string[];
+  fashion: FashionItem[];
+  ngItems: FashionItem[];
   celebrities: string[];
   products: ProductRecommendation[];
   salonCta: SalonCta;

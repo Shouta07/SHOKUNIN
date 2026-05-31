@@ -43,6 +43,11 @@ export default function DiagnosisFlow({ title, intro, questions, results, accent
   };
 
   if (result) {
+    const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+    const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+    const topLabel = results[sortedScores[0][0]]?.label ?? sortedScores[0][0];
+    const topPct = Math.round((sortedScores[0][1] / totalScore) * 100);
+
     return (
       <div className="px-4 pt-8 pb-24">
         <div className="text-center mb-6">
@@ -50,7 +55,39 @@ export default function DiagnosisFlow({ title, intro, questions, results, accent
           <h2 className="text-2xl font-black mt-1" style={{ color: accentColor }}>
             {result.label}
           </h2>
+          <p className="text-xs text-[var(--color-text-muted)] mt-2">
+            一致度 {topPct}%
+          </p>
         </div>
+
+        {/* スコア内訳 */}
+        <Card className="p-5 mb-4">
+          <h3 className="font-bold mb-3 text-sm">診断スコア</h3>
+          <div className="space-y-2">
+            {sortedScores.map(([key, value]) => {
+              const pct = Math.round((value / totalScore) * 100);
+              const label = results[key]?.label ?? key;
+              const isTop = key === result.type;
+              return (
+                <div key={key}>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className={isTop ? "font-bold" : "text-[var(--color-text-muted)]"}>{label}</span>
+                    <span className={isTop ? "font-bold" : "text-[var(--color-text-muted)]"}>{pct}%</span>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-2">
+                    <div
+                      className="h-2 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${pct}%`,
+                        backgroundColor: isTop ? accentColor : "#d1d5db",
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
 
         <Card className="p-5 mb-4">
           <p className="text-sm leading-relaxed">{result.description}</p>
@@ -61,7 +98,7 @@ export default function DiagnosisFlow({ title, intro, questions, results, accent
           <ul className="space-y-2">
             {result.features.map((f, i) => (
               <li key={i} className="text-sm flex items-start gap-2">
-                <span className="text-green-500 mt-0.5">+</span>
+                <span className="text-green-500 mt-0.5 flex-shrink-0">✓</span>
                 <span>{f}</span>
               </li>
             ))}
@@ -69,27 +106,33 @@ export default function DiagnosisFlow({ title, intro, questions, results, accent
         </Card>
 
         <Card className="p-5 mb-4">
-          <h3 className="font-bold mb-3">似合うファッション</h3>
-          <ul className="space-y-2">
+          <h3 className="font-bold mb-3">なぜこの服が似合うのか</h3>
+          <div className="space-y-3">
             {result.fashion.map((f, i) => (
-              <li key={i} className="text-sm flex items-start gap-2">
-                <span style={{ color: accentColor }}>●</span>
-                <span>{f}</span>
-              </li>
+              <div key={i} className="text-sm">
+                <p className="font-medium flex items-start gap-2">
+                  <span style={{ color: accentColor }} className="flex-shrink-0">●</span>
+                  <span>{f.item}</span>
+                </p>
+                <p className="text-xs text-[var(--color-text-muted)] ml-5 mt-0.5">{f.reason}</p>
+              </div>
             ))}
-          </ul>
+          </div>
         </Card>
 
         <Card className="p-5 mb-4">
-          <h3 className="font-bold mb-3">避けたほうがいいアイテム</h3>
-          <ul className="space-y-2">
+          <h3 className="font-bold mb-3">なぜこの服が似合わないのか</h3>
+          <div className="space-y-3">
             {result.ngItems.map((f, i) => (
-              <li key={i} className="text-sm flex items-start gap-2">
-                <span className="text-gray-400">△</span>
-                <span>{f}</span>
-              </li>
+              <div key={i} className="text-sm">
+                <p className="font-medium flex items-start gap-2">
+                  <span className="text-red-400 flex-shrink-0">✕</span>
+                  <span>{f.item}</span>
+                </p>
+                <p className="text-xs text-[var(--color-text-muted)] ml-5 mt-0.5">{f.reason}</p>
+              </div>
             ))}
-          </ul>
+          </div>
         </Card>
 
         <Card className="p-5 mb-4">
@@ -101,7 +144,6 @@ export default function DiagnosisFlow({ title, intro, questions, results, accent
           </div>
         </Card>
 
-        {/* おすすめアイテム（アフィリエイト） */}
         <div className="mb-4">
           <h3 className="font-bold mb-3 px-1">あなたにおすすめのアイテム</h3>
           <div className="space-y-3">
@@ -134,7 +176,6 @@ export default function DiagnosisFlow({ title, intro, questions, results, accent
           </div>
         </div>
 
-        {/* サロン送客CTA */}
         <Card className="p-5 mb-6 gradient-accent text-white">
           <h3 className="font-bold text-lg mb-2">{result.salonCta.heading}</h3>
           <p className="text-sm opacity-90 mb-4">{result.salonCta.description}</p>
