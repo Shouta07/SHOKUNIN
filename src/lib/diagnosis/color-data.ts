@@ -3,71 +3,72 @@ import type { Question, DiagnosisResult } from "./types";
 export const colorQuestions: Question[] = [
   {
     id: "c1",
-    text: "手首の内側の血管の色は？",
+    text: "白いワイシャツを着たとき、顔色が良く見えるのはどのタイプ？",
     options: [
-      { label: "緑っぽい", value: "a", score: { spring: 1, summer: 0, autumn: 1, winter: 0 } },
-      { label: "青・紫っぽい", value: "b", score: { spring: 0, summer: 1, autumn: 0, winter: 1 } },
-      { label: "どちらとも言えない", value: "c", score: { spring: 1, summer: 1, autumn: 0, winter: 0 } },
-    ],
-  },
-  {
-    id: "c2",
-    text: "日焼けしたとき肌はどうなる？",
-    options: [
-      { label: "赤くなってすぐ戻る", value: "a", score: { spring: 1, summer: 2, autumn: 0, winter: 0 } },
-      { label: "すぐ黒くなる", value: "b", score: { spring: 0, summer: 0, autumn: 2, winter: 1 } },
-      { label: "少し赤くなってから黒くなる", value: "c", score: { spring: 1, summer: 0, autumn: 1, winter: 0 } },
-      { label: "赤くなりやすく白い肌に戻る", value: "d", score: { spring: 0, summer: 1, autumn: 0, winter: 2 } },
-    ],
-  },
-  {
-    id: "c3",
-    text: "瞳の色は？",
-    options: [
-      { label: "明るい茶色・キラキラしている", value: "a", score: { spring: 2, summer: 0, autumn: 0, winter: 0 } },
-      { label: "柔らかい黒・グレーがかった茶色", value: "b", score: { spring: 0, summer: 2, autumn: 0, winter: 0 } },
-      { label: "深い茶色・ダークブラウン", value: "c", score: { spring: 0, summer: 0, autumn: 2, winter: 0 } },
-      { label: "はっきりした黒", value: "d", score: { spring: 0, summer: 0, autumn: 0, winter: 2 } },
-    ],
-  },
-  {
-    id: "c4",
-    text: "地毛の色は？",
-    options: [
-      { label: "明るめの茶色", value: "a", score: { spring: 2, summer: 0, autumn: 1, winter: 0 } },
-      { label: "アッシュがかった茶色・柔らかい黒", value: "b", score: { spring: 0, summer: 2, autumn: 0, winter: 0 } },
-      { label: "暗めのこげ茶", value: "c", score: { spring: 0, summer: 0, autumn: 2, winter: 0 } },
-      { label: "真っ黒でツヤがある", value: "d", score: { spring: 0, summer: 0, autumn: 0, winter: 2 } },
-    ],
-  },
-  {
-    id: "c5",
-    text: "似合うと言われるアクセサリーの色は？",
-    options: [
-      { label: "ゴールド（明るめ）", value: "a", score: { spring: 2, summer: 0, autumn: 1, winter: 0 } },
-      { label: "シルバー（マットな質感）", value: "b", score: { spring: 0, summer: 2, autumn: 0, winter: 0 } },
-      { label: "ゴールド（アンティーク調）", value: "c", score: { spring: 0, summer: 0, autumn: 2, winter: 0 } },
-      { label: "シルバー（光沢あり）・プラチナ", value: "d", score: { spring: 0, summer: 0, autumn: 0, winter: 2 } },
-    ],
-  },
-  {
-    id: "c6",
-    text: "白いシャツを着たとき、しっくりくるのは？",
-    options: [
-      { label: "アイボリーやクリーム色", value: "a", score: { spring: 2, summer: 0, autumn: 1, winter: 0 } },
-      { label: "薄いラベンダーがかった白", value: "b", score: { spring: 0, summer: 2, autumn: 0, winter: 0 } },
+      { label: "アイボリーやクリーム系の白", value: "a", score: { spring: 2, summer: 0, autumn: 1, winter: 0 } },
+      { label: "薄いブルーがかった白", value: "b", score: { spring: 0, summer: 2, autumn: 0, winter: 0 } },
       { label: "生成り・オフホワイト", value: "c", score: { spring: 0, summer: 0, autumn: 2, winter: 0 } },
       { label: "真っ白（ピュアホワイト）", value: "d", score: { spring: 0, summer: 0, autumn: 0, winter: 2 } },
     ],
   },
   {
-    id: "c7",
-    text: "肌の色味の傾向は？",
+    id: "c2",
+    text: "腕時計やアクセサリーを着けたとき、肌に映えると感じるのは？",
     options: [
-      { label: "黄味があり明るい・血色がいい", value: "a", score: { spring: 2, summer: 0, autumn: 0, winter: 0 } },
-      { label: "ピンクがかって明るい・繊細", value: "b", score: { spring: 0, summer: 2, autumn: 0, winter: 0 } },
-      { label: "黄味があり暗め・マットな質感", value: "c", score: { spring: 0, summer: 0, autumn: 2, winter: 0 } },
+      { label: "明るいゴールド（イエローゴールド）", value: "a", score: { spring: 2, summer: 0, autumn: 1, winter: 0 } },
+      { label: "マットなシルバーやホワイトゴールド", value: "b", score: { spring: 0, summer: 2, autumn: 0, winter: 0 } },
+      { label: "アンティーク調のゴールド・ブロンズ", value: "c", score: { spring: 0, summer: 0, autumn: 2, winter: 0 } },
+      { label: "光沢のあるシルバーやプラチナ", value: "d", score: { spring: 0, summer: 0, autumn: 0, winter: 2 } },
+    ],
+  },
+  {
+    id: "c3",
+    text: "髭剃りのあと鏡で見ると、肌の色味はどう見える？",
+    options: [
+      { label: "黄味がかっていて血色がいい", value: "a", score: { spring: 2, summer: 0, autumn: 1, winter: 0 } },
+      { label: "ピンクがかって明るい", value: "b", score: { spring: 0, summer: 2, autumn: 0, winter: 1 } },
+      { label: "黄味が強く、マットな質感", value: "c", score: { spring: 1, summer: 0, autumn: 2, winter: 0 } },
       { label: "青白い・色白でコントラストが強い", value: "d", score: { spring: 0, summer: 0, autumn: 0, winter: 2 } },
+    ],
+  },
+  {
+    id: "c4",
+    text: "夏に日焼けしたあと、肌はどう変化する？",
+    options: [
+      { label: "少し赤くなるが、すぐ元の肌色に戻る", value: "a", score: { spring: 1, summer: 2, autumn: 0, winter: 0 } },
+      { label: "赤くなってから薄く焼ける", value: "b", score: { spring: 1, summer: 0, autumn: 0, winter: 2 } },
+      { label: "すぐに黒く焼けて、なかなか戻らない", value: "c", score: { spring: 0, summer: 0, autumn: 2, winter: 0 } },
+      { label: "あまり焼けず、赤くなって白い肌に戻る", value: "d", score: { spring: 0, summer: 1, autumn: 0, winter: 1 } },
+    ],
+  },
+  {
+    id: "c5",
+    text: "スーツやジャケットの色で、周りから「似合う」と言われるのは？",
+    options: [
+      { label: "明るいベージュ・キャメル系", value: "a", score: { spring: 2, summer: 0, autumn: 1, winter: 0 } },
+      { label: "ライトグレー・パウダーブルー系", value: "b", score: { spring: 0, summer: 2, autumn: 0, winter: 0 } },
+      { label: "ダークブラウン・カーキ系", value: "c", score: { spring: 0, summer: 0, autumn: 2, winter: 0 } },
+      { label: "ブラック・チャコール・ネイビー系", value: "d", score: { spring: 0, summer: 0, autumn: 0, winter: 2 } },
+    ],
+  },
+  {
+    id: "c6",
+    text: "自分の地毛の色を光の下で見ると、どう見える？",
+    options: [
+      { label: "明るめの茶色・光に透ける感じ", value: "a", score: { spring: 2, summer: 0, autumn: 1, winter: 0 } },
+      { label: "アッシュがかった柔らかい黒", value: "b", score: { spring: 0, summer: 2, autumn: 0, winter: 0 } },
+      { label: "暗めのこげ茶・マットな質感", value: "c", score: { spring: 0, summer: 0, autumn: 2, winter: 0 } },
+      { label: "真っ黒でツヤがある", value: "d", score: { spring: 0, summer: 0, autumn: 0, winter: 2 } },
+    ],
+  },
+  {
+    id: "c7",
+    text: "ネクタイやマフラーで、顔色が明るく見えると感じる色は？",
+    options: [
+      { label: "コーラルピンク・オレンジ系の暖色", value: "a", score: { spring: 2, summer: 0, autumn: 0, winter: 0 } },
+      { label: "ラベンダー・ローズ系のくすんだ色", value: "b", score: { spring: 0, summer: 2, autumn: 0, winter: 0 } },
+      { label: "テラコッタ・マスタード系の深い暖色", value: "c", score: { spring: 0, summer: 0, autumn: 2, winter: 0 } },
+      { label: "ロイヤルブルー・ワインレッド等の鮮やかな色", value: "d", score: { spring: 0, summer: 0, autumn: 0, winter: 2 } },
     ],
   },
 ];
