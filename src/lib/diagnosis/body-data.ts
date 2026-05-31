@@ -2,15 +2,15 @@ import type { Question, DiagnosisResult, DiagnosisIntro } from "./types";
 
 export const bodyIntro: DiagnosisIntro = {
   headline: "骨格の試練",
-  problem: "同じ服でも、体型に合えば「信頼感+20」。合わなければ「清潔感-15」。装備選びを間違えるだけで、ステータスは大きく下がる。",
-  solution: "この試練をクリアすれば、あなたの骨格タイプが判明し、装備適性が解放される。強みを活かす装備、弱みをカバーする装備がすべてわかる。",
+  problem: "骨格の試練が あなたの前に\n立ちはだかった！\n\n同じ装備でも 体型に合えば「信頼感+20」。\n合わなければ「清潔感-15」。\n装備選びを間違えるだけで\nステータスは 大きく下がってしまう。",
+  solution: "この試練をクリアすれば\nあなたの骨格タイプが判明し\n装備適性が解放される。\n強みを活かす装備、弱みをカバーする装備が\nすべてわかるようになる。",
   benefits: [
-    { icon: "🗡️", text: "体型の弱点をカバーし、強みを際立たせる装備が解放される" },
+    { icon: "🗡️", text: "体型の弱点をカバーし 強みを際立たせる装備が解放される" },
     { icon: "💰", text: "「買ったけど似合わなかった」のゴールド損失がなくなる" },
-    { icon: "⚡", text: "毎朝の装備選択が即座に完了する" },
-    { icon: "🪞", text: "鏡を見たとき「いい感じ」と思える自分にレベルアップ" },
+    { icon: "⚡", text: "毎朝の装備選択が 即座に完了する" },
+    { icon: "🪞", text: "鏡を見たとき「いい感じだ」と 自信がレベルアップする" },
   ],
-  closingHook: "7 STAGES / ESTIMATED TIME: 2 MIN",
+  closingHook: "7 STAGES / 所要時間: 2分",
 };
 
 export const bodyQuestions: Question[] = [

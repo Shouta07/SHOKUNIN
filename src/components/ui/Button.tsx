@@ -10,11 +10,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = "primary", size = "lg", className = "", children, ...props }, ref) => {
     const base =
-      "touch-target rounded-xl font-bold transition-colors focus:outline-none focus:ring-4 focus:ring-offset-2 active:scale-95";
+      "touch-target rounded-xl font-bold transition-all focus:outline-none active:scale-95";
     const variants = {
-      primary: "bg-[var(--color-primary)] text-white hover:bg-blue-800 focus:ring-blue-300",
-      secondary: "bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-300",
-      danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-300",
+      primary:
+        "bg-[var(--color-accent)] text-[#0a0a1a] hover:brightness-110",
+      secondary:
+        "dq-window text-[var(--color-text)] hover:brightness-110",
+      danger: "bg-red-800 text-white hover:bg-red-700",
     };
     const sizes = {
       lg: "px-6 py-4 text-lg min-h-[56px]",

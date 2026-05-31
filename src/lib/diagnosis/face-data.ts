@@ -2,15 +2,15 @@ import type { Question, DiagnosisResult, DiagnosisIntro } from "./types";
 
 export const faceIntro: DiagnosisIntro = {
   headline: "顔の試練",
-  problem: "同じ髪型でも、顔タイプに合えば「親しみ+20」。合わなければ「信頼感-15」。見た目の印象装備を間違えるだけで、第一印象のステータスは激減する。",
-  solution: "この試練をクリアすれば、あなたの顔タイプが判明し、印象の装備適性が解放される。顔に合う髪型・メガネ・服のテイストがすべてわかる。",
+  problem: "顔の試練が あなたの前に\n立ちはだかった！\n\n同じ髪型でも 顔タイプに合えば「親しみ+20」。\n合わなければ「信頼感-15」。\n印象装備を間違えるだけで\n第一印象のステータスは 激減してしまう。",
+  solution: "この試練をクリアすれば\nあなたの顔タイプが判明し\n印象の装備適性が解放される。\n顔に合う髪型・メガネ・服のテイストが\nすべてわかるようになる。",
   benefits: [
     { icon: "🛡️", text: "第一印象で「信頼感」「好感度」のステータスが跳ね上がる" },
-    { icon: "💈", text: "美容室で最適なヘアスタイル装備をオーダーできるようになる" },
+    { icon: "💈", text: "美容室で 最適なヘアスタイル装備をオーダーできる" },
     { icon: "⚔️", text: "顔の印象に合う服・アクセサリーの装備適性が解放される" },
-    { icon: "📸", text: "写真映りがレベルアップし、SNSでの印象値が向上する" },
+    { icon: "📸", text: "写真映りがレベルアップし SNSでの印象値が向上する" },
   ],
-  closingHook: "6 STAGES / ESTIMATED TIME: 2 MIN",
+  closingHook: "6 STAGES / 所要時間: 2分",
 };
 
 export const faceQuestions: Question[] = [

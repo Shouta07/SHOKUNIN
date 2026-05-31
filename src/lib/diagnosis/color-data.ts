@@ -2,15 +2,15 @@ import type { Question, DiagnosisResult, DiagnosisIntro } from "./types";
 
 export const colorIntro: DiagnosisIntro = {
   headline: "色の試練",
-  problem: "同じ白シャツでも、カラー適性が合えば「清潔感+20」。合わなければ「色気-15」。色という属性装備を間違えるだけで、顔色のステータスは大幅にダウンする。",
-  solution: "この試練をクリアすれば、あなたのパーソナルカラーが判明し、カラー装備適性が解放される。肌・髪・瞳に映える最強の色パレットが手に入る。",
+  problem: "色の試練が あなたの前に\n立ちはだかった！\n\n同じ白シャツでも カラー適性が合えば「清潔感+20」。\n合わなければ「色気-15」。\n色という属性装備を間違えるだけで\n顔色のステータスは 大幅にダウンする。",
+  solution: "この試練をクリアすれば\nあなたのパーソナルカラーが判明し\nカラー装備適性が解放される。\n肌・髪・瞳に映える\n最強の色パレットが手に入る。",
   benefits: [
-    { icon: "✨", text: "顔色ステータスが跳ね上がり、清潔感・健康感が最大化される" },
-    { icon: "🗡️", text: "服・ネクタイ・アウターの色装備で迷わなくなる" },
-    { icon: "🛡️", text: "「疲れてる？」のデバフ攻撃を完全に防御できる" },
-    { icon: "⚡", text: "仕事・対人の印象値がレベルアップする" },
+    { icon: "✨", text: "顔色ステータスが跳ね上がり 清潔感・健康感が最大化される" },
+    { icon: "🗡️", text: "服・ネクタイ・アウターの色装備で 迷わなくなる" },
+    { icon: "🛡️", text: "「疲れてる？」のデバフ攻撃を 完全に防御できる" },
+    { icon: "⚡", text: "仕事・対人の印象値が レベルアップする" },
   ],
-  closingHook: "7 STAGES / ESTIMATED TIME: 2 MIN",
+  closingHook: "7 STAGES / 所要時間: 2分",
 };
 
 export const colorQuestions: Question[] = [
