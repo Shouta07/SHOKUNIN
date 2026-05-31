@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 
 const navItems = [
   { href: "/", label: "ホーム", icon: "🏠" },
-  { href: "/estimates/new", label: "見積作成", icon: "📝" },
-  { href: "/estimates", label: "見積一覧", icon: "📋" },
-  { href: "/master", label: "単価", icon: "💰" },
+  { href: "/diagnosis/body", label: "骨格", icon: "🦴" },
+  { href: "/diagnosis/face", label: "顔タイプ", icon: "👤" },
+  { href: "/diagnosis/color", label: "カラー", icon: "🎨" },
 ];
 
 export default function BottomNav() {
@@ -17,15 +17,15 @@ export default function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white">
       <div className="mx-auto flex max-w-lg">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link
               key={item.href}
               href={item.href}
               className={`touch-target flex flex-1 flex-col items-center justify-center py-2 text-xs transition-colors ${
                 isActive
-                  ? "text-[var(--color-primary)] font-bold"
-                  : "text-gray-500"
+                  ? "text-[var(--color-accent)] font-bold"
+                  : "text-gray-400"
               }`}
             >
               <span className="text-xl">{item.icon}</span>

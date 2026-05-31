@@ -1,18 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  --color-primary: #1a365d;
-  --color-accent: #ed8936;
-  --color-bg: #f7fafc;
+  --color-primary: #1a1a2e;
+  --color-secondary: #16213e;
+  --color-accent: #e94560;
+  --color-accent-light: #ff6b81;
+  --color-bg: #f8f9fa;
+  --color-surface: #ffffff;
+  --color-text: #1a1a2e;
+  --color-text-muted: #6b7280;
+  --color-spring: #f59e0b;
+  --color-summer: #6366f1;
+  --color-autumn: #dc2626;
+  --color-winter: #0ea5e9;
 }
 
 body {
   font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
   -webkit-tap-highlight-color: transparent;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
-/* 軍手でも押せる大きなタッチターゲット */
 .touch-target {
   min-height: 48px;
   min-width: 48px;
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+}
+
+.gradient-accent {
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
 }

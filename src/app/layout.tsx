@@ -3,12 +3,12 @@ import "./globals.css";
 import BottomNav from "@/components/layout/BottomNav";
 
 export const metadata: Metadata = {
-  title: "SHOKUNIN 人工見積AI - 建設人材会社のための見積作成ツール",
+  title: "His Recoveries - 男のための外見診断",
   description:
-    "建設人材会社向けの人工見積作成SaaS。職種別単価管理、AI単価提案、粗利シミュレーション、見積書PDF出力。",
+    "骨格診断・顔タイプ診断・パーソナルカラー診断であなたに似合うスタイルを見つける。無料の男性向け外見診断サービス。",
   openGraph: {
-    title: "SHOKUNIN 人工見積AI",
-    description: "建設人材会社のための見積作成ツール。人工計算からPDF出力まで30秒。",
+    title: "His Recoveries - 男のための外見診断",
+    description: "3つの診断であなたに本当に似合うスタイルがわかる。",
     locale: "ja_JP",
     type: "website",
   },
@@ -21,8 +21,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className="bg-[var(--color-bg)] text-gray-900 antialiased">
-        <main className="mx-auto max-w-lg min-h-screen">{children}</main>
+      <body className="antialiased">
+        <main className="mx-auto max-w-lg min-h-screen pb-20">{children}</main>
         <BottomNav />
       </body>
     </html>
