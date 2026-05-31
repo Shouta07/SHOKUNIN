@@ -1,4 +1,17 @@
-import type { Question, DiagnosisResult } from "./types";
+import type { Question, DiagnosisResult, DiagnosisIntro } from "./types";
+
+export const faceIntro: DiagnosisIntro = {
+  headline: "なぜ顔タイプを知ると\n第一印象が変わるのか",
+  problem: "髪型を変えたのにしっくりこない。オシャレな服を買ったのに「なんか違う」。それは顔の印象と服・髪のテイストがズレているから。",
+  solution: "顔タイプを知れば、自分の顔が周りにどう映っているかが客観的にわかる。顔の印象に合ったファッションや髪型を選ぶだけで、「似合ってる」と言われる回数が変わる。",
+  benefits: [
+    { icon: "🤝", text: "第一印象で「信頼できそう」「好感が持てる」と思われる" },
+    { icon: "💈", text: "美容室で「こうしてください」と自信を持って伝えられる" },
+    { icon: "👔", text: "自分の顔に合う服のテイストが明確になる" },
+    { icon: "📸", text: "写真映りが良くなり、SNSや仕事のプロフィールに自信が持てる" },
+  ],
+  closingHook: "6問・約2分で、あなたの顔タイプがわかります。",
+};
 
 export const faceQuestions: Question[] = [
   {

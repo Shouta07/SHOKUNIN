@@ -5,7 +5,7 @@ const diagnoses = [
   {
     href: "/diagnosis/body",
     title: "骨格診断",
-    description: "体型の特徴からストレート・ウェーブ・ナチュラルを判定",
+    description: "体型の短所をカバーし、長所を活かす服がわかる",
     icon: "🦴",
     time: "約2分",
     color: "border-l-4 border-l-blue-500",
@@ -13,7 +13,7 @@ const diagnoses = [
   {
     href: "/diagnosis/face",
     title: "顔タイプ診断",
-    description: "顔の輪郭・パーツから似合うテイストを特定",
+    description: "第一印象を最大化する髪型・ファッションがわかる",
     icon: "👤",
     time: "約2分",
     color: "border-l-4 border-l-purple-500",
@@ -21,7 +21,7 @@ const diagnoses = [
   {
     href: "/diagnosis/color",
     title: "パーソナルカラー診断",
-    description: "肌・瞳・髪の色から似合う色のグループを診断",
+    description: "顔色が良く見え、清潔感が上がる色の選び方がわかる",
     icon: "🎨",
     time: "約2分",
     color: "border-l-4 border-l-amber-500",
@@ -38,9 +38,9 @@ export default function HomePage() {
         <p className="mt-2 text-sm text-[var(--color-text-muted)]">
           男のための外見診断
         </p>
-        <p className="mt-4 text-base text-[var(--color-text)]">
-          3つの診断で、あなたに<br />
-          <span className="font-bold text-[var(--color-accent)]">本当に似合うスタイル</span>がわかる。
+        <p className="mt-4 text-base text-[var(--color-text)] leading-relaxed">
+          センスじゃない。<span className="font-bold text-[var(--color-accent)]">自分を知ること</span>で<br />
+          見た目は変えられる。
         </p>
       </header>
 

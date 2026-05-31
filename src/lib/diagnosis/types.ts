@@ -23,6 +23,14 @@ export interface SalonCta {
   url: string;
 }
 
+export interface DiagnosisIntro {
+  headline: string;
+  problem: string;
+  solution: string;
+  benefits: { icon: string; text: string }[];
+  closingHook: string;
+}
+
 export interface DiagnosisResult {
   type: string;
   label: string;

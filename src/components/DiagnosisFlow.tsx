@@ -3,16 +3,18 @@
 import { useState, useCallback } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import type { Question, DiagnosisResult } from "@/lib/diagnosis/types";
+import type { Question, DiagnosisResult, DiagnosisIntro } from "@/lib/diagnosis/types";
 
 interface Props {
   title: string;
+  intro: DiagnosisIntro;
   questions: Question[];
   results: Record<string, DiagnosisResult>;
   accentColor: string;
 }
 
-export default function DiagnosisFlow({ title, questions, results, accentColor }: Props) {
+export default function DiagnosisFlow({ title, intro, questions, results, accentColor }: Props) {
+  const [started, setStarted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useState<Record<string, number>>({});
   const [result, setResult] = useState<DiagnosisResult | null>(null);
@@ -34,6 +36,7 @@ export default function DiagnosisFlow({ title, questions, results, accentColor }
   }, [scores, currentIndex, questions.length, results]);
 
   const restart = () => {
+    setStarted(false);
     setCurrentIndex(0);
     setScores({});
     setResult(null);
@@ -149,6 +152,53 @@ export default function DiagnosisFlow({ title, questions, results, accentColor }
           <Button variant="secondary" onClick={restart} className="flex-1">もう一度診断する</Button>
           <Button onClick={() => window.location.href = "/"} className="flex-1">ホームに戻る</Button>
         </div>
+      </div>
+    );
+  }
+
+  if (!started) {
+    return (
+      <div className="px-4 pt-8 pb-24">
+        <div className="text-center mb-8">
+          <h1
+            className="text-2xl font-black leading-tight whitespace-pre-line"
+            style={{ color: accentColor }}
+          >
+            {intro.headline}
+          </h1>
+        </div>
+
+        <Card className="p-5 mb-4">
+          <p className="text-sm leading-relaxed text-[var(--color-text)]">
+            {intro.problem}
+          </p>
+        </Card>
+
+        <Card className="p-5 mb-4">
+          <p className="text-sm leading-relaxed text-[var(--color-text)] font-medium">
+            {intro.solution}
+          </p>
+        </Card>
+
+        <div className="mb-6">
+          <h3 className="font-bold mb-3 px-1">知ることで変わること</h3>
+          <div className="space-y-3">
+            {intro.benefits.map((b, i) => (
+              <Card key={i} className="p-4 flex items-start gap-3">
+                <span className="text-xl flex-shrink-0">{b.icon}</span>
+                <p className="text-sm font-medium">{b.text}</p>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        <p className="text-center text-sm text-[var(--color-text-muted)] mb-4">
+          {intro.closingHook}
+        </p>
+
+        <Button onClick={() => setStarted(true)} className="w-full">
+          診断を始める
+        </Button>
       </div>
     );
   }

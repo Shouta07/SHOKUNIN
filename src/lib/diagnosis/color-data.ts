@@ -1,4 +1,17 @@
-import type { Question, DiagnosisResult } from "./types";
+import type { Question, DiagnosisResult, DiagnosisIntro } from "./types";
+
+export const colorIntro: DiagnosisIntro = {
+  headline: "なぜパーソナルカラーを知ると\n顔の印象が変わるのか",
+  problem: "同じ白シャツでも、顔色が良く見える人とくすんで見える人がいる。同じネイビースーツでも、映える人と地味に沈む人がいる。その差は「肌の色と服の色の相性」で決まる。",
+  solution: "パーソナルカラーを知れば、自分の肌・髪・瞳に合う色が客観的にわかる。似合う色を身につけるだけで、顔色が明るくなり、清潔感と健康的な印象が格段に上がる。",
+  benefits: [
+    { icon: "✨", text: "顔色が良く見え、健康的で清潔感のある印象になる" },
+    { icon: "👕", text: "服・ネクタイ・アウターの色選びで迷わなくなる" },
+    { icon: "🪞", text: "「疲れてる？」と言われることが減る" },
+    { icon: "📈", text: "見た目の印象がアップし、仕事や対人関係にプラスになる" },
+  ],
+  closingHook: "7問・約2分で、あなたのパーソナルカラーがわかります。",
+};
 
 export const colorQuestions: Question[] = [
   {

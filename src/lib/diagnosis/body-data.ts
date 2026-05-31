@@ -1,4 +1,17 @@
-import type { Question, DiagnosisResult } from "./types";
+import type { Question, DiagnosisResult, DiagnosisIntro } from "./types";
+
+export const bodyIntro: DiagnosisIntro = {
+  headline: "なぜ骨格を知ると\n服選びが変わるのか",
+  problem: "「なんかダサい」「似合ってない気がする」——その違和感の正体は、センスではなく骨格と服の相性。自分の体型に合っていない服は、どんなに高くてもどんなにオシャレでも似合わない。",
+  solution: "骨格タイプを知れば、自分の体の「強み」と「弱み」が客観的にわかる。強みを活かし、弱みをカバーする服を選ぶだけで、同じ自分でも見え方がまったく変わる。",
+  benefits: [
+    { icon: "📐", text: "体型の短所をカバーし、長所を際立たせる服がわかる" },
+    { icon: "💰", text: "「買ったけど似合わなかった」の無駄な出費がなくなる" },
+    { icon: "⏱️", text: "朝の服選びに迷わなくなる" },
+    { icon: "💪", text: "鏡を見たとき「いい感じ」と思える自分になれる" },
+  ],
+  closingHook: "7問・約2分で、あなたの骨格タイプがわかります。",
+};
 
 export const bodyQuestions: Question[] = [
   {
