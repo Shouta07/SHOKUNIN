@@ -4,10 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  { href: "/", label: "ホーム", icon: "🏠" },
-  { href: "/diagnosis/body", label: "骨格", icon: "🦴" },
-  { href: "/diagnosis/face", label: "顔タイプ", icon: "👤" },
-  { href: "/diagnosis/color", label: "カラー", icon: "🎨" },
+  { href: "/", label: "ホーム", icon: "🎬" },
+  { href: "/diagnosis", label: "診断", icon: "⚔️" },
 ];
 
 export default function BottomNav() {
@@ -18,7 +16,9 @@ export default function BottomNav() {
       <div className="mx-auto flex max-w-lg">
         {navItems.map((item) => {
           const isActive =
-            pathname === item.href || pathname.startsWith(item.href + "/");
+            item.href === "/"
+              ? pathname === "/"
+              : pathname.startsWith(item.href);
           return (
             <Link
               key={item.href}
