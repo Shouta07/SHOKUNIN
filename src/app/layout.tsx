@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className="antialiased">
-        <main className="mx-auto max-w-lg min-h-screen pb-20">{children}</main>
+        <main>{children}</main>
         <BottomNav />
       </body>
     </html>

@@ -11,6 +11,10 @@ const navItems = [
 export default function BottomNav() {
   const pathname = usePathname();
 
+  if (pathname.startsWith("/confess") || pathname.startsWith("/poster")) {
+    return null;
+  }
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t-2 border-[var(--color-dq-border)] bg-[#0d1b3e]">
       <div className="mx-auto flex max-w-lg">
