@@ -107,7 +107,7 @@ const CHALLENGE = {
 
 // ─── Hooks / Utils ───────────────────────────────────────────────
 
-type Step = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+type Step = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 function useTypewriter(text: string, speed = 80, startDelay = 0, active = true) {
   const [displayed, setDisplayed] = useState("");
@@ -217,11 +217,7 @@ const CSS = `
 export default function ConfessPage() {
   const [step, setStep] = useState<Step>(0);
   const [cat, setCat] = useState<CategoryId | null>(null);
-  const [pain, setPain] = useState<number | null>(null);
   const [msg, setMsg] = useState("");
-  const [discord, setDiscord] = useState("");
-  const [xH, setXH] = useState("");
-  const [otherC, setOtherC] = useState("");
   const [vc, setVc] = useState(0);
   const [busy, setBusy] = useState(false);
   const [out, setOut] = useState(false);
@@ -236,16 +232,16 @@ export default function ConfessPage() {
 
   useEffect(() => { setMounted(true); setVc(getCount()); }, []);
   useEffect(() => { if (tw2.done) { const t = setTimeout(() => setCta0(true), 800); return () => clearTimeout(t); } }, [tw2.done]);
-  useEffect(() => { if (step === 3) { const t = setTimeout(() => ta.current?.focus(), 600); return () => clearTimeout(t); } }, [step]);
-  useEffect(() => { if (step === 5) { const t = setTimeout(() => go(6), 3500); return () => clearTimeout(t); } }, [step]);
+  useEffect(() => { if (step === 1) { const t = setTimeout(() => ta.current?.focus(), 600); return () => clearTimeout(t); } }, [step]);
+  useEffect(() => { if (step === 2) { const t = setTimeout(() => go(3), 3000); return () => clearTimeout(t); } }, [step]);
   useEffect(() => {
-    if (step !== 6 || !cat) return;
+    if (step !== 4 || !cat) return;
     if (vShown >= SEED_VOICES[cat].length) return;
     const t = setTimeout(() => setVShown((v) => v + 1), vShown === 0 ? 1000 : 700);
     return () => clearTimeout(t);
   }, [step, cat, vShown]);
   useEffect(() => {
-    if (step === 7 && cat) {
+    if (step === 5 && cat) {
       setMatchCount(0);
       const target = Math.floor(SEED_COUNTS[cat] * 0.3) + Math.floor(Math.random() * 5);
       let c = 0;
@@ -257,15 +253,15 @@ export default function ConfessPage() {
   const go = useCallback((n: Step) => { setOut(true); setTimeout(() => { setStep(n); setOut(false); }, 450); }, []);
 
   const submit = useCallback(async () => {
-    if (busy) return;
+    if (busy || !msg) return;
     setBusy(true);
-    const p = { category: cat, painLevel: pain, message: msg, contact: { discord: discord || undefined, x: xH || undefined, other: otherC || undefined } };
+    const p = { message: msg };
     try { const a = JSON.parse(localStorage.getItem("confess_submissions") || "[]") as unknown[]; a.push({ ...p, ts: new Date().toISOString() }); localStorage.setItem("confess_submissions", JSON.stringify(a)); } catch {}
     try { await fetch("/confess/api", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p) }); } catch {}
     setVc(incCount());
     setBusy(false);
-    go(5);
-  }, [busy, cat, pain, msg, discord, xH, otherC, go]);
+    go(2);
+  }, [busy, msg, go]);
 
   const catLabel = cat ? CATEGORIES.find((c) => c.id === cat)?.label ?? "" : "";
 
@@ -337,51 +333,8 @@ export default function ConfessPage() {
             </>
           )}
 
-          {/* ── 1: Category ── */}
+          {/* ── 1: Write (30秒で完結) ── */}
           {step === 1 && (
-            <>
-              <Sub><span className="a-fadeUp">select</span></Sub>
-              <H className="a-fadeUp d1">何に、一番苦しんでいる？</H>
-              <div style={{ marginTop: "32px", display: "flex", flexDirection: "column", gap: "8px" }}>
-                {CATEGORIES.map((c, i) => (
-                  <button key={c.id} className={`a-fadeUp d${Math.min(i + 2, 5)}`}
-                    onClick={() => { setCat(c.id); go(2); }}
-                    style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", textAlign: "left", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "14px", padding: "18px 22px", cursor: "pointer", transition: "all 350ms ease", color: "#fff" }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; e.currentTarget.style.transform = "translateX(4px)"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.02)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)"; e.currentTarget.style.transform = "translateX(0)"; }}>
-                    <div>
-                      <span style={{ fontSize: "15px", fontWeight: 400, display: "block" }}>{c.label}</span>
-                      <span style={{ fontSize: "11px", fontWeight: 300, color: "rgba(255,255,255,0.25)", marginTop: "4px", display: "block" }}>{c.sub}</span>
-                    </div>
-                    <span style={{ fontSize: "11px", fontWeight: 300, color: "rgba(255,255,255,0.15)", letterSpacing: "0.1em" }}>{c.en}</span>
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-
-          {/* ── 2: Pain ── */}
-          {step === 2 && (
-            <>
-              <Sub><span className="a-fadeUp">level</span></Sub>
-              <H className="a-fadeUp d1">今、どれくらい辛い？</H>
-              <p className="a-fadeUp d2" style={{ fontSize: "12px", color: "rgba(255,255,255,0.2)", margin: "8px 0 40px" }}>直感で</p>
-              <div className="a-fadeUp d3" style={{ display: "flex", justifyContent: "center", gap: "8px" }}>
-                {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
-                  const s = pain === n;
-                  return (
-                    <button key={n} onClick={() => { setPain(n); setTimeout(() => go(3), 500); }}
-                      style={{ width: "34px", height: "34px", borderRadius: "50%", border: s ? "1.5px solid rgba(255,255,255,0.7)" : "1px solid rgba(255,255,255,0.08)", background: s ? "rgba(255,255,255,0.12)" : "transparent", color: s ? "#fff" : `rgba(255,255,255,${0.15 + n * 0.06})`, fontSize: "12px", fontWeight: s ? 500 : 300, fontFamily: F, cursor: "pointer", transition: "all 300ms ease", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {n}
-                    </button>
-                  );
-                })}
-              </div>
-            </>
-          )}
-
-          {/* ── 3: Write ── */}
-          {step === 3 && (
             <>
               <Sub><span className="a-fadeUp">leave it here</span></Sub>
               <H className="a-fadeUp d1">ここに、<br />置いていってください。</H>
@@ -392,40 +345,14 @@ export default function ConfessPage() {
                   onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; }}
                   onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)"; }} />
                 <div style={{ marginTop: "28px", opacity: msg.length > 0 ? 1 : 0, transform: msg.length > 0 ? "translateY(0)" : "translateY(8px)", transition: "all 600ms ease" }}>
-                  <Pill onClick={() => go(4)} disabled={!msg}>置いていく</Pill>
+                  <Pill onClick={submit} disabled={busy || !msg}>{busy ? "..." : "置いていく"}</Pill>
                 </div>
               </div>
             </>
           )}
 
-          {/* ── 4: Contact ── */}
-          {step === 4 && (
-            <>
-              <Sub><span className="a-fadeUp">connect</span></Sub>
-              <H className="a-fadeUp d1">同じ悩みの人と、<br />つながれる場所があります。</H>
-              <p className="a-fadeUp d2" style={{ fontSize: "12px", color: "rgba(255,255,255,0.2)", margin: "8px 0 28px" }}>任意です</p>
-              <div className="a-fadeUp d3" style={{ display: "flex", flexDirection: "column", gap: "16px", textAlign: "left" }}>
-                {([{ l: "Discord", v: discord, s: setDiscord, p: "username" }, { l: "X", v: xH, s: setXH, p: "@username" }, { l: "Other", v: otherC, s: setOtherC, p: "LINE, Instagram..." }] as const).map((f) => (
-                  <div key={f.l}>
-                    <label style={{ fontSize: "11px", fontWeight: 400, color: "rgba(255,255,255,0.2)", letterSpacing: "0.1em", display: "block", marginBottom: "6px" }}>{f.l}</label>
-                    <input type="text" value={f.v} onChange={(e) => f.s(e.target.value)} placeholder={f.p}
-                      style={{ width: "100%", fontFamily: F, fontSize: "15px", fontWeight: 300, color: "#fff", background: "rgba(255,255,255,0.015)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "10px", padding: "14px 16px", outline: "none", transition: "border-color 400ms ease" }}
-                      onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; }}
-                      onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)"; }} />
-                  </div>
-                ))}
-              </div>
-              <div className="a-fadeUp d4" style={{ marginTop: "36px", display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
-                <Pill onClick={submit} disabled={busy}>{busy ? "..." : "つながる"}</Pill>
-                <button onClick={submit} disabled={busy} style={{ fontSize: "12px", color: "rgba(255,255,255,0.15)", background: "none", border: "none", cursor: "pointer", transition: "color 300ms" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.35)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.15)"; }}>スキップ</button>
-              </div>
-            </>
-          )}
-
-          {/* ── 5: Thanks ── */}
-          {step === 5 && (
+          {/* ── 2: Thanks ── */}
+          {step === 2 && (
             <div className="a-scaleUp">
               <h2 style={{ fontSize: "36px", fontWeight: 200, letterSpacing: "0.15em" }}>ありがとう。</h2>
               <p style={{ marginTop: "28px", fontSize: "15px", fontWeight: 300, color: "rgba(255,255,255,0.5)", opacity: 0, animation: "fadeIn 800ms ease 1.5s forwards" }}>
@@ -434,15 +361,44 @@ export default function ConfessPage() {
             </div>
           )}
 
-          {/* ── 6: Voices ── */}
-          {step === 6 && cat && (
+          {/* ── 3: Browse Categories (投稿後の体験) ── */}
+          {step === 3 && (
+            <>
+              <Sub><span className="a-fadeUp">explore</span></Sub>
+              <H className="a-fadeUp d1">みんなの悩みを覗く</H>
+              <p className="a-fadeUp d2" style={{ fontSize: "13px", color: "rgba(255,255,255,0.25)", margin: "8px 0 32px" }}>
+                同じ痛みを抱えている人がいる
+              </p>
+              <div style={{ marginTop: "8px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                {CATEGORIES.map((c, i) => (
+                  <button key={c.id} className={`a-fadeUp d${Math.min(i + 2, 5)}`}
+                    onClick={() => { setCat(c.id); setVShown(0); go(4); }}
+                    style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", textAlign: "left", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "14px", padding: "18px 22px", cursor: "pointer", transition: "all 350ms ease", color: "#fff" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; e.currentTarget.style.transform = "translateX(4px)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.02)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)"; e.currentTarget.style.transform = "translateX(0)"; }}>
+                    <div>
+                      <span style={{ fontSize: "15px", fontWeight: 400, display: "block" }}>{c.label}</span>
+                      <span style={{ fontSize: "11px", fontWeight: 300, color: "rgba(255,255,255,0.25)", marginTop: "4px", display: "block" }}>{c.sub}</span>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <span style={{ fontSize: "11px", fontWeight: 300, color: "rgba(255,255,255,0.15)", letterSpacing: "0.1em", display: "block" }}>{c.en}</span>
+                      <span style={{ fontSize: "10px", fontWeight: 300, color: "rgba(255,255,255,0.1)", marginTop: "4px", display: "block" }}>{SEED_COUNTS[c.id]}人</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* ── 4: Voices ── */}
+          {step === 4 && cat && (
             <>
               <Sub><span className="a-fadeUp">you&apos;re not alone</span></Sub>
               <div className="a-fadeUp d1" style={{ marginBottom: "12px" }}>
                 <span style={{ fontSize: "48px", fontWeight: 200 }}>{SEED_COUNTS[cat]}</span>
                 <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)", marginLeft: "6px" }}>人</span>
               </div>
-              <p className="a-fadeUp d2" style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)", marginBottom: "32px" }}>「{catLabel}」を選んだ人</p>
+              <p className="a-fadeUp d2" style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)", marginBottom: "32px" }}>「{catLabel}」で悩んでいる人</p>
               <div style={{ width: "24px", height: "1px", background: "rgba(255,255,255,0.08)", margin: "0 auto 28px" }} />
               <div style={{ textAlign: "left", display: "flex", flexDirection: "column", gap: "16px" }}>
                 {SEED_VOICES[cat].slice(0, vShown).map((v, i) => (
@@ -455,14 +411,21 @@ export default function ConfessPage() {
                 <div style={{ opacity: 0, animation: "fadeUp 800ms ease 0.6s forwards" }}>
                   <div style={{ width: "24px", height: "1px", background: "rgba(255,255,255,0.08)", margin: "32px auto 24px" }} />
                   <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)", lineHeight: 1.9, marginBottom: "28px" }}>あなたの声も、<br />誰かの「俺だけじゃなかった」になる。</p>
-                  <Pill onClick={() => go(7)}>→</Pill>
+                  <div style={{ display: "flex", justifyContent: "center", gap: "16px" }}>
+                    <Pill onClick={() => go(5)}>同じ仲間を見る</Pill>
+                  </div>
+                  <div style={{ marginTop: "16px" }}>
+                    <button onClick={() => go(3)} style={{ fontSize: "12px", color: "rgba(255,255,255,0.15)", background: "none", border: "none", cursor: "pointer", transition: "color 300ms" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.3)"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.15)"; }}>他のジャンルを見る</button>
+                  </div>
                 </div>
               )}
             </>
           )}
 
-          {/* ── 7: Match + Next ── */}
-          {step === 7 && cat && (
+          {/* ── 5: Match ── */}
+          {step === 5 && cat && (
             <>
               <Sub><span className="a-fadeUp">matched</span></Sub>
 
@@ -477,8 +440,7 @@ export default function ConfessPage() {
               <div style={{ width: "24px", height: "1px", background: "rgba(139,92,246,0.15)", margin: "0 auto 28px" }} />
 
               <div className="a-fadeUp d3" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                {/* Challenge */}
-                <button onClick={() => go(8)}
+                <button onClick={() => go(6)}
                   style={{
                     width: "100%", textAlign: "left",
                     background: "rgba(139,92,246,0.04)",
@@ -498,7 +460,6 @@ export default function ConfessPage() {
                   </span>
                 </button>
 
-                {/* Community */}
                 <a href="https://discord.gg/placeholder" target="_blank" rel="noopener noreferrer"
                   style={{ display: "block", width: "100%", textAlign: "left", background: "rgba(88,101,242,0.04)", border: "1px solid rgba(88,101,242,0.12)", borderRadius: "16px", padding: "22px 24px", textDecoration: "none", transition: "all 400ms ease", color: "#fff" }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(88,101,242,0.1)"; e.currentTarget.style.transform = "translateX(4px)"; }}
@@ -510,30 +471,27 @@ export default function ConfessPage() {
               </div>
 
               <div className="a-fadeUp d4" style={{ marginTop: "24px" }}>
-                <button style={{ fontSize: "12px", color: "rgba(255,255,255,0.12)", background: "none", border: "none", cursor: "pointer", transition: "color 300ms" }}
+                <button onClick={() => go(3)} style={{ fontSize: "12px", color: "rgba(255,255,255,0.12)", background: "none", border: "none", cursor: "pointer", transition: "color 300ms" }}
                   onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.3)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.12)"; }}>まだいい</button>
+                  onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.12)"; }}>他のジャンルを見る</button>
               </div>
             </>
           )}
 
-          {/* ── 8: Recovery Challenge ── */}
-          {step === 8 && cat && (
+          {/* ── 6: Recovery Challenge ── */}
+          {step === 6 && (
             <>
-              {/* Concept */}
               <Sub><span className="a-fadeUp">recovery challenge</span></Sub>
               <H className="a-fadeUp d1">改善チャレンジ</H>
               <p className="a-fadeUp d2" style={{ fontSize: "14px", fontWeight: 300, color: "rgba(255,255,255,0.4)", lineHeight: 2, margin: "16px 0 48px" }}>
                 同じことで悩む人たちと<br />最初の一歩を踏み出す体験
               </p>
 
-              {/* Challenge Card */}
               <div className="a-fadeUp d3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "20px", padding: "32px 28px", textAlign: "left" }}>
                 <h3 style={{ fontSize: "20px", fontWeight: 400, letterSpacing: "0.04em", marginBottom: "24px", textAlign: "center" }}>
                   {CHALLENGE.title}
                 </h3>
 
-                {/* Stats Grid */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1px", background: "rgba(255,255,255,0.04)", borderRadius: "12px", overflow: "hidden", marginBottom: "28px" }}>
                   {([
                     { label: "参加費", value: `${CHALLENGE.price}円` },
@@ -548,7 +506,6 @@ export default function ConfessPage() {
                   ))}
                 </div>
 
-                {/* 内容 */}
                 <div style={{ marginBottom: "28px" }}>
                   <span style={{ fontSize: "10px", fontWeight: 400, color: "rgba(255,255,255,0.2)", letterSpacing: "0.15em", display: "block", marginBottom: "14px" }}>内容</span>
                   <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -563,7 +520,6 @@ export default function ConfessPage() {
 
                 <div style={{ width: "100%", height: "1px", background: "rgba(255,255,255,0.04)", marginBottom: "28px" }} />
 
-                {/* 期待できること */}
                 <div style={{ marginBottom: "28px" }}>
                   <span style={{ fontSize: "10px", fontWeight: 400, color: "rgba(255,255,255,0.2)", letterSpacing: "0.15em", display: "block", marginBottom: "14px" }}>期待できること</span>
                   <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -578,7 +534,6 @@ export default function ConfessPage() {
 
                 <div style={{ width: "100%", height: "1px", background: "rgba(255,255,255,0.04)", marginBottom: "28px" }} />
 
-                {/* 保証できないこと */}
                 <div style={{ marginBottom: "28px" }}>
                   <span style={{ fontSize: "10px", fontWeight: 400, color: "rgba(255,255,255,0.2)", letterSpacing: "0.15em", display: "block", marginBottom: "14px" }}>保証できないこと</span>
                   <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -593,13 +548,11 @@ export default function ConfessPage() {
 
                 <div style={{ width: "100%", height: "1px", background: "rgba(255,255,255,0.04)", marginBottom: "28px" }} />
 
-                {/* ただし */}
                 <p style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.35)", lineHeight: 2, textAlign: "center", marginBottom: "32px" }}>
                   ただし<br />
                   <span style={{ color: "rgba(255,255,255,0.6)" }}>何も変わらない日常を<br />少し前に進めることを目指す</span>
                 </p>
 
-                {/* CTA */}
                 <a href={CHALLENGE.bookUrl} target="_blank" rel="noopener noreferrer"
                   style={{
                     display: "block", width: "100%", textAlign: "center",
@@ -616,7 +569,7 @@ export default function ConfessPage() {
               </div>
 
               <div className="a-fadeUp d4" style={{ marginTop: "28px" }}>
-                <button onClick={() => go(7)} style={{ fontSize: "12px", color: "rgba(255,255,255,0.15)", background: "none", border: "none", cursor: "pointer", transition: "color 300ms" }}
+                <button onClick={() => go(5)} style={{ fontSize: "12px", color: "rgba(255,255,255,0.15)", background: "none", border: "none", cursor: "pointer", transition: "color 300ms" }}
                   onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.3)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.15)"; }}>← 戻る</button>
               </div>
