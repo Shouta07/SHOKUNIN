@@ -1,11 +1,48 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
-const CATEGORIES = ["外見", "恋愛", "孤独", "キャリア", "お金", "健康"] as const;
-type Category = (typeof CATEGORIES)[number];
+const CATEGORIES = [
+  { id: "smell", label: "体臭・ワキガ", sub: "近づくのが怖い" },
+  { id: "sweat", label: "汗", sub: "手が、服が、止まらない" },
+  { id: "skin", label: "肌・老け", sub: "鏡を見たくない" },
+  { id: "hair", label: "薄毛", sub: "気づかれてる気がする" },
+  { id: "breath", label: "口臭", sub: "距離を取ってしまう" },
+] as const;
+type CategoryId = (typeof CATEGORIES)[number]["id"];
 
 type Step = 0 | 1 | 2 | 3 | 4 | 5;
+
+function useTypewriter(text: string, speed = 80, startDelay = 0) {
+  const [displayed, setDisplayed] = useState("");
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    setDisplayed("");
+    setDone(false);
+    let i = 0;
+    const startTimer = setTimeout(() => {
+      const interval = setInterval(() => {
+        i++;
+        setDisplayed(text.slice(0, i));
+        if (i >= text.length) {
+          clearInterval(interval);
+          setDone(true);
+        }
+      }, speed);
+      return () => clearInterval(interval);
+    }, startDelay);
+    return () => clearTimeout(startTimer);
+  }, [text, speed, startDelay]);
+
+  return { displayed, done };
+}
+
+function Cursor() {
+  return (
+    <span className="animate-pulse ml-0.5 inline-block w-[2px] h-[1.1em] bg-white/60 align-middle" />
+  );
+}
 
 function getVisitorCount(): number {
   if (typeof window === "undefined") return 0;
@@ -20,81 +57,50 @@ function incrementVisitorCount(): number {
   return next;
 }
 
-function FadeIn({
-  show,
-  delay = 0,
-  children,
-  className = "",
-}: {
-  show: boolean;
-  delay?: number;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (!show) {
-      setVisible(false);
-      return;
-    }
-    const timer = setTimeout(() => setVisible(true), delay);
-    return () => clearTimeout(timer);
-  }, [show, delay]);
-
-  return (
-    <div
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transition: "opacity 600ms ease",
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
 export default function ConfessPage() {
   const [step, setStep] = useState<Step>(0);
-  const [stepVisible, setStepVisible] = useState(true);
-  const [category, setCategory] = useState<Category | null>(null);
+  const [category, setCategory] = useState<CategoryId | null>(null);
   const [painLevel, setPainLevel] = useState<number | null>(null);
   const [message, setMessage] = useState("");
   const [contactDiscord, setContactDiscord] = useState("");
   const [contactX, setContactX] = useState("");
   const [contactOther, setContactOther] = useState("");
-  const [showButton, setShowButton] = useState(false);
   const [visitorCount, setVisitorCount] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
+  const [showEntryButton, setShowEntryButton] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const line1 = useTypewriter("誰にも言えないこと、", 100, 800);
+  const line2 = useTypewriter("ありますか？", 120, 2600);
 
   useEffect(() => {
+    setMounted(true);
     setVisitorCount(getVisitorCount());
   }, []);
 
-  const goToStep = useCallback((nextStep: Step) => {
-    setStepVisible(false);
+  useEffect(() => {
+    if (line2.done) {
+      const t = setTimeout(() => setShowEntryButton(true), 600);
+      return () => clearTimeout(t);
+    }
+  }, [line2.done]);
+
+  useEffect(() => {
+    if (step === 3 && textareaRef.current) {
+      const t = setTimeout(() => textareaRef.current?.focus(), 800);
+      return () => clearTimeout(t);
+    }
+  }, [step]);
+
+  const goToStep = useCallback((next: Step) => {
+    setTransitioning(true);
     setTimeout(() => {
-      setStep(nextStep);
-      setStepVisible(true);
-    }, 400);
+      setStep(next);
+      setTimeout(() => setTransitioning(false), 50);
+    }, 500);
   }, []);
-
-  const handleCategorySelect = useCallback(
-    (cat: Category) => {
-      setCategory(cat);
-      goToStep(2);
-    },
-    [goToStep]
-  );
-
-  const handlePainSelect = useCallback(
-    (level: number) => {
-      setPainLevel(level);
-      setTimeout(() => goToStep(3), 500);
-    },
-    [goToStep]
-  );
 
   const handleSubmit = useCallback(async () => {
     if (submitting) return;
@@ -111,16 +117,13 @@ export default function ConfessPage() {
       },
     };
 
-    // Save to localStorage as backup
     try {
       const existing = JSON.parse(
         localStorage.getItem("confess_submissions") || "[]"
       ) as unknown[];
       existing.push({ ...payload, timestamp: new Date().toISOString() });
       localStorage.setItem("confess_submissions", JSON.stringify(existing));
-    } catch {
-      // localStorage might be full or unavailable
-    }
+    } catch {}
 
     try {
       await fetch("/confess/api", {
@@ -128,358 +131,356 @@ export default function ConfessPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-    } catch {
-      // fire-and-forget for MVP
-    }
+    } catch {}
 
     const count = incrementVisitorCount();
     setVisitorCount(count);
     setSubmitting(false);
     goToStep(5);
-  }, [
-    submitting,
-    category,
-    painLevel,
-    message,
-    contactDiscord,
-    contactX,
-    contactOther,
-    goToStep,
-  ]);
+  }, [submitting, category, painLevel, message, contactDiscord, contactX, contactOther, goToStep]);
 
-  // Step 0: show button after delay
-  useEffect(() => {
-    if (step === 0) {
-      const timer = setTimeout(() => setShowButton(true), 2000);
-      return () => clearTimeout(timer);
-    }
-    setShowButton(false);
-  }, [step]);
+  if (!mounted) {
+    return <div className="min-h-[100dvh] bg-black" />;
+  }
 
   return (
-    <div
-      className="flex min-h-screen items-center justify-center bg-black px-6"
-      style={{
-        fontFamily: "'Hiragino Sans', 'Noto Sans JP', sans-serif",
-      }}
-    >
+    <div className="relative min-h-[100dvh] bg-black overflow-hidden">
+      {/* Ambient breathing glow */}
       <div
-        className="w-full max-w-md text-center"
+        className="pointer-events-none absolute inset-0"
         style={{
-          opacity: stepVisible ? 1 : 0,
-          transition: "opacity 400ms ease",
+          background: "radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.02) 0%, transparent 70%)",
+          animation: "breathe 6s ease-in-out infinite",
+        }}
+      />
+
+      <style jsx>{`
+        @keyframes breathe {
+          0%, 100% { opacity: 0.3; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.1); }
+        }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.9); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes glowPulse {
+          0%, 100% { box-shadow: 0 0 0 rgba(255,255,255,0); }
+          50% { box-shadow: 0 0 20px rgba(255,255,255,0.1); }
+        }
+        .slide-up { animation: slideUp 700ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .fade-in { animation: fadeIn 800ms ease forwards; }
+        .scale-in { animation: scaleIn 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .stagger-1 { animation-delay: 100ms; opacity: 0; }
+        .stagger-2 { animation-delay: 200ms; opacity: 0; }
+        .stagger-3 { animation-delay: 300ms; opacity: 0; }
+        .stagger-4 { animation-delay: 400ms; opacity: 0; }
+        .stagger-5 { animation-delay: 500ms; opacity: 0; }
+      `}</style>
+
+      <div
+        className="relative z-10 flex min-h-[100dvh] items-center justify-center px-6"
+        style={{
+          fontFamily: "'Hiragino Sans', 'Noto Sans JP', sans-serif",
+          opacity: transitioning ? 0 : 1,
+          transform: transitioning ? "translateY(-10px)" : "translateY(0)",
+          transition: "opacity 500ms ease, transform 500ms ease",
         }}
       >
-        {/* Step 0: Entry */}
-        {step === 0 && (
-          <div>
-            <FadeIn show className="mb-16">
-              <h1
-                className="text-white"
-                style={{
-                  fontSize: "24px",
-                  fontWeight: 300,
-                  lineHeight: 1.8,
-                  letterSpacing: "0.05em",
-                }}
-              >
-                誰にも言えないこと、
-                <br />
-                ありますか？
-              </h1>
-            </FadeIn>
-            <FadeIn show delay={2000}>
-              <button
-                onClick={() => goToStep(1)}
-                className="text-white"
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 300,
-                  background: "none",
-                  border: "1px solid rgba(255, 255, 255, 0.3)",
-                  borderRadius: "8px",
-                  padding: "14px 48px",
-                  cursor: "pointer",
-                  opacity: showButton ? 1 : 0,
-                  transition: "opacity 600ms ease",
-                }}
-              >
-                はい
-              </button>
-            </FadeIn>
-          </div>
-        )}
+        <div className="w-full max-w-sm text-center">
 
-        {/* Step 1: Category */}
-        {step === 1 && (
-          <div>
-            <FadeIn show className="mb-12">
-              <h2
-                className="text-white"
+          {/* Step 0: Typewriter Entry */}
+          {step === 0 && (
+            <div>
+              <h1
+                className="text-white mb-16"
+                style={{ fontSize: "26px", fontWeight: 200, lineHeight: 2, letterSpacing: "0.08em" }}
+              >
+                {line1.displayed}
+                {!line1.done && <Cursor />}
+                {line1.done && <br />}
+                {line1.done && line2.displayed}
+                {line1.done && !line2.done && <Cursor />}
+              </h1>
+
+              <div
                 style={{
-                  fontSize: "22px",
-                  fontWeight: 300,
-                  letterSpacing: "0.05em",
+                  opacity: showEntryButton ? 1 : 0,
+                  transform: showEntryButton ? "translateY(0)" : "translateY(20px)",
+                  transition: "opacity 800ms ease, transform 800ms ease",
                 }}
               >
-                今のあなたに
-                <br />
-                一番近いもの
-              </h2>
-            </FadeIn>
-            <FadeIn show delay={300}>
-              <div className="flex flex-wrap justify-center gap-3">
-                {CATEGORIES.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => handleCategorySelect(cat)}
-                    className="text-white"
+                <button
+                  onClick={() => goToStep(1)}
+                  className="group relative text-white/80 hover:text-white"
+                  style={{
+                    fontSize: "15px",
+                    fontWeight: 300,
+                    background: "none",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    borderRadius: "40px",
+                    padding: "14px 56px",
+                    cursor: "pointer",
+                    transition: "all 400ms ease",
+                  }}
+                >
+                  <span className="relative z-10">はい</span>
+                  <div
+                    className="absolute inset-0 rounded-[40px] opacity-0 group-hover:opacity-100"
                     style={{
-                      fontSize: "16px",
-                      fontWeight: 300,
-                      background: "none",
-                      border: "1px solid rgba(255, 255, 255, 0.2)",
-                      borderRadius: "8px",
-                      padding: "12px 24px",
+                      background: "rgba(255,255,255,0.05)",
+                      transition: "opacity 400ms ease",
+                    }}
+                  />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 1: Categories (narrowed to 5) */}
+          {step === 1 && (
+            <div>
+              <h2
+                className="text-white mb-10 slide-up"
+                style={{ fontSize: "20px", fontWeight: 200, letterSpacing: "0.06em", lineHeight: 1.8 }}
+              >
+                何に、一番苦しんでいる？
+              </h2>
+
+              <div className="space-y-3">
+                {CATEGORIES.map((cat, i) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      setCategory(cat.id);
+                      goToStep(2);
+                    }}
+                    className={`slide-up stagger-${i + 1} group w-full text-left`}
+                    style={{
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      borderRadius: "12px",
+                      padding: "16px 20px",
                       cursor: "pointer",
-                      transition: "border-color 200ms ease",
-                      minWidth: "80px",
+                      transition: "all 300ms ease",
                     }}
                     onMouseEnter={(e) => {
-                      (e.target as HTMLButtonElement).style.borderColor =
-                        "rgba(255, 255, 255, 0.6)";
+                      (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.07)";
+                      (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.2)";
                     }}
                     onMouseLeave={(e) => {
-                      (e.target as HTMLButtonElement).style.borderColor =
-                        "rgba(255, 255, 255, 0.2)";
+                      (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.03)";
+                      (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.08)";
                     }}
                   >
-                    {cat}
+                    <span className="text-white/90 block" style={{ fontSize: "16px", fontWeight: 400 }}>
+                      {cat.label}
+                    </span>
+                    <span className="text-white/30 block mt-1" style={{ fontSize: "12px", fontWeight: 300 }}>
+                      {cat.sub}
+                    </span>
                   </button>
                 ))}
               </div>
-            </FadeIn>
-          </div>
-        )}
+            </div>
+          )}
 
-        {/* Step 2: Pain scale */}
-        {step === 2 && (
-          <div>
-            <FadeIn show className="mb-12">
+          {/* Step 2: Pain scale */}
+          {step === 2 && (
+            <div>
               <h2
-                className="text-white"
-                style={{
-                  fontSize: "22px",
-                  fontWeight: 300,
-                  letterSpacing: "0.05em",
-                }}
+                className="text-white mb-4 slide-up"
+                style={{ fontSize: "20px", fontWeight: 200, letterSpacing: "0.06em" }}
               >
                 今、どれくらい辛い？
               </h2>
-            </FadeIn>
-            <FadeIn show delay={300}>
-              <div className="flex justify-center gap-2">
-                {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-                  <button
-                    key={n}
-                    onClick={() => handlePainSelect(n)}
-                    className="text-white"
-                    style={{
-                      fontSize: "16px",
-                      fontWeight: painLevel === n ? 500 : 300,
-                      background:
-                        painLevel === n
-                          ? "rgba(255, 255, 255, 0.15)"
-                          : "none",
-                      border:
-                        painLevel === n
-                          ? "1px solid rgba(255, 255, 255, 0.6)"
-                          : "1px solid rgba(255, 255, 255, 0.15)",
-                      borderRadius: "50%",
-                      width: "40px",
-                      height: "40px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      transition: "all 200ms ease",
-                    }}
-                  >
-                    {n}
-                  </button>
-                ))}
-              </div>
-            </FadeIn>
-          </div>
-        )}
+              <p
+                className="text-white/25 mb-10 slide-up stagger-1"
+                style={{ fontSize: "12px", fontWeight: 300 }}
+              >
+                直感で選んでください
+              </p>
 
-        {/* Step 3: Free text */}
-        {step === 3 && (
-          <div>
-            <FadeIn show className="mb-8">
+              <div className="flex justify-center gap-[6px] slide-up stagger-2">
+                {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
+                  const isSelected = painLevel === n;
+                  const intensity = n / 10;
+                  return (
+                    <button
+                      key={n}
+                      onClick={() => {
+                        setPainLevel(n);
+                        setTimeout(() => goToStep(3), 600);
+                      }}
+                      style={{
+                        width: "32px",
+                        height: "32px",
+                        borderRadius: "50%",
+                        border: isSelected
+                          ? "1.5px solid rgba(255,255,255,0.8)"
+                          : "1px solid rgba(255,255,255,0.12)",
+                        background: isSelected
+                          ? `rgba(255, ${Math.round(100 - intensity * 80)}, ${Math.round(80 - intensity * 80)}, 0.3)`
+                          : "none",
+                        color: isSelected ? "white" : `rgba(255,255,255,${0.3 + intensity * 0.3})`,
+                        fontSize: "13px",
+                        fontWeight: isSelected ? 500 : 300,
+                        cursor: "pointer",
+                        transition: "all 300ms ease",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        boxShadow: isSelected ? `0 0 16px rgba(255,100,80,0.3)` : "none",
+                      }}
+                    >
+                      {n}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {painLevel && (
+                <p className="text-white/20 mt-6 fade-in" style={{ fontSize: "11px" }}>
+                  {painLevel >= 8 ? "...辛いですね。" : painLevel >= 5 ? "" : ""}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Step 3: Free text */}
+          {step === 3 && (
+            <div>
               <h2
-                className="text-white"
-                style={{
-                  fontSize: "22px",
-                  fontWeight: 300,
-                  letterSpacing: "0.05em",
-                  lineHeight: 1.7,
-                }}
+                className="text-white mb-8 slide-up"
+                style={{ fontSize: "20px", fontWeight: 200, letterSpacing: "0.06em", lineHeight: 1.8 }}
               >
-                よければ、
-                <br />
-                ここに置いていってください。
+                ここに、<br />置いていってください。
               </h2>
-            </FadeIn>
-            <FadeIn show delay={400}>
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="誰にも見せなくていい。ただ、書くだけでいい。"
-                rows={6}
-                className="w-full text-white placeholder-gray-600 focus:outline-none"
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 300,
-                  lineHeight: 1.8,
-                  background: "#111",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: "8px",
-                  padding: "16px",
-                  resize: "none",
-                }}
-              />
-              <div
-                className="mt-8"
-                style={{
-                  opacity: message.length > 0 ? 1 : 0,
-                  transition: "opacity 600ms ease",
-                }}
-              >
-                <button
-                  onClick={() => goToStep(4)}
-                  disabled={message.length === 0}
-                  className="text-white"
+
+              <div className="slide-up stagger-2">
+                <textarea
+                  ref={textareaRef}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="誰にも見せません。ただ、書くだけでいい。"
+                  rows={5}
+                  className="w-full text-white placeholder-white/20 focus:outline-none"
                   style={{
-                    fontSize: "16px",
+                    fontSize: "15px",
                     fontWeight: 300,
-                    background: "none",
-                    border: "1px solid rgba(255, 255, 255, 0.3)",
-                    borderRadius: "8px",
-                    padding: "14px 48px",
-                    cursor: "pointer",
+                    lineHeight: 2,
+                    background: "rgba(255,255,255,0.02)",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                    borderRadius: "12px",
+                    padding: "20px",
+                    resize: "none",
+                    transition: "border-color 400ms ease",
+                    caretColor: "rgba(255,255,255,0.6)",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
+                  }}
+                />
+
+                <div
+                  className="mt-8"
+                  style={{
+                    opacity: message.length > 0 ? 1 : 0,
+                    transform: message.length > 0 ? "translateY(0)" : "translateY(10px)",
+                    transition: "opacity 500ms ease, transform 500ms ease",
                   }}
                 >
-                  置いていく
-                </button>
+                  <button
+                    onClick={() => goToStep(4)}
+                    disabled={message.length === 0}
+                    className="text-white/70 hover:text-white"
+                    style={{
+                      fontSize: "15px",
+                      fontWeight: 300,
+                      background: "none",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      borderRadius: "40px",
+                      padding: "12px 44px",
+                      cursor: "pointer",
+                      transition: "all 400ms ease",
+                    }}
+                  >
+                    置いていく
+                  </button>
+                </div>
               </div>
-            </FadeIn>
-          </div>
-        )}
+            </div>
+          )}
 
-        {/* Step 4: Optional contact */}
-        {step === 4 && (
-          <div>
-            <FadeIn show className="mb-10">
+          {/* Step 4: Optional contact */}
+          {step === 4 && (
+            <div>
               <h2
-                className="text-white"
-                style={{
-                  fontSize: "20px",
-                  fontWeight: 300,
-                  letterSpacing: "0.03em",
-                  lineHeight: 1.8,
-                }}
+                className="text-white mb-3 slide-up"
+                style={{ fontSize: "18px", fontWeight: 200, letterSpacing: "0.04em", lineHeight: 1.8 }}
               >
-                同じ悩みを持つ人と、
-                <br />
-                つながれる場所があります。
+                同じ悩みを持つ人と、<br />つながれる場所があります。
               </h2>
-            </FadeIn>
-            <FadeIn show delay={400}>
-              <div className="space-y-4 text-left">
-                <div>
-                  <label
-                    className="mb-1 block text-gray-500"
-                    style={{ fontSize: "13px", fontWeight: 300 }}
-                  >
-                    Discord
-                  </label>
-                  <input
-                    type="text"
-                    value={contactDiscord}
-                    onChange={(e) => setContactDiscord(e.target.value)}
-                    placeholder="username#1234"
-                    className="w-full text-white placeholder-gray-700 focus:outline-none"
-                    style={{
-                      fontSize: "16px",
-                      fontWeight: 300,
-                      background: "#111",
-                      border: "1px solid rgba(255, 255, 255, 0.1)",
-                      borderRadius: "8px",
-                      padding: "12px 16px",
-                    }}
-                  />
-                </div>
-                <div>
-                  <label
-                    className="mb-1 block text-gray-500"
-                    style={{ fontSize: "13px", fontWeight: 300 }}
-                  >
-                    X (Twitter)
-                  </label>
-                  <input
-                    type="text"
-                    value={contactX}
-                    onChange={(e) => setContactX(e.target.value)}
-                    placeholder="@username"
-                    className="w-full text-white placeholder-gray-700 focus:outline-none"
-                    style={{
-                      fontSize: "16px",
-                      fontWeight: 300,
-                      background: "#111",
-                      border: "1px solid rgba(255, 255, 255, 0.1)",
-                      borderRadius: "8px",
-                      padding: "12px 16px",
-                    }}
-                  />
-                </div>
-                <div>
-                  <label
-                    className="mb-1 block text-gray-500"
-                    style={{ fontSize: "13px", fontWeight: 300 }}
-                  >
-                    その他
-                  </label>
-                  <input
-                    type="text"
-                    value={contactOther}
-                    onChange={(e) => setContactOther(e.target.value)}
-                    placeholder="LINE, Instagram など"
-                    className="w-full text-white placeholder-gray-700 focus:outline-none"
-                    style={{
-                      fontSize: "16px",
-                      fontWeight: 300,
-                      background: "#111",
-                      border: "1px solid rgba(255, 255, 255, 0.1)",
-                      borderRadius: "8px",
-                      padding: "12px 16px",
-                    }}
-                  />
-                </div>
+              <p className="text-white/20 mb-8 slide-up stagger-1" style={{ fontSize: "12px" }}>
+                任意です。スキップできます。
+              </p>
+
+              <div className="space-y-4 text-left slide-up stagger-2">
+                {[
+                  { label: "Discord", value: contactDiscord, set: setContactDiscord, ph: "username" },
+                  { label: "X (Twitter)", value: contactX, set: setContactX, ph: "@username" },
+                  { label: "その他", value: contactOther, set: setContactOther, ph: "LINE, Instagramなど" },
+                ].map((field) => (
+                  <div key={field.label}>
+                    <label className="mb-1.5 block text-white/25" style={{ fontSize: "12px", fontWeight: 300 }}>
+                      {field.label}
+                    </label>
+                    <input
+                      type="text"
+                      value={field.value}
+                      onChange={(e) => field.set(e.target.value)}
+                      placeholder={field.ph}
+                      className="w-full text-white placeholder-white/15 focus:outline-none"
+                      style={{
+                        fontSize: "15px",
+                        fontWeight: 300,
+                        background: "rgba(255,255,255,0.02)",
+                        border: "1px solid rgba(255,255,255,0.06)",
+                        borderRadius: "10px",
+                        padding: "12px 16px",
+                        transition: "border-color 400ms ease",
+                      }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; }}
+                    />
+                  </div>
+                ))}
               </div>
-              <div className="mt-8 flex flex-col items-center gap-4">
+
+              <div className="mt-10 flex flex-col items-center gap-5 slide-up stagger-3">
                 <button
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="text-white"
+                  className="text-white/70 hover:text-white"
                   style={{
-                    fontSize: "16px",
+                    fontSize: "15px",
                     fontWeight: 300,
                     background: "none",
-                    border: "1px solid rgba(255, 255, 255, 0.3)",
-                    borderRadius: "8px",
-                    padding: "14px 48px",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    borderRadius: "40px",
+                    padding: "12px 44px",
                     cursor: "pointer",
+                    transition: "all 400ms ease",
                   }}
                 >
                   {submitting ? "..." : "つながる"}
@@ -487,63 +488,60 @@ export default function ConfessPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="text-gray-600 hover:text-gray-400"
+                  className="text-white/20 hover:text-white/40"
                   style={{
-                    fontSize: "14px",
+                    fontSize: "13px",
                     fontWeight: 300,
                     background: "none",
                     border: "none",
                     cursor: "pointer",
-                    transition: "color 200ms ease",
+                    transition: "color 300ms ease",
                   }}
                 >
                   スキップ
                 </button>
               </div>
-            </FadeIn>
-          </div>
-        )}
+            </div>
+          )}
 
-        {/* Step 5: End */}
-        {step === 5 && (
-          <div>
-            <FadeIn show>
+          {/* Step 5: End */}
+          {step === 5 && (
+            <div>
               <h2
-                className="text-white"
-                style={{
-                  fontSize: "28px",
-                  fontWeight: 300,
-                  letterSpacing: "0.1em",
-                }}
+                className="text-white scale-in"
+                style={{ fontSize: "32px", fontWeight: 200, letterSpacing: "0.12em" }}
               >
                 ありがとう。
               </h2>
-            </FadeIn>
-            <FadeIn show delay={2000} className="mt-8">
-              <p
-                className="text-white"
-                style={{
-                  fontSize: "18px",
-                  fontWeight: 300,
-                  letterSpacing: "0.05em",
-                }}
+
+              <div
+                className="mt-10"
+                style={{ opacity: 0, animation: "fadeIn 1000ms ease 2s forwards" }}
               >
-                あなただけじゃない。
-              </p>
-            </FadeIn>
-            <FadeIn show delay={4000} className="mt-16">
-              <p
-                className="text-gray-600"
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 300,
-                }}
+                <p className="text-white/70" style={{ fontSize: "16px", fontWeight: 300, letterSpacing: "0.06em" }}>
+                  あなただけじゃない。
+                </p>
+              </div>
+
+              <div
+                className="mt-16"
+                style={{ opacity: 0, animation: "slideUp 800ms ease 4s forwards" }}
               >
-                これまでに {visitorCount}人 がここに来ました
-              </p>
-            </FadeIn>
-          </div>
-        )}
+                <div
+                  style={{
+                    width: "1px",
+                    height: "40px",
+                    background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.15))",
+                    margin: "0 auto 16px",
+                  }}
+                />
+                <p className="text-white/20" style={{ fontSize: "12px", fontWeight: 300 }}>
+                  これまでに {visitorCount}人 がここに来ました
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
