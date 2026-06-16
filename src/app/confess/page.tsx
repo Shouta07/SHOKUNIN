@@ -64,7 +64,30 @@ const SEED_COUNTS: Record<CategoryId, number> = {
 
 // ─── Hooks ───────────────────────────────────────────────────────
 
-type Step = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+type Step = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+
+const RECOVERY_SERVICES = [
+  {
+    id: "photo",
+    title: "写真撮影",
+    en: "Photo Session",
+    desc: "プロに撮ってもらう体験。自分の「いい顔」を知る。",
+    price: "¥5,000〜",
+    provider: "Yuki",
+    bookUrl: "https://line.me/ti/p/placeholder",
+    bookLabel: "LINEで予約する",
+  },
+  {
+    id: "makeup",
+    title: "メイク体験",
+    en: "Grooming Session",
+    desc: "眉・肌・印象。プロが1時間であなたの「整え方」を教える。",
+    price: "¥8,000〜",
+    provider: "Rina",
+    bookUrl: "https://instagram.com/placeholder",
+    bookLabel: "DMで予約する",
+  },
+];
 
 function useTypewriter(text: string, speed = 80, startDelay = 0) {
   const [displayed, setDisplayed] = useState("");
@@ -508,51 +531,80 @@ export default function ConfessPage() {
             </>
           )}
 
-          {/* ── Step 7: Community ── */}
+          {/* ── Step 7: What's next ── */}
           {step === 7 && (
             <>
               <p className="a-fadeUp" style={{ fontSize: "11px", fontWeight: 400, letterSpacing: "0.25em", color: "rgba(255,255,255,0.2)", textTransform: "uppercase", marginBottom: "24px" }}>
-                community
+                what&apos;s next
               </p>
 
-              <h2 className="a-fadeUp d1" style={{ fontSize: "22px", fontWeight: 200, letterSpacing: "0.04em", lineHeight: 1.7, marginBottom: "12px" }}>
-                ここに集まり始めています。
+              <h2 className="a-fadeUp d1" style={{ fontSize: "22px", fontWeight: 200, letterSpacing: "0.04em", lineHeight: 1.7, marginBottom: "32px" }}>
+                ここから、どうする？
               </h2>
 
-              <p className="a-fadeUp d2" style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.25)", lineHeight: 1.8, marginBottom: "36px" }}>
-                名前も顔も出さなくていい。<br />
-                同じ痛みを知ってる人がいる場所。
-              </p>
-
-              <div className="a-fadeUp d3">
-                <a href="https://discord.gg/placeholder" target="_blank" rel="noopener noreferrer"
+              <div className="a-fadeUp d2" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                {/* Recovery action */}
+                <button onClick={() => go(8)}
                   style={{
-                    display: "inline-flex", flexDirection: "column", alignItems: "center",
-                    fontSize: "14px", fontWeight: 300, letterSpacing: "0.08em",
-                    background: "rgba(88,101,242,0.08)",
-                    border: "1px solid rgba(88,101,242,0.2)",
-                    borderRadius: "16px", padding: "20px 40px",
-                    color: "rgba(255,255,255,0.7)", textDecoration: "none",
-                    transition: "all 400ms ease",
+                    width: "100%", textAlign: "left",
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                    borderRadius: "16px", padding: "22px 24px",
+                    cursor: "pointer", transition: "all 400ms ease",
+                    color: "#fff",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgba(88,101,242,0.15)";
-                    e.currentTarget.style.borderColor = "rgba(88,101,242,0.4)";
-                    e.currentTarget.style.color = "#fff";
+                    e.currentTarget.style.background = "rgba(255,255,255,0.07)";
+                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
+                    e.currentTarget.style.transform = "translateX(4px)";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "rgba(88,101,242,0.08)";
-                    e.currentTarget.style.borderColor = "rgba(88,101,242,0.2)";
-                    e.currentTarget.style.color = "rgba(255,255,255,0.7)";
-                  }}>
-                  匿名で会話する
-                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "6px" }}>
-                    Discord — anonymous OK
+                    e.currentTarget.style.background = "rgba(255,255,255,0.03)";
+                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
+                    e.currentTarget.style.transform = "translateX(0)";
+                  }}
+                >
+                  <span style={{ fontSize: "16px", fontWeight: 400, display: "block" }}>変わってみる</span>
+                  <span style={{ fontSize: "12px", fontWeight: 300, color: "rgba(255,255,255,0.3)", marginTop: "6px", display: "block" }}>
+                    写真撮影・メイク体験で、自分を知り直す
+                  </span>
+                  <span style={{ fontSize: "10px", fontWeight: 300, color: "rgba(255,255,255,0.12)", marginTop: "8px", display: "block", letterSpacing: "0.1em" }}>
+                    RECOVERY SESSION →
+                  </span>
+                </button>
+
+                {/* Community */}
+                <a href="https://discord.gg/placeholder" target="_blank" rel="noopener noreferrer"
+                  style={{
+                    display: "block", width: "100%", textAlign: "left",
+                    background: "rgba(88,101,242,0.04)",
+                    border: "1px solid rgba(88,101,242,0.12)",
+                    borderRadius: "16px", padding: "22px 24px",
+                    textDecoration: "none", transition: "all 400ms ease",
+                    color: "#fff",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(88,101,242,0.1)";
+                    e.currentTarget.style.borderColor = "rgba(88,101,242,0.3)";
+                    e.currentTarget.style.transform = "translateX(4px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "rgba(88,101,242,0.04)";
+                    e.currentTarget.style.borderColor = "rgba(88,101,242,0.12)";
+                    e.currentTarget.style.transform = "translateX(0)";
+                  }}
+                >
+                  <span style={{ fontSize: "16px", fontWeight: 400, display: "block" }}>話してみる</span>
+                  <span style={{ fontSize: "12px", fontWeight: 300, color: "rgba(255,255,255,0.3)", marginTop: "6px", display: "block" }}>
+                    匿名で、同じ痛みを知ってる人と
+                  </span>
+                  <span style={{ fontSize: "10px", fontWeight: 300, color: "rgba(255,255,255,0.12)", marginTop: "8px", display: "block", letterSpacing: "0.1em" }}>
+                    DISCORD — ANONYMOUS OK →
                   </span>
                 </a>
               </div>
 
-              <div className="a-fadeUp d4" style={{ marginTop: "24px" }}>
+              <div className="a-fadeUp d3" style={{ marginTop: "28px" }}>
                 <button style={{ fontSize: "12px", color: "rgba(255,255,255,0.12)", background: "none", border: "none", cursor: "pointer", transition: "color 300ms" }}
                   onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.3)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.12)"; }}>
@@ -560,11 +612,92 @@ export default function ConfessPage() {
                 </button>
               </div>
 
-              <div className="a-fadeUp d5" style={{ marginTop: "48px" }}>
+              <div className="a-fadeUp d4" style={{ marginTop: "40px" }}>
                 <div style={{ width: "1px", height: "24px", background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.06))", margin: "0 auto 12px" }} />
                 <p style={{ fontSize: "11px", fontWeight: 300, color: "rgba(255,255,255,0.1)", letterSpacing: "0.05em" }}>
                   {visitorCount + SEED_COUNTS[category ?? "smell"]} people have been here
                 </p>
+              </div>
+            </>
+          )}
+
+          {/* ── Step 8: Recovery Services ── */}
+          {step === 8 && (
+            <>
+              <p className="a-fadeUp" style={{ fontSize: "11px", fontWeight: 400, letterSpacing: "0.25em", color: "rgba(255,255,255,0.2)", textTransform: "uppercase", marginBottom: "12px" }}>
+                recovery session
+              </p>
+
+              <h2 className="a-fadeUp d1" style={{ fontSize: "22px", fontWeight: 200, letterSpacing: "0.04em", lineHeight: 1.7, marginBottom: "8px" }}>
+                自分を知り直す体験。
+              </h2>
+
+              <p className="a-fadeUp d2" style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.25)", lineHeight: 1.8, marginBottom: "32px" }}>
+                悩んでいた時間を、<br />変わり始める時間に。
+              </p>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                {RECOVERY_SERVICES.map((svc, i) => (
+                  <div
+                    key={svc.id}
+                    className={`a-fadeUp d${Math.min(i + 3, 5)}`}
+                    style={{
+                      background: "rgba(255,255,255,0.02)",
+                      border: "1px solid rgba(255,255,255,0.06)",
+                      borderRadius: "16px", padding: "24px",
+                      textAlign: "left",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
+                      <span style={{ fontSize: "17px", fontWeight: 400 }}>{svc.title}</span>
+                      <span style={{ fontSize: "10px", fontWeight: 300, color: "rgba(255,255,255,0.2)", letterSpacing: "0.1em" }}>{svc.en}</span>
+                    </div>
+
+                    <p style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.45)", lineHeight: 1.8, marginBottom: "16px" }}>
+                      {svc.desc}
+                    </p>
+
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                      <span style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.3)" }}>
+                        担当: {svc.provider}
+                      </span>
+                      <span style={{ fontSize: "15px", fontWeight: 400, color: "rgba(255,255,255,0.7)" }}>
+                        {svc.price}
+                      </span>
+                    </div>
+
+                    <a href={svc.bookUrl} target="_blank" rel="noopener noreferrer"
+                      style={{
+                        display: "block", width: "100%", textAlign: "center",
+                        fontSize: "13px", fontWeight: 400, letterSpacing: "0.06em",
+                        background: "rgba(255,255,255,0.06)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        borderRadius: "100px", padding: "12px",
+                        color: "rgba(255,255,255,0.7)", textDecoration: "none",
+                        transition: "all 400ms ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "rgba(255,255,255,0.12)";
+                        e.currentTarget.style.color = "#fff";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                        e.currentTarget.style.color = "rgba(255,255,255,0.7)";
+                      }}
+                    >
+                      {svc.bookLabel}
+                    </a>
+                  </div>
+                ))}
+              </div>
+
+              <div className="a-fadeUp d5" style={{ marginTop: "24px" }}>
+                <button onClick={() => go(7)}
+                  style={{ fontSize: "12px", color: "rgba(255,255,255,0.15)", background: "none", border: "none", cursor: "pointer", transition: "color 300ms" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.3)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.15)"; }}>
+                  ← 戻る
+                </button>
               </div>
             </>
           )}
