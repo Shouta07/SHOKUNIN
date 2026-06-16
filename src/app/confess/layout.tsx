@@ -24,7 +24,7 @@ export default function ConfessLayout({
         href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&display=swap"
         rel="stylesheet"
       />
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen" style={{ background: "#030014" }}>
         {children}
       </div>
     </>

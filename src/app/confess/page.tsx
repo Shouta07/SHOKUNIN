@@ -182,24 +182,48 @@ const GLOBAL_WHISPERS = [
 
 // ─── Floating Fragments ─────────────────────────────────────────
 
+const TINTS = [
+  "rgba(139,92,246,OP)",
+  "rgba(59,130,246,OP)",
+  "rgba(6,182,212,OP)",
+  "rgba(168,85,247,OP)",
+  "rgba(99,102,241,OP)",
+];
+
 function FloatingWorld() {
   const particles = useMemo(() => {
-    return FLOATING_FRAGMENTS.map((f, i) => ({
-      text: f.text,
-      city: f.city,
-      x: Math.random() * 80 + 10,
-      y: Math.random() * 70 + 15,
-      size: 10 + Math.random() * 4,
-      opacity: 0.04 + Math.random() * 0.08,
-      duration: 20 + Math.random() * 30,
-      delay: -(Math.random() * 40),
-      blur: Math.random() > 0.7 ? 1 : 0,
-      key: i,
-    }));
+    return FLOATING_FRAGMENTS.map((f, i) => {
+      const tint = TINTS[i % TINTS.length];
+      return {
+        text: f.text,
+        city: f.city,
+        x: Math.random() * 84 + 8,
+        y: Math.random() * 75 + 12,
+        size: 11 + Math.random() * 4,
+        opacity: 0.08 + Math.random() * 0.14,
+        duration: 25 + Math.random() * 35,
+        delay: -(Math.random() * 50),
+        blur: Math.random() > 0.8 ? 1 : 0,
+        tint,
+        key: i,
+      };
+    });
   }, []);
 
   return (
     <div style={{ position: "fixed", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "radial-gradient(ellipse 120% 60% at 50% 40%, rgba(59,30,100,0.25) 0%, rgba(15,15,30,0.4) 50%, transparent 100%)",
+      }} />
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "radial-gradient(ellipse 80% 50% at 20% 80%, rgba(30,58,138,0.12) 0%, transparent 70%)",
+      }} />
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "radial-gradient(ellipse 60% 40% at 80% 20%, rgba(88,28,135,0.08) 0%, transparent 60%)",
+      }} />
       {particles.map((p) => (
         <div
           key={p.key}
@@ -216,7 +240,7 @@ function FloatingWorld() {
             fontSize: `${p.size}px`,
             fontWeight: 300,
             fontFamily: F,
-            color: `rgba(255,255,255,${p.opacity})`,
+            color: p.tint.replace("OP", String(p.opacity)),
             display: "block",
           }}>
             {p.text}
@@ -225,7 +249,7 @@ function FloatingWorld() {
             fontSize: "8px",
             fontWeight: 300,
             fontFamily: F,
-            color: `rgba(255,255,255,${p.opacity * 0.4})`,
+            color: `rgba(255,255,255,${p.opacity * 0.3})`,
             letterSpacing: "0.15em",
             display: "block",
             marginTop: "2px",
@@ -235,10 +259,10 @@ function FloatingWorld() {
         </div>
       ))}
       <style>{`
-        @keyframes drift0 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(15px,-20px); } }
-        @keyframes drift1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-20px,12px); } }
-        @keyframes drift2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(10px,18px); } }
-        @keyframes drift3 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-12px,-15px); } }
+        @keyframes drift0 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(18px,-25px); } }
+        @keyframes drift1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-22px,15px); } }
+        @keyframes drift2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(12px,22px); } }
+        @keyframes drift3 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-15px,-18px); } }
       `}</style>
     </div>
   );
@@ -335,7 +359,7 @@ export default function ConfessPage() {
   );
 
   return (
-    <div style={{ minHeight: "100dvh", background: "#000", fontFamily: F, color: "#fff" }}>
+    <div style={{ minHeight: "100dvh", background: "linear-gradient(160deg, #030014 0%, #0a0a1a 30%, #0d0d1f 60%, #050510 100%)", fontFamily: F, color: "#fff" }}>
       <style>{CSS}</style>
       <FloatingWorld />
 
@@ -352,13 +376,13 @@ export default function ConfessPage() {
           {step === 0 && (
             <>
               <div style={{ marginBottom: "16px", opacity: 0, animation: "fadeIn 2s ease 0.3s forwards" }}>
-                <span style={{ fontSize: "10px", fontWeight: 300, letterSpacing: "0.3em", color: "rgba(255,255,255,0.12)", textTransform: "uppercase" }}>
+                <span style={{ fontSize: "10px", fontWeight: 300, letterSpacing: "0.3em", color: "rgba(139,92,246,0.35)", textTransform: "uppercase" }}>
                   {vc + 241} confessions and counting
                 </span>
               </div>
 
               <div style={{ marginBottom: "8px", opacity: 0, animation: "fadeIn 3s ease 0.8s forwards" }}>
-                <span style={{ fontSize: "9px", fontWeight: 300, letterSpacing: "0.25em", color: "rgba(255,255,255,0.08)" }}>
+                <span style={{ fontSize: "9px", fontWeight: 300, letterSpacing: "0.25em", color: "rgba(99,102,241,0.3)" }}>
                   from <CityTicker />
                 </span>
               </div>
@@ -558,7 +582,7 @@ export default function ConfessPage() {
                     { label: "時間", value: `${CHALLENGE.duration}分` },
                     { label: "開催形式", value: CHALLENGE.format },
                   ]).map((s) => (
-                    <div key={s.label} style={{ background: "#000", padding: "16px", textAlign: "center" }}>
+                    <div key={s.label} style={{ background: "#030014", padding: "16px", textAlign: "center" }}>
                       <span style={{ fontSize: "10px", fontWeight: 400, color: "rgba(255,255,255,0.2)", letterSpacing: "0.12em", display: "block", marginBottom: "6px" }}>{s.label}</span>
                       <span style={{ fontSize: "16px", fontWeight: 300, color: "rgba(255,255,255,0.8)" }}>{s.value}</span>
                     </div>
