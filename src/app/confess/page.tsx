@@ -81,26 +81,29 @@ const SEED_COUNTS: Record<CategoryId, number> = {
   smell: 47, sweat: 38, skin: 52, hair: 63, breath: 41,
 };
 
-const CHALLENGES = [
-  {
-    id: "photo",
-    title: "写真撮影チャレンジ",
-    en: "Photo Challenge",
-    desc: "同じ悩みの2人で、プロに撮ってもらう。自分の「いい顔」を発見する体験。",
-    price: "¥5,000 / 人",
-    capacity: "2〜3人",
-    bookUrl: "https://line.me/ti/p/placeholder",
-  },
-  {
-    id: "grooming",
-    title: "グルーミング体験",
-    en: "Grooming Session",
-    desc: "眉・肌・身だしなみ。プロと一緒に「整え方」を覚える60分。",
-    price: "¥8,000 / 人",
-    capacity: "2〜4人",
-    bookUrl: "https://instagram.com/placeholder",
-  },
-];
+const CHALLENGE = {
+  title: "孤独チャレンジ",
+  price: "500",
+  capacity: "5",
+  duration: "90",
+  format: "オンライン",
+  contents: [
+    "今抱えていることを共有",
+    "同じ悩みを持つ人と出会う",
+    "次の1週間でやることを決める",
+    "振り返り方法を受け取る",
+  ],
+  canExpect: [
+    "自分だけではないと知る",
+    "行動のきっかけを作る",
+    "同じ悩みを持つ仲間と出会う",
+  ],
+  cannotGuarantee: [
+    "悩みの解決",
+    "人生の劇的な変化",
+  ],
+  bookUrl: "https://line.me/ti/p/placeholder",
+};
 
 // ─── Hooks / Utils ───────────────────────────────────────────────
 
@@ -517,36 +520,102 @@ export default function ConfessPage() {
           {/* ── 8: Recovery Challenge ── */}
           {step === 8 && cat && (
             <>
+              {/* Concept */}
               <Sub><span className="a-fadeUp">recovery challenge</span></Sub>
-              <H className="a-fadeUp d1">仲間と一緒に、<br />変わり始める。</H>
-              <p className="a-fadeUp d2" style={{ fontSize: "13px", color: "rgba(255,255,255,0.25)", lineHeight: 1.8, margin: "8px 0 32px" }}>
-                同じ悩みの{matchCount}人と組んで挑戦。<br />一人じゃないから、動ける。
+              <H className="a-fadeUp d1">改善チャレンジ</H>
+              <p className="a-fadeUp d2" style={{ fontSize: "14px", fontWeight: 300, color: "rgba(255,255,255,0.4)", lineHeight: 2, margin: "16px 0 48px" }}>
+                同じことで悩む人たちと<br />最初の一歩を踏み出す体験
               </p>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                {CHALLENGES.map((ch, i) => (
-                  <div key={ch.id} className={`a-fadeUp d${Math.min(i + 3, 5)}`}
-                    style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "16px", padding: "24px", textAlign: "left" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "4px" }}>
-                      <span style={{ fontSize: "17px", fontWeight: 400 }}>{ch.title}</span>
-                      <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.15)", letterSpacing: "0.1em" }}>{ch.en}</span>
+              {/* Challenge Card */}
+              <div className="a-fadeUp d3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "20px", padding: "32px 28px", textAlign: "left" }}>
+                <h3 style={{ fontSize: "20px", fontWeight: 400, letterSpacing: "0.04em", marginBottom: "24px", textAlign: "center" }}>
+                  {CHALLENGE.title}
+                </h3>
+
+                {/* Stats Grid */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1px", background: "rgba(255,255,255,0.04)", borderRadius: "12px", overflow: "hidden", marginBottom: "28px" }}>
+                  {([
+                    { label: "参加費", value: `${CHALLENGE.price}円` },
+                    { label: "定員", value: `${CHALLENGE.capacity}名` },
+                    { label: "時間", value: `${CHALLENGE.duration}分` },
+                    { label: "開催形式", value: CHALLENGE.format },
+                  ]).map((s) => (
+                    <div key={s.label} style={{ background: "#000", padding: "16px", textAlign: "center" }}>
+                      <span style={{ fontSize: "10px", fontWeight: 400, color: "rgba(255,255,255,0.2)", letterSpacing: "0.12em", display: "block", marginBottom: "6px" }}>{s.label}</span>
+                      <span style={{ fontSize: "16px", fontWeight: 300, color: "rgba(255,255,255,0.8)" }}>{s.value}</span>
                     </div>
-                    <p style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.45)", lineHeight: 1.8, margin: "8px 0 16px" }}>{ch.desc}</p>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                      <span style={{ fontSize: "12px", color: "rgba(139,92,246,0.5)" }}>{ch.capacity}</span>
-                      <span style={{ fontSize: "15px", fontWeight: 400, color: "rgba(255,255,255,0.7)" }}>{ch.price}</span>
-                    </div>
-                    <a href={ch.bookUrl} target="_blank" rel="noopener noreferrer"
-                      style={{ display: "block", width: "100%", textAlign: "center", fontSize: "13px", fontWeight: 400, letterSpacing: "0.06em", background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.15)", borderRadius: "100px", padding: "13px", color: "rgba(255,255,255,0.7)", textDecoration: "none", transition: "all 400ms ease" }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(139,92,246,0.18)"; e.currentTarget.style.color = "#fff"; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(139,92,246,0.08)"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}>
-                      チャレンジに参加する
-                    </a>
+                  ))}
+                </div>
+
+                {/* 内容 */}
+                <div style={{ marginBottom: "28px" }}>
+                  <span style={{ fontSize: "10px", fontWeight: 400, color: "rgba(255,255,255,0.2)", letterSpacing: "0.15em", display: "block", marginBottom: "14px" }}>内容</span>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {CHALLENGE.contents.map((c) => (
+                      <div key={c} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.12)", lineHeight: 1.8 }}>・</span>
+                        <span style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.55)", lineHeight: 1.8 }}>{c}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+
+                <div style={{ width: "100%", height: "1px", background: "rgba(255,255,255,0.04)", marginBottom: "28px" }} />
+
+                {/* 期待できること */}
+                <div style={{ marginBottom: "28px" }}>
+                  <span style={{ fontSize: "10px", fontWeight: 400, color: "rgba(255,255,255,0.2)", letterSpacing: "0.15em", display: "block", marginBottom: "14px" }}>期待できること</span>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {CHALLENGE.canExpect.map((c) => (
+                      <div key={c} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.12)", lineHeight: 1.8 }}>・</span>
+                        <span style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.55)", lineHeight: 1.8 }}>{c}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ width: "100%", height: "1px", background: "rgba(255,255,255,0.04)", marginBottom: "28px" }} />
+
+                {/* 保証できないこと */}
+                <div style={{ marginBottom: "28px" }}>
+                  <span style={{ fontSize: "10px", fontWeight: 400, color: "rgba(255,255,255,0.2)", letterSpacing: "0.15em", display: "block", marginBottom: "14px" }}>保証できないこと</span>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    {CHALLENGE.cannotGuarantee.map((c) => (
+                      <div key={c} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.12)", lineHeight: 1.8 }}>・</span>
+                        <span style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.55)", lineHeight: 1.8 }}>{c}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ width: "100%", height: "1px", background: "rgba(255,255,255,0.04)", marginBottom: "28px" }} />
+
+                {/* ただし */}
+                <p style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.35)", lineHeight: 2, textAlign: "center", marginBottom: "32px" }}>
+                  ただし<br />
+                  <span style={{ color: "rgba(255,255,255,0.6)" }}>何も変わらない日常を<br />少し前に進めることを目指す</span>
+                </p>
+
+                {/* CTA */}
+                <a href={CHALLENGE.bookUrl} target="_blank" rel="noopener noreferrer"
+                  style={{
+                    display: "block", width: "100%", textAlign: "center",
+                    fontSize: "14px", fontWeight: 400, letterSpacing: "0.08em",
+                    background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
+                    borderRadius: "100px", padding: "16px",
+                    color: "rgba(255,255,255,0.8)", textDecoration: "none",
+                    transition: "all 400ms ease",
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "rgba(255,255,255,0.8)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; }}>
+                  予約する
+                </a>
               </div>
 
-              <div className="a-fadeUp d5" style={{ marginTop: "24px" }}>
+              <div className="a-fadeUp d4" style={{ marginTop: "28px" }}>
                 <button onClick={() => go(7)} style={{ fontSize: "12px", color: "rgba(255,255,255,0.15)", background: "none", border: "none", cursor: "pointer", transition: "color 300ms" }}
                   onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.3)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.15)"; }}>← 戻る</button>
