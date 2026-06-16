@@ -13,27 +13,41 @@ const CATEGORIES = [
 ];
 type CategoryId = (typeof CATEGORIES)[number]["id"];
 
-const FLOATING_FRAGMENTS = [
-  "電車で隣の人が離れた",
-  "握手が怖い",
-  "鏡を見たくない",
-  "帽子を脱げない",
-  "口を閉じたまま6階まで",
-  "制汗剤を3本",
-  "写真のタグ付け外して",
-  "夏が来るのが怖い",
-  "「疲れてる？」って",
-  "誰にも聞けない",
-  "マスクが外せない",
-  "風が吹くたびに",
-  "I can't shake hands",
-  "Nobody told me",
-  "Am I the only one?",
-  "I avoid mirrors",
-  "距離を取ってしまう",
-  "気づかれてる気がする",
-  "3日眠れなかった",
-  "いつも端の席",
+const FLOATING_FRAGMENTS: { text: string; city: string }[] = [
+  { text: "電車で隣の人が離れた", city: "Tokyo" },
+  { text: "握手が怖い", city: "Osaka" },
+  { text: "鏡を見たくない", city: "Nagoya" },
+  { text: "帽子を脱げない", city: "Fukuoka" },
+  { text: "口を閉じたまま6階まで", city: "Sapporo" },
+  { text: "制汗剤を3本", city: "Yokohama" },
+  { text: "I can't shake hands", city: "New York" },
+  { text: "Nobody told me", city: "London" },
+  { text: "Am I the only one?", city: "Toronto" },
+  { text: "I avoid mirrors", city: "Sydney" },
+  { text: "My hands are always wet", city: "Los Angeles" },
+  { text: "나만 이런 건가", city: "Seoul" },
+  { text: "모자를 벗을 수 없어", city: "Busan" },
+  { text: "No puedo dar la mano", city: "Madrid" },
+  { text: "Tengo miedo del verano", city: "Buenos Aires" },
+  { text: "Ninguém me disse", city: "São Paulo" },
+  { text: "我不敢靠近别人", city: "Shanghai" },
+  { text: "夏が来るのが怖い", city: "Kyoto" },
+  { text: "「疲れてる？」って", city: "Sendai" },
+  { text: "距離を取ってしまう", city: "Kobe" },
+  { text: "I check my breath constantly", city: "Berlin" },
+  { text: "J'évite les ascenseurs", city: "Paris" },
+  { text: "誰にも聞けない", city: "Hiroshima" },
+  { text: "3日眠れなかった", city: "Taipei" },
+  { text: "Always the corner seat", city: "Chicago" },
+  { text: "마스크를 벗을 수 없어", city: "Incheon" },
+  { text: "Evito los espejos", city: "México" },
+  { text: "风一吹就紧张", city: "Beijing" },
+];
+
+const CITIES = [
+  "Tokyo", "New York", "London", "Seoul", "São Paulo",
+  "Paris", "Shanghai", "Sydney", "Toronto", "Berlin",
+  "Buenos Aires", "Madrid", "Osaka", "Taipei", "México",
 ];
 
 const SEED_VOICES: Record<CategoryId, string[]> = {
@@ -144,21 +158,42 @@ function incCount(): number {
 
 const F = "'Inter', 'Hiragino Sans', 'Noto Sans JP', sans-serif";
 
+function CityTicker() {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const iv = setInterval(() => setIdx((i) => (i + 1) % CITIES.length), 2400);
+    return () => clearInterval(iv);
+  }, []);
+  return (
+    <span style={{ display: "inline-block", minWidth: "80px", transition: "opacity 600ms ease" }}>
+      {CITIES[idx]}
+    </span>
+  );
+}
+
+const GLOBAL_WHISPERS = [
+  "今、Londonの誰かも同じことを感じている。",
+  "今、São Pauloの誰かも同じことを感じている。",
+  "今、Seoulの誰かも同じことを感じている。",
+  "今、New Yorkの誰かも同じことを感じている。",
+  "今、Parisの誰かも同じことを感じている。",
+  "今、Shanghaiの誰かも同じことを感じている。",
+];
+
 // ─── Floating Fragments ─────────────────────────────────────────
 
 function FloatingWorld() {
   const particles = useMemo(() => {
-    return FLOATING_FRAGMENTS.map((text, i) => ({
-      text,
+    return FLOATING_FRAGMENTS.map((f, i) => ({
+      text: f.text,
+      city: f.city,
       x: Math.random() * 80 + 10,
       y: Math.random() * 70 + 15,
       size: 10 + Math.random() * 4,
       opacity: 0.04 + Math.random() * 0.08,
       duration: 20 + Math.random() * 30,
       delay: -(Math.random() * 40),
-      dx: (Math.random() - 0.5) * 30,
-      dy: (Math.random() - 0.5) * 20,
-      blur: Math.random() > 0.6 ? 1 : 0,
+      blur: Math.random() > 0.7 ? 1 : 0,
       key: i,
     }));
   }, []);
@@ -172,16 +207,31 @@ function FloatingWorld() {
             position: "absolute",
             left: `${p.x}%`,
             top: `${p.y}%`,
-            fontSize: `${p.size}px`,
-            fontWeight: 300,
-            fontFamily: F,
-            color: `rgba(255,255,255,${p.opacity})`,
             whiteSpace: "nowrap",
             filter: p.blur ? "blur(1px)" : "none",
             animation: `drift${p.key % 4} ${p.duration}s ease-in-out ${p.delay}s infinite`,
           }}
         >
-          {p.text}
+          <span style={{
+            fontSize: `${p.size}px`,
+            fontWeight: 300,
+            fontFamily: F,
+            color: `rgba(255,255,255,${p.opacity})`,
+            display: "block",
+          }}>
+            {p.text}
+          </span>
+          <span style={{
+            fontSize: "8px",
+            fontWeight: 300,
+            fontFamily: F,
+            color: `rgba(255,255,255,${p.opacity * 0.4})`,
+            letterSpacing: "0.15em",
+            display: "block",
+            marginTop: "2px",
+          }}>
+            {p.city}
+          </span>
         </div>
       ))}
       <style>{`
@@ -307,6 +357,12 @@ export default function ConfessPage() {
                 </span>
               </div>
 
+              <div style={{ marginBottom: "8px", opacity: 0, animation: "fadeIn 3s ease 0.8s forwards" }}>
+                <span style={{ fontSize: "9px", fontWeight: 300, letterSpacing: "0.25em", color: "rgba(255,255,255,0.08)" }}>
+                  from <CityTicker />
+                </span>
+              </div>
+
               <h1 style={{ fontSize: "28px", fontWeight: 200, lineHeight: 2.2, letterSpacing: "0.04em", marginBottom: "56px" }}>
                 {tw1.displayed}
                 {!tw1.done && <span style={{ animation: "blink 1s step-end infinite", marginLeft: "2px" }}>|</span>}
@@ -355,8 +411,11 @@ export default function ConfessPage() {
           {step === 2 && (
             <div className="a-scaleUp">
               <h2 style={{ fontSize: "36px", fontWeight: 200, letterSpacing: "0.15em" }}>ありがとう。</h2>
-              <p style={{ marginTop: "28px", fontSize: "15px", fontWeight: 300, color: "rgba(255,255,255,0.5)", opacity: 0, animation: "fadeIn 800ms ease 1.5s forwards" }}>
+              <p style={{ marginTop: "28px", fontSize: "15px", fontWeight: 300, color: "rgba(255,255,255,0.5)", opacity: 0, animation: "fadeIn 800ms ease 1s forwards" }}>
                 あなただけじゃない。
+              </p>
+              <p style={{ marginTop: "16px", fontSize: "12px", fontWeight: 300, color: "rgba(255,255,255,0.2)", opacity: 0, animation: "fadeIn 800ms ease 2s forwards", letterSpacing: "0.05em" }}>
+                {GLOBAL_WHISPERS[Math.floor(Math.random() * GLOBAL_WHISPERS.length)]}
               </p>
             </div>
           )}
