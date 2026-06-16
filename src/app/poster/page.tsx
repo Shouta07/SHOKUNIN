@@ -9,88 +9,98 @@ export default function PosterPage() {
   return (
     <>
       <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap');
         @media print {
-          body {
-            margin: 0 !important;
-            background: #000 !important;
-          }
-          @page {
-            size: A4;
-            margin: 0;
-          }
-          .no-print {
-            display: none !important;
-          }
+          body { margin: 0 !important; background: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          @page { size: A4; margin: 0; }
+          .no-print { display: none !important; }
         }
       `}</style>
 
       <div
-        className="relative bg-black text-white"
         style={{
           width: "210mm",
           height: "297mm",
           margin: "0 auto",
+          background: "#000",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          fontFamily: "'Hiragino Sans', 'Noto Sans JP', sans-serif",
+          fontFamily: "'Inter', 'Hiragino Sans', 'Noto Sans JP', sans-serif",
+          color: "#fff",
+          position: "relative",
         }}
       >
-        <p
-          style={{
-            fontSize: "36px",
-            fontWeight: 300,
-            letterSpacing: "0.1em",
-            marginBottom: "8px",
-          }}
-        >
+        <p style={{
+          fontSize: "40px",
+          fontWeight: 200,
+          letterSpacing: "0.08em",
+          marginBottom: "4px",
+          lineHeight: 1.6,
+        }}>
           誰にも言えないことを
         </p>
-        <p
-          style={{
-            fontSize: "48px",
-            fontWeight: 500,
-            letterSpacing: "0.15em",
-            marginBottom: "80px",
-          }}
-        >
+        <p style={{
+          fontSize: "52px",
+          fontWeight: 300,
+          letterSpacing: "0.12em",
+          marginBottom: "72px",
+        }}>
           ここへ
         </p>
 
-        <div
-          style={{
-            padding: "16px",
-            backgroundColor: "#ffffff",
-            borderRadius: "12px",
-            marginBottom: "24px",
-          }}
-        >
+        <div style={{
+          padding: "16px",
+          background: "#fff",
+          borderRadius: "16px",
+          marginBottom: "20px",
+        }}>
           <QRCodeSVG
             value={url}
-            size={200}
+            size={180}
             bgColor="#ffffff"
             fgColor="#000000"
             level="M"
           />
         </div>
+
+        <p style={{
+          fontSize: "10px",
+          fontWeight: 300,
+          color: "rgba(255,255,255,0.2)",
+          letterSpacing: "0.08em",
+        }}>
+          anonymous — no sign up
+        </p>
       </div>
 
-      <div className="no-print flex flex-col items-center gap-4 py-8 bg-gray-950">
-        <div className="w-full max-w-md px-4">
-          <label className="block text-gray-400 text-sm mb-2">QRコードのリンク先URL</label>
+      <div className="no-print" style={{
+        display: "flex", flexDirection: "column", alignItems: "center", gap: "16px",
+        padding: "32px", background: "#0a0a0a",
+        fontFamily: "'Inter', sans-serif",
+      }}>
+        <div style={{ width: "100%", maxWidth: "400px" }}>
+          <label style={{ display: "block", color: "#666", fontSize: "12px", marginBottom: "8px", letterSpacing: "0.1em" }}>
+            QR LINK URL
+          </label>
           <input
-            type="text"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-gray-500"
+            type="text" value={url} onChange={(e) => setUrl(e.target.value)}
+            style={{
+              width: "100%", background: "#111", border: "1px solid #222",
+              borderRadius: "10px", padding: "14px 16px", color: "#fff",
+              fontSize: "14px", outline: "none",
+            }}
           />
         </div>
-        <button
-          onClick={() => window.print()}
-          className="rounded-lg bg-white px-8 py-3 text-black font-medium hover:bg-gray-200 transition-colors"
-        >
-          A4で印刷する
+        <button onClick={() => window.print()}
+          style={{
+            background: "#fff", color: "#000", border: "none",
+            borderRadius: "100px", padding: "14px 48px",
+            fontSize: "14px", fontWeight: 500, letterSpacing: "0.05em",
+            cursor: "pointer",
+          }}>
+          Print A4
         </button>
       </div>
     </>
