@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { use } from "react";
-import { notFound } from "next/navigation";
+import { use, useEffect, useState } from "react";
 import {
   C, SANS, SERIF, getCaseById, fmtCost, fmtDuration, SOLUTION_FLOW,
+  type CaseRecord,
 } from "@/lib/recovery";
 
 // 安心感のあるBefore/After表示。写真は大きく扱いすぎず、抽象的なプレースホルダで。
@@ -51,8 +51,24 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function CaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const c = getCaseById(id);
-  if (!c) return notFound();
+  // 公開済み症例はlocalStorageにあるためマウント後に解決する（SSRで404にしない）
+  const [c, setC] = useState<CaseRecord | null | undefined>(undefined);
+  useEffect(() => { setC(getCaseById(id) ?? null); }, [id]);
+
+  if (c === undefined) {
+    return <div style={{ minHeight: "100dvh", background: C.bg }} />;
+  }
+
+  if (c === null) {
+    return (
+      <div style={{ fontFamily: SANS, color: C.ink, minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px", textAlign: "center" }}>
+        <div>
+          <p style={{ fontFamily: SERIF, fontSize: "18px", marginBottom: "20px" }}>この症例は見つかりませんでした</p>
+          <Link href="/cases" style={{ fontSize: "14px", color: "#fff", background: C.accent, borderRadius: "100px", padding: "14px 36px", textDecoration: "none" }}>改善事例一覧へ</Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ fontFamily: SANS, color: C.ink }}>
