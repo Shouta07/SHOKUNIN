@@ -596,7 +596,7 @@ export default function ConfessPage() {
                   ))}
                 </div>
 
-                <a href="/recovery"
+                <a href="/cases"
                   style={{
                     display: "block", width: "100%", textAlign: "center",
                     fontSize: "14px", fontWeight: 400, letterSpacing: "0.1em",
@@ -608,8 +608,11 @@ export default function ConfessPage() {
                   }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(139,92,246,0.2)"; e.currentTarget.style.borderColor = "rgba(139,92,246,0.45)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(139,92,246,0.1)"; e.currentTarget.style.borderColor = "rgba(139,92,246,0.25)"; }}>
-                  チャレンジに参加する
+                  似た人の改善事例を見る
                 </a>
+                <p style={{ fontSize: "11px", fontWeight: 300, color: "rgba(255,255,255,0.2)", marginTop: "12px", textAlign: "center", lineHeight: 1.8 }}>
+                  まず検索。同じ悩みを越えた人の記録から。
+                </p>
               </div>
 
               <div className="a-fadeUp d4" style={{ marginTop: "28px" }}>
