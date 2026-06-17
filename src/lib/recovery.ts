@@ -74,6 +74,16 @@ export interface DayRecord {
   createdAt: string;
 }
 
+export interface Report {
+  id: string;
+  challengeId: string;
+  cost: number;
+  comment: string;
+  isPublished: boolean;
+  recoveryScore: number;
+  createdAt: string;
+}
+
 // ─── Categories ─────────────────────────────────────────────────
 
 export const CATEGORIES: { id: CategoryId; label: string; en: string }[] = [
@@ -287,7 +297,9 @@ export function fmtDuration(days: number): string {
 }
 
 export function getCaseById(id: string): CaseRecord | undefined {
-  return SEED_CASES.find((c) => c.id === id);
+  const seed = SEED_CASES.find((c) => c.id === id);
+  if (seed) return seed;
+  return getPublishedCases().find((c) => c.id === id);
 }
 
 // 改善スコア（簡易計算）。将来は画像AIの状態変化を組み込む。
@@ -367,3 +379,111 @@ export function daysSince(startDate: string): number {
 }
 
 export const MILESTONES = [0, 7, 14, 30, 60, 100];
+
+const CHS_KEY = "recovery_challenges";
+const REPORT_KEY = "recovery_reports";
+const PUBLISHED_KEY = "recovery_published_cases";
+
+export function getChallengeById(id: string): ChallengeData | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const all = JSON.parse(localStorage.getItem(CHS_KEY) || "[]") as ChallengeData[];
+    return all.find((c) => c.id === id) ?? getCurrentChallenge();
+  } catch {
+    return getCurrentChallenge();
+  }
+}
+
+export function getReport(challengeId: string): Report | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const all = JSON.parse(localStorage.getItem(REPORT_KEY) || "[]") as Report[];
+    return all.find((r) => r.challengeId === challengeId) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveReport(report: Report): void {
+  if (typeof window === "undefined") return;
+  try {
+    const all = JSON.parse(localStorage.getItem(REPORT_KEY) || "[]") as Report[];
+    const idx = all.findIndex((r) => r.challengeId === report.challengeId);
+    if (idx >= 0) all[idx] = report; else all.push(report);
+    localStorage.setItem(REPORT_KEY, JSON.stringify(all));
+  } catch {}
+}
+
+export function getPublishedCases(): CaseRecord[] {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(localStorage.getItem(PUBLISHED_KEY) || "[]") as CaseRecord[];
+  } catch {
+    return [];
+  }
+}
+
+// チャレンジ + 記録 + レポートから匿名症例（CaseRecord）を組成して公開する。
+// 個人が特定されないよう、ニックネーム等は含めない。
+export function publishAsCase(
+  challenge: ChallengeData,
+  records: DayRecord[],
+  report: Report,
+): CaseRecord {
+  const catLabel = CATEGORIES.find((c) => c.id === challenge.category)?.label ?? "その他";
+  const duration = records.length ? records[records.length - 1].day : daysSince(challenge.startDate);
+  const uniqueCare = Array.from(new Set(
+    records.flatMap((r) => r.careActions.split(/[、,\n]/).map((s) => s.trim()).filter(Boolean)),
+  )).slice(0, 6);
+  const firstNote = records.find((r) => r.note)?.note ?? "";
+  const lastNote = [...records].reverse().find((r) => r.note)?.note ?? "";
+
+  const caseRecord: CaseRecord = {
+    id: `u_${challenge.id.slice(0, 8)}`,
+    category: challenge.category as CategoryId,
+    categoryLabel: catLabel,
+    ageBand: challenge.age,
+    gender: challenge.gender,
+    severity: challenge.severity,
+    durationDays: duration,
+    cost: report.cost,
+    improvementDegree: report.recoveryScore,
+    title: challenge.goal || "100日間の記録",
+    beforeNote: firstNote || "記録を始めた時点の状態。",
+    afterNote: lastNote || "100日間の継続を経た現在の状態。",
+    whatTheyDid: uniqueCare.length ? uniqueCare : ["毎日の記録を継続した"],
+    failures: ["改善は一直線ではなく、停滞した日もあった"],
+    progress: records
+      .filter((r) => r.note)
+      .map((r) => ({ day: r.day, note: r.note })),
+    emotionChange: report.comment || "記録を通じて、少しずつ自分と向き合えるようになった。",
+    comment: report.comment || "完璧じゃない。でも続けたことに意味があった。",
+  };
+
+  try {
+    const all = getPublishedCases();
+    const idx = all.findIndex((c) => c.id === caseRecord.id);
+    if (idx >= 0) all[idx] = caseRecord; else all.unshift(caseRecord);
+    localStorage.setItem(PUBLISHED_KEY, JSON.stringify(all));
+  } catch {}
+
+  return caseRecord;
+}
+
+export function unpublishCase(challengeId: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    const id = `u_${challengeId.slice(0, 8)}`;
+    const all = getPublishedCases().filter((c) => c.id !== id);
+    localStorage.setItem(PUBLISHED_KEY, JSON.stringify(all));
+  } catch {}
+}
+
+// 改善手段（将来のMarketplace送客導線）— 設計のみ。
+export const SOLUTION_FLOW: { step: string; label: string }[] = [
+  { step: "01", label: "症例を見る" },
+  { step: "02", label: "改善手段を知る" },
+  { step: "03", label: "提携サロン" },
+  { step: "04", label: "提携クリニック" },
+  { step: "05", label: "予約する" },
+];

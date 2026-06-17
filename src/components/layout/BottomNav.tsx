@@ -16,7 +16,8 @@ export default function BottomNav() {
     pathname.startsWith("/poster") ||
     pathname.startsWith("/recovery") ||
     pathname.startsWith("/cases") ||
-    pathname.startsWith("/challenge")
+    pathname.startsWith("/challenge") ||
+    pathname.startsWith("/report")
   ) {
     return null;
   }

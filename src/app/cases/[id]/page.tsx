@@ -4,7 +4,7 @@ import Link from "next/link";
 import { use } from "react";
 import { notFound } from "next/navigation";
 import {
-  C, SANS, SERIF, getCaseById, fmtCost, fmtDuration,
+  C, SANS, SERIF, getCaseById, fmtCost, fmtDuration, SOLUTION_FLOW,
 } from "@/lib/recovery";
 
 // 安心感のあるBefore/After表示。写真は大きく扱いすぎず、抽象的なプレースホルダで。
@@ -152,8 +152,28 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
           </div>
         </Section>
 
+        {/* Solutions / future marketplace (design only) */}
+        <Section title="改善手段を探す">
+          <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "22px 20px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px", marginBottom: "16px" }}>
+              {SOLUTION_FLOW.map((s, i) => (
+                <div key={s.step} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{ textAlign: "center" }}>
+                    <span style={{ fontSize: "9px", color: C.faint, display: "block" }}>{s.step}</span>
+                    <span style={{ fontSize: "11px", color: C.sub }}>{s.label}</span>
+                  </div>
+                  {i < SOLUTION_FLOW.length - 1 && <span style={{ color: C.faint, fontSize: "10px" }}>›</span>}
+                </div>
+              ))}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", paddingTop: "14px", borderTop: `1px solid ${C.lineSoft}` }}>
+              <span style={{ fontSize: "12px", color: C.faint }}>提携サロン・クリニックへの予約導線は近日公開</span>
+            </div>
+          </div>
+        </Section>
+
         {/* CTA */}
-        <div style={{ marginTop: "56px", textAlign: "center", padding: "40px 24px", background: C.surface, border: `1px solid ${C.line}`, borderRadius: "20px" }}>
+        <div style={{ marginTop: "16px", textAlign: "center", padding: "40px 24px", background: C.surface, border: `1px solid ${C.line}`, borderRadius: "20px" }}>
           <p style={{ fontFamily: SERIF, fontSize: "18px", lineHeight: 1.6, marginBottom: "8px" }}>
             あなたも、<br />誰かの地図になれる。
           </p>

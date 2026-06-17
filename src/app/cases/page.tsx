@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   C, SANS, SERIF, SEED_CASES, CATEGORIES, AGE_BANDS, GENDERS,
-  fmtCost, fmtDuration, type CategoryId,
+  getPublishedCases, fmtCost, fmtDuration, type CategoryId, type CaseRecord,
 } from "@/lib/recovery";
 
 export default function CasesPage() {
@@ -13,9 +13,14 @@ export default function CasesPage() {
   const [gender, setGender] = useState("");
   const [severity, setSeverity] = useState<number | "">("");
   const [budget, setBudget] = useState<number | "">("");
+  const [published, setPublished] = useState<CaseRecord[]>([]);
+
+  useEffect(() => { setPublished(getPublishedCases()); }, []);
+
+  const allCases = useMemo(() => [...published, ...SEED_CASES], [published]);
 
   const results = useMemo(() => {
-    return SEED_CASES.filter((c) => {
+    return allCases.filter((c) => {
       if (cat && c.category !== cat) return false;
       if (age && c.ageBand !== age) return false;
       if (gender && c.gender !== gender) return false;
@@ -23,7 +28,7 @@ export default function CasesPage() {
       if (budget !== "" && c.cost > (budget as number)) return false;
       return true;
     });
-  }, [cat, age, gender, severity, budget]);
+  }, [allCases, cat, age, gender, severity, budget]);
 
   const chip = (active: boolean): React.CSSProperties => ({
     fontSize: "13px", fontWeight: 400, padding: "9px 18px", borderRadius: "100px",

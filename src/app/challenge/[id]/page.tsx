@@ -178,12 +178,16 @@ export default function ChallengeDashboard({ params }: { params: Promise<{ id: s
         {/* Report teaser */}
         <div style={{ textAlign: "center", padding: "32px 24px", background: C.accentSoft, borderRadius: "20px" }}>
           <p style={{ fontFamily: SERIF, fontSize: "16px", lineHeight: 1.6, marginBottom: "8px", color: C.accent }}>
-            Day 100 で、<br />あなたのレポートが生成されます。
+            {days >= 100 ? "100日、走り抜きました。" : "Day 100 で、あなたのレポートが生成されます。"}
           </p>
-          <p style={{ fontSize: "12px", color: C.sub, lineHeight: 1.8 }}>
+          <p style={{ fontSize: "12px", color: C.sub, lineHeight: 1.8, marginBottom: "20px" }}>
             Before / After・変化グラフ・100日間の記録。<br />
             希望すれば、匿名症例として誰かの希望になれます。
           </p>
+          <Link href={`/report/${challenge.id}`}
+            style={{ display: "inline-block", fontSize: "13px", fontWeight: 500, color: C.accent, border: `1px solid ${C.accent}`, borderRadius: "100px", padding: "12px 32px", textDecoration: "none" }}>
+            {days >= 100 ? "完走レポートを作る" : "レポートをプレビュー"}
+          </Link>
         </div>
 
         <div style={{ textAlign: "center", marginTop: "32px" }}>
