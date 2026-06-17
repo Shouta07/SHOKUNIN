@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
 import {
-  C, SANS, SERIF, getCaseById, fmtCost, fmtDuration, SOLUTION_FLOW,
+  C, SANS, SERIF, getCaseById, fmtCost, fmtDuration, SOLUTION_FLOW, WORTH_IT_LABELS,
   type CaseRecord,
 } from "@/lib/recovery";
 
@@ -86,37 +86,62 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
               {c.categoryLabel}
             </span>
             {c.verified && <span style={{ fontSize: "10px", fontWeight: 500, color: C.accent, border: `1px solid ${C.accent}`, borderRadius: "100px", padding: "4px 10px" }}>✓ 検証済み</span>}
-            <span style={{ fontSize: "12px", color: C.faint }}>{c.ageBand}・{c.gender}・重症度{c.severity}</span>
+            <span style={{ fontSize: "12px", color: C.faint }}>
+              {[c.ageBand, c.gender, c.occupation, c.region].filter(Boolean).join("・")}・深刻度{c.severity}/10
+            </span>
           </div>
           <h1 style={{ fontFamily: SERIF, fontSize: "26px", fontWeight: 500, lineHeight: 1.5 }}>
             {c.title}
           </h1>
         </div>
 
-        {/* Clinic / procedure — 口コミより深い核 */}
-        {(c.clinic || c.procedure || c.worthIt !== undefined) && (
+        {/* Worth It badge */}
+        {c.worthItLevel && (
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: c.worthItLevel === "great" ? C.accent : c.worthItLevel === "ok" ? C.accentSoft : C.surface, color: c.worthItLevel === "great" ? "#fff" : C.ink, border: `1px solid ${c.worthItLevel === "great" ? C.accent : C.line}`, borderRadius: "100px", padding: "8px 18px", marginBottom: "24px" }}>
+            <span style={{ fontSize: "12px", opacity: 0.7 }}>Worth It</span>
+            <span style={{ fontSize: "14px", fontWeight: 500 }}>{WORTH_IT_LABELS[c.worthItLevel]}</span>
+          </div>
+        )}
+
+        {/* Clinic / procedure / treatments — 口コミより深い核 */}
+        {(c.clinic || c.procedure || (c.treatments && c.treatments.length > 0)) && (
           <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "20px 22px", marginBottom: "28px" }}>
             {c.procedure && (
-              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: c.clinic || c.worthIt !== undefined ? "12px" : 0 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: "12px" }}>
                 <span style={{ fontSize: "12px", color: C.faint }}>受けた施術・方法</span>
                 <span style={{ fontSize: "13px", color: C.ink, textAlign: "right", flex: 1 }}>{c.procedure}</span>
               </div>
             )}
             {c.clinic && (
-              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: c.worthIt !== undefined ? "12px" : 0 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: c.treatments && c.treatments.length ? "14px" : 0 }}>
                 <span style={{ fontSize: "12px", color: C.faint }}>場所</span>
                 <span style={{ fontSize: "13px", color: C.ink, textAlign: "right", flex: 1 }}>{c.clinic}</span>
               </div>
             )}
-            {c.worthIt !== undefined && (
-              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
-                <span style={{ fontSize: "12px", color: C.faint }}>また受けるか</span>
-                <span style={{ fontSize: "13px", fontWeight: 500, color: c.worthIt ? C.accent : C.sub, textAlign: "right", flex: 1 }}>
-                  {c.worthIt ? "はい、また受ける" : "いいえ"}
-                </span>
+            {c.treatments && c.treatments.length > 0 && (
+              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", paddingTop: "14px", borderTop: `1px solid ${C.lineSoft}` }}>
+                {c.treatments.map((t) => (
+                  <span key={t} style={{ fontSize: "11px", color: C.accent, background: C.accentSoft, borderRadius: "100px", padding: "5px 12px" }}>{t}</span>
+                ))}
               </div>
             )}
           </div>
+        )}
+
+        {/* 改善ストーリー（時系列）— 最重要機能 */}
+        {c.story && c.story.length > 0 && (
+          <Section title="改善ストーリー">
+            <div style={{ position: "relative", paddingLeft: "24px" }}>
+              <div style={{ position: "absolute", left: "5px", top: "6px", bottom: "6px", width: "1px", background: C.line }} />
+              {c.story.map((s, i) => (
+                <div key={i} style={{ position: "relative", marginBottom: i < c.story!.length - 1 ? "22px" : 0 }}>
+                  <div style={{ position: "absolute", left: "-24px", top: "3px", width: "11px", height: "11px", borderRadius: "50%", background: C.bg, border: `2px solid ${C.accent}` }} />
+                  <span style={{ fontSize: "11px", fontWeight: 500, color: C.accent, letterSpacing: "0.05em" }}>{s.date}</span>
+                  <p style={{ fontSize: "14px", color: C.ink, lineHeight: 1.7, marginTop: "3px" }}>{s.event}</p>
+                </div>
+              ))}
+            </div>
+          </Section>
         )}
 
         {/* Before / After */}

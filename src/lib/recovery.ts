@@ -21,7 +21,19 @@ export const SERIF = "'Lora', 'Hiragino Mincho ProN', serif";
 
 // ─── Types ──────────────────────────────────────────────────────
 
-export type CategoryId = "back_acne" | "aga" | "hyperhidrosis" | "body_odor";
+export type CategoryId =
+  | "aga" | "ed" | "phimosis" | "hyperhidrosis" | "body_odor"
+  | "back_acne" | "beard" | "bad_breath" | "teeth" | "skin"
+  | "diet" | "muscle" | "menopause" | "sleep";
+
+// RealSelf型 Worth It（やってよかった / 微妙 / おすすめしない）
+export type WorthItLevel = "great" | "ok" | "no";
+
+export const WORTH_IT_LABELS: Record<WorthItLevel, string> = {
+  great: "やってよかった",
+  ok: "微妙",
+  no: "おすすめしない",
+};
 
 export interface CaseRecord {
   id: string;
@@ -29,10 +41,10 @@ export interface CaseRecord {
   categoryLabel: string;
   ageBand: string;
   gender: string;
-  severity: number;          // 1-5
+  severity: number;          // 深刻度 1-10
   durationDays: number;
   cost: number;              // JPY
-  improvementDegree: number; // 0-100 (仮)
+  improvementDegree: number; // 0-100
   title: string;
   beforeNote: string;
   afterNote: string;
@@ -43,9 +55,14 @@ export interface CaseRecord {
   comment: string;
   // クリニック単位の構造化アウトカム（口コミより深い情報）
   clinic?: string;        // 受けた場所（任意・匿名表記可）
-  procedure?: string;     // 施術・治療法
+  procedure?: string;     // 施術・治療法（自由記述）
+  treatments?: string[];  // 実施内容（複数選択）
+  occupation?: string;    // 職業
+  region?: string;        // 地域
   verified?: boolean;     // 領収書等で検証済み
-  worthIt?: boolean;      // また受けるか（RealSelf型 Worth It）
+  worthItLevel?: WorthItLevel;
+  // 改善ストーリー（時系列）— 最重要機能
+  story?: { date: string; event: string }[];
 }
 
 export interface ChallengeData {
@@ -91,15 +108,35 @@ export interface Report {
 
 // ─── Categories ─────────────────────────────────────────────────
 
+// 男性コンプレックス特化。送客単価の高い順（高LTVカテゴリを先頭に）。
 export const CATEGORIES: { id: CategoryId; label: string; en: string }[] = [
-  { id: "back_acne", label: "背中ニキビ", en: "Back Acne" },
   { id: "aga", label: "AGA・薄毛", en: "Hair Loss" },
+  { id: "ed", label: "ED・性機能", en: "ED" },
+  { id: "phimosis", label: "包茎", en: "Phimosis" },
   { id: "hyperhidrosis", label: "多汗症", en: "Hyperhidrosis" },
-  { id: "body_odor", label: "体臭", en: "Body Odor" },
+  { id: "body_odor", label: "体臭・ワキガ", en: "Body Odor" },
+  { id: "back_acne", label: "ニキビ・背中", en: "Acne" },
+  { id: "beard", label: "ヒゲ・脱毛", en: "Beard / Hair Removal" },
+  { id: "bad_breath", label: "口臭", en: "Bad Breath" },
+  { id: "teeth", label: "歯列矯正・歯", en: "Teeth" },
+  { id: "skin", label: "肌・スキンケア", en: "Skin" },
+  { id: "diet", label: "ダイエット", en: "Diet" },
+  { id: "muscle", label: "筋トレ・体型", en: "Body" },
+  { id: "menopause", label: "男性更年期", en: "Andropause" },
+  { id: "sleep", label: "睡眠", en: "Sleep" },
 ];
 
 export const AGE_BANDS = ["10代", "20代", "30代", "40代", "50代〜"];
 export const GENDERS = ["男性", "女性", "その他"];
+export const OCCUPATIONS = ["営業", "エンジニア", "経営・自営", "医療・専門職", "接客・サービス", "事務・管理", "学生", "その他"];
+
+// 実施内容（複数選択）— カテゴリ横断の代表的な手段
+export const TREATMENTS = [
+  "AGA内服", "AGA外用", "植毛", "ミラドライ", "ボトックス", "ヒゲ脱毛",
+  "ED内服薬", "包茎手術", "ケミカルピーリング", "ポテンツァ", "医療デオドラント",
+  "歯列矯正", "ホワイトニング", "ジム・筋トレ", "食事改善", "生活習慣改善",
+  "皮膚科処方", "市販薬・セルフケア",
+];
 
 // ─── Seed Cases (改善のプロセスを見せる。完璧な成功談ではない) ───
 
@@ -110,15 +147,24 @@ export const SEED_CASES: CaseRecord[] = [
     categoryLabel: "背中ニキビ",
     ageBand: "20代",
     gender: "男性",
-    severity: 4,
+    severity: 7,
     durationDays: 92,
     cost: 38000,
     improvementDegree: 72,
     title: "プールを諦めていた夏が、変わった",
+    occupation: "営業",
+    region: "東京",
     clinic: "都内・一般皮膚科クリニック",
     procedure: "保険診療＋外用薬（継続）",
+    treatments: ["皮膚科処方", "生活習慣改善"],
     verified: true,
-    worthIt: true,
+    worthItLevel: "great",
+    story: [
+      { date: "2026/01", event: "背中の炎症が悪化、半袖が着られない" },
+      { date: "2026/02", event: "意を決して皮膚科を受診、外用薬を開始" },
+      { date: "2026/04", event: "新しい炎症が減ってきた。跡はまだ残る" },
+      { date: "2026/04", event: "鏡を見るのが怖くなくなった" },
+    ],
     beforeNote: "背中全体に赤みと炎症。Tシャツの上からでも気になっていた。",
     afterNote: "炎症はほぼ収まり、色素沈着が残る程度。シャツが着られるようになった。",
     whatTheyDid: [
@@ -146,15 +192,24 @@ export const SEED_CASES: CaseRecord[] = [
     categoryLabel: "AGA・薄毛",
     ageBand: "30代",
     gender: "男性",
-    severity: 3,
+    severity: 6,
     durationDays: 180,
     cost: 96000,
     improvementDegree: 58,
     title: "進行を止められた、それで十分だった",
+    occupation: "エンジニア",
+    region: "神奈川",
     clinic: "AGA専門クリニック（オンライン診療）",
     procedure: "内服薬（フィナステリド系）",
+    treatments: ["AGA内服"],
     verified: true,
-    worthIt: true,
+    worthItLevel: "great",
+    story: [
+      { date: "2025/07", event: "頭頂部の薄さに気づく。半年悩む" },
+      { date: "2026/01", event: "オンライン診療で内服を開始" },
+      { date: "2026/03", event: "抜け毛が減ってきた気がする" },
+      { date: "2026/06", event: "増えてはいないが、減ってもいない。それが安心" },
+    ],
     beforeNote: "頭頂部と生え際が後退。風が吹くたびに手で押さえていた。",
     afterNote: "劇的な増毛はないが、進行が止まり産毛が増えた。気にする頻度が激減。",
     whatTheyDid: [
@@ -181,15 +236,18 @@ export const SEED_CASES: CaseRecord[] = [
     categoryLabel: "多汗症",
     ageBand: "20代",
     gender: "女性",
-    severity: 5,
+    severity: 9,
     durationDays: 75,
     cost: 22000,
     improvementDegree: 65,
     title: "握手が、怖くなくなるまで",
+    occupation: "接客・サービス",
+    region: "大阪",
     clinic: "皮膚科クリニック",
     procedure: "塩化アルミニウム外用＋呼吸法",
+    treatments: ["皮膚科処方"],
     verified: false,
-    worthIt: true,
+    worthItLevel: "ok",
     beforeNote: "手のひらから汗が滴るレベル。書類が湿る、人の手を握れない。",
     afterNote: "完全には止まらないが、日常で気にならない程度に。仕事中の不安が減った。",
     whatTheyDid: [
@@ -215,15 +273,18 @@ export const SEED_CASES: CaseRecord[] = [
     categoryLabel: "体臭",
     ageBand: "30代",
     gender: "男性",
-    severity: 4,
+    severity: 7,
     durationDays: 60,
     cost: 15000,
     improvementDegree: 70,
     title: "電車で隣に立てるようになった",
+    occupation: "事務・管理",
+    region: "愛知",
     clinic: "セルフケア中心（市販品）",
     procedure: "医療用デオドラント＋生活改善",
+    treatments: ["医療デオドラント", "食事改善"],
     verified: false,
-    worthIt: true,
+    worthItLevel: "great",
     beforeNote: "ワキガ体質。夏は特に自分でも分かるレベルで、人との距離が怖かった。",
     afterNote: "デオドラントと生活改善で日常レベルは気にならなく。再検討で手術は見送り。",
     whatTheyDid: [
@@ -250,15 +311,18 @@ export const SEED_CASES: CaseRecord[] = [
     categoryLabel: "背中ニキビ",
     ageBand: "30代",
     gender: "女性",
-    severity: 3,
+    severity: 6,
     durationDays: 120,
     cost: 28000,
     improvementDegree: 60,
-    title: "結婚式のドレスのために始めた100日",
+    title: "結婚式のために始めた100日",
+    occupation: "医療・専門職",
+    region: "東京",
     clinic: "美容皮膚科",
     procedure: "ケミカルピーリング（月1回）",
+    treatments: ["ケミカルピーリング", "皮膚科処方"],
     verified: true,
-    worthIt: true,
+    worthItLevel: "great",
     beforeNote: "肩から背中にかけてのニキビ跡。ドレス選びで初めて本気で向き合った。",
     afterNote: "新しい炎症はほぼ消失。跡は残るが、当日はメイクでカバーできる範囲に。",
     whatTheyDid: [
@@ -284,15 +348,18 @@ export const SEED_CASES: CaseRecord[] = [
     categoryLabel: "AGA・薄毛",
     ageBand: "20代",
     gender: "男性",
-    severity: 4,
+    severity: 8,
     durationDays: 150,
     cost: 72000,
     improvementDegree: 50,
     title: "28歳で始めた、早すぎないかと思いながら",
+    occupation: "営業",
+    region: "福岡",
     clinic: "AGAクリニック",
     procedure: "内服＋外用の併用",
+    treatments: ["AGA内服", "AGA外用"],
     verified: true,
-    worthIt: false,
+    worthItLevel: "ok",
     beforeNote: "若くして生え際が後退。年齢と現実のギャップに苦しんだ。",
     afterNote: "進行が緩やかに。劇的ではないが、毎日の不安が確実に減った。",
     whatTheyDid: [
@@ -311,6 +378,90 @@ export const SEED_CASES: CaseRecord[] = [
     ],
     emotionChange: "毎日の絶望から、データに基づいた冷静さへ。",
     comment: "記録が一番効いた。感情じゃなく事実で自分を見れるようになった。",
+  },
+  {
+    id: "c7",
+    category: "ed",
+    categoryLabel: "ED・性機能",
+    ageBand: "30代",
+    gender: "男性",
+    severity: 7,
+    durationDays: 90,
+    cost: 24000,
+    improvementDegree: 68,
+    title: "誰にも言えなかった。オンライン診療で変わった",
+    occupation: "営業",
+    region: "東京",
+    clinic: "オンライン診療クリニック",
+    procedure: "内服薬（PDE5阻害薬）＋生活改善",
+    treatments: ["ED内服薬", "生活習慣改善"],
+    verified: true,
+    worthItLevel: "great",
+    story: [
+      { date: "2026/01", event: "プレッシャーから悪循環に。誰にも相談できず" },
+      { date: "2026/02", event: "対面が怖くてオンライン診療を選択" },
+      { date: "2026/03", event: "薬と睡眠改善で自信が戻り始める" },
+      { date: "2026/04", event: "薬に頼らない日も増えた" },
+    ],
+    beforeNote: "原因の多くは心理的なものだった。一度の失敗が頭から離れなかった。",
+    afterNote: "薬で『大丈夫』という安心ができ、悪循環が断ち切れた。今は頻度も減った。",
+    whatTheyDid: [
+      "オンライン診療で内服を処方",
+      "睡眠と運動を立て直した",
+      "完璧を求めないと決めた",
+    ],
+    failures: [
+      "怪しい個人輸入サイトで時間とお金を無駄にした",
+      "一人で抱え込んで悪化させた期間が長かった",
+    ],
+    progress: [
+      { day: 0, note: "この悩みを文字にするだけで手が震えた。" },
+      { day: 90, note: "結局、一番効いたのは『一人じゃない』と知ること。" },
+    ],
+    emotionChange: "「終わった」という絶望から、「対処できる」という落ち着きへ。",
+    comment: "恥ずかしくて何年も放置した。もっと早く相談すればよかった。",
+  },
+  {
+    id: "c8",
+    category: "phimosis",
+    categoryLabel: "包茎",
+    ageBand: "20代",
+    gender: "男性",
+    severity: 6,
+    durationDays: 30,
+    cost: 80000,
+    improvementDegree: 80,
+    title: "ずっと避けてきたことに、向き合った1ヶ月",
+    occupation: "学生",
+    region: "東京",
+    clinic: "泌尿器科・専門クリニック",
+    procedure: "日帰り手術",
+    treatments: ["包茎手術"],
+    verified: true,
+    worthItLevel: "great",
+    story: [
+      { date: "2026/03", event: "コンプレックスで人と比べては落ち込む日々" },
+      { date: "2026/04", event: "複数院でカウンセリング、料金体系を比較" },
+      { date: "2026/04", event: "明朗会計の専門院で日帰り手術" },
+      { date: "2026/05", event: "回復し、長年の不安から解放された" },
+    ],
+    beforeNote: "思春期からずっと気にしていた。人に相談できる類いの悩みではなかった。",
+    afterNote: "手術自体は想像よりずっと簡単だった。心理的な重荷が消えたのが一番大きい。",
+    whatTheyDid: [
+      "複数のクリニックでカウンセリング・見積もり比較",
+      "料金が明朗な専門院を選んだ",
+      "アフターケアの説明が丁寧な院を重視",
+    ],
+    failures: [
+      "最初に行った院で高額な追加施術を勧められ不信感",
+      "ネットの過激な広告に惑わされかけた",
+    ],
+    progress: [
+      { day: 0, note: "カウンセリングに行くまでが一番勇気が要った。" },
+      { day: 30, note: "もっと早く向き合えばよかった、が正直な感想。" },
+    ],
+    emotionChange: "比べて落ち込む日々から、自分を気にしなくなる毎日へ。",
+    comment: "大事なのは『安いか』より『信頼できて明朗か』だった。比較して正解。",
   },
 ];
 
@@ -339,10 +490,12 @@ export interface Aggregate {
   count: number;
   improvedRate: number;   // 改善度50%以上の割合
   avgImprovement: number;
+  worthItRate: number;    // 「やってよかった」の割合
   avgCost: number;
   medianCost: number;
   avgDuration: number;
   topActions: { label: string; count: number }[];
+  topTreatments: { label: string; count: number }[];
   topFailures: { label: string; count: number }[];
 }
 
@@ -368,19 +521,43 @@ function median(nums: number[]): number {
 export function calcAggregate(cases: CaseRecord[]): Aggregate {
   const count = cases.length;
   if (count === 0) {
-    return { count: 0, improvedRate: 0, avgImprovement: 0, avgCost: 0, medianCost: 0, avgDuration: 0, topActions: [], topFailures: [] };
+    return { count: 0, improvedRate: 0, avgImprovement: 0, worthItRate: 0, avgCost: 0, medianCost: 0, avgDuration: 0, topActions: [], topTreatments: [], topFailures: [] };
   }
   const improved = cases.filter((c) => c.improvementDegree >= 50).length;
+  const worthIt = cases.filter((c) => c.worthItLevel === "great").length;
   return {
     count,
     improvedRate: Math.round((improved / count) * 100),
     avgImprovement: Math.round(cases.reduce((s, c) => s + c.improvementDegree, 0) / count),
+    worthItRate: Math.round((worthIt / count) * 100),
     avgCost: Math.round(cases.reduce((s, c) => s + c.cost, 0) / count),
     medianCost: median(cases.map((c) => c.cost)),
     avgDuration: Math.round(cases.reduce((s, c) => s + c.durationDays, 0) / count),
     topActions: rank(cases.flatMap((c) => c.whatTheyDid)).slice(0, 3),
+    topTreatments: rank(cases.flatMap((c) => c.treatments ?? [])).slice(0, 5),
     topFailures: rank(cases.flatMap((c) => c.failures)).slice(0, 3),
   };
+}
+
+// カテゴリ別ランキング（Worth It率 / 改善率）— RealSelf型 "Most Worth It"
+export interface CategoryStat {
+  id: CategoryId;
+  label: string;
+  count: number;
+  improvedRate: number;
+  worthItRate: number;
+  medianCost: number;
+}
+
+export function categoryRanking(cases: CaseRecord[]): CategoryStat[] {
+  return CATEGORIES.map((cat) => {
+    const cs = cases.filter((c) => c.category === cat.id);
+    const agg = calcAggregate(cs);
+    return {
+      id: cat.id, label: cat.label, count: cs.length,
+      improvedRate: agg.improvedRate, worthItRate: agg.worthItRate, medianCost: agg.medianCost,
+    };
+  }).filter((s) => s.count > 0).sort((a, b) => b.worthItRate - a.worthItRate || b.count - a.count);
 }
 
 // 改善スコア（簡易計算）。将来は画像AIの状態変化を組み込む。
@@ -578,19 +755,21 @@ export interface ContributionInput {
   category: CategoryId;
   ageBand: string;
   gender: string;
+  occupation: string;
+  region: string;
   severity: number;
   clinic: string;
   procedure: string;
+  treatments: string[];
   cost: number;
   durationDays: number;
   improvementDegree: number;
-  worthIt: boolean;
+  worthItLevel: WorthItLevel;
   verified: boolean;
-  beforeNote: string;
-  afterNote: string;
   whatTheyDid: string[];
   failures: string[];
   comment: string;
+  story: { date: string; event: string }[];
 }
 
 export function contributeCase(input: ContributionInput): CaseRecord {
@@ -601,13 +780,15 @@ export function contributeCase(input: ContributionInput): CaseRecord {
     categoryLabel: catLabel,
     ageBand: input.ageBand,
     gender: input.gender,
+    occupation: input.occupation || undefined,
+    region: input.region || undefined,
     severity: input.severity,
     durationDays: input.durationDays,
     cost: input.cost,
     improvementDegree: input.improvementDegree,
     title: input.comment.slice(0, 28) || `${catLabel}の記録`,
-    beforeNote: input.beforeNote,
-    afterNote: input.afterNote,
+    beforeNote: "",
+    afterNote: "",
     whatTheyDid: input.whatTheyDid.filter(Boolean),
     failures: input.failures.filter(Boolean),
     progress: [],
@@ -615,8 +796,10 @@ export function contributeCase(input: ContributionInput): CaseRecord {
     comment: input.comment,
     clinic: input.clinic || undefined,
     procedure: input.procedure || undefined,
+    treatments: input.treatments.filter(Boolean),
     verified: input.verified,
-    worthIt: input.worthIt,
+    worthItLevel: input.worthItLevel,
+    story: input.story.filter((s) => s.event),
   };
   try {
     const all = getPublishedCases();
