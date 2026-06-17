@@ -96,26 +96,6 @@ const SEED_COUNTS: Record<CategoryId, number> = {
 };
 
 const CHALLENGE = {
-  title: "孤独チャレンジ",
-  price: "500",
-  capacity: "5",
-  duration: "90",
-  format: "オンライン",
-  contents: [
-    "今抱えていることを共有",
-    "同じ悩みを持つ人と出会う",
-    "次の1週間でやることを決める",
-    "振り返り方法を受け取る",
-  ],
-  canExpect: [
-    "自分だけではないと知る",
-    "行動のきっかけを作る",
-    "同じ悩みを持つ仲間と出会う",
-  ],
-  cannotGuarantee: [
-    "悩みの解決",
-    "人生の劇的な変化",
-  ],
   bookUrl: "https://line.me/ti/p/placeholder",
 };
 
@@ -561,98 +541,75 @@ export default function ConfessPage() {
             </>
           )}
 
-          {/* ── 6: Recovery Challenge ── */}
+          {/* ── 6: Recovery Challenge Season 1 ── */}
           {step === 6 && (
             <>
-              <Sub><span className="a-fadeUp">recovery challenge</span></Sub>
-              <H className="a-fadeUp d1">改善チャレンジ</H>
-              <p className="a-fadeUp d2" style={{ fontSize: "14px", fontWeight: 300, color: "rgba(255,255,255,0.4)", lineHeight: 2, margin: "16px 0 48px" }}>
-                同じことで悩む人たちと<br />最初の一歩を踏み出す体験
+              <div className="a-fadeUp" style={{ marginBottom: "12px" }}>
+                <span style={{ fontSize: "9px", fontWeight: 400, letterSpacing: "0.35em", color: "rgba(139,92,246,0.5)" }}>SEASON 1</span>
+              </div>
+              <h2 className="a-fadeUp d1" style={{ fontSize: "26px", fontWeight: 200, letterSpacing: "0.06em", lineHeight: 1.8 }}>
+                100日後、<br />別人になれるか。
+              </h2>
+              <p className="a-fadeUp d2" style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.35)", lineHeight: 2, margin: "20px 0 36px" }}>
+                恥ずかしかったBeforeを<br />未来の誰かの地図に変える。
               </p>
 
-              <div className="a-fadeUp d3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "20px", padding: "32px 28px", textAlign: "left" }}>
-                <h3 style={{ fontSize: "20px", fontWeight: 400, letterSpacing: "0.04em", marginBottom: "24px", textAlign: "center" }}>
-                  {CHALLENGE.title}
-                </h3>
+              <div className="a-fadeUp d3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "20px", padding: "28px 24px", textAlign: "left" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                  <span style={{ fontSize: "10px", fontWeight: 400, letterSpacing: "0.2em", color: "rgba(255,255,255,0.25)" }}>RECOVERY CHALLENGE</span>
+                  <span style={{ fontSize: "10px", fontWeight: 400, letterSpacing: "0.15em", color: "rgba(139,92,246,0.5)" }}>100名限定</span>
+                </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1px", background: "rgba(255,255,255,0.04)", borderRadius: "12px", overflow: "hidden", marginBottom: "28px" }}>
-                  {([
-                    { label: "参加費", value: `${CHALLENGE.price}円` },
-                    { label: "定員", value: `${CHALLENGE.capacity}名` },
-                    { label: "時間", value: `${CHALLENGE.duration}分` },
-                    { label: "開催形式", value: CHALLENGE.format },
-                  ]).map((s) => (
-                    <div key={s.label} style={{ background: "#030014", padding: "16px", textAlign: "center" }}>
-                      <span style={{ fontSize: "10px", fontWeight: 400, color: "rgba(255,255,255,0.2)", letterSpacing: "0.12em", display: "block", marginBottom: "6px" }}>{s.label}</span>
-                      <span style={{ fontSize: "16px", fontWeight: 300, color: "rgba(255,255,255,0.8)" }}>{s.value}</span>
+                <p style={{ fontSize: "14px", fontWeight: 300, color: "rgba(255,255,255,0.6)", lineHeight: 2, marginBottom: "24px" }}>
+                  同じ悩みを持つ仲間と100日間。<br />
+                  写真で変化を記録し、<br />
+                  あなたの改善記録が<br />
+                  誰かの希望になる。
+                </p>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "24px" }}>
+                  {[
+                    { label: "01", text: "匿名でBefore写真を記録" },
+                    { label: "02", text: "100日間、変化を撮り続ける" },
+                    { label: "03", text: "改善レポートが自動生成される" },
+                    { label: "04", text: "あなたの記録が匿名症例に" },
+                  ].map((s) => (
+                    <div key={s.label} style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
+                      <span style={{ fontSize: "10px", fontWeight: 400, color: "rgba(139,92,246,0.4)", letterSpacing: "0.1em", minWidth: "20px" }}>{s.label}</span>
+                      <span style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.5)", lineHeight: 1.6 }}>{s.text}</span>
                     </div>
                   ))}
                 </div>
 
-                <div style={{ marginBottom: "28px" }}>
-                  <span style={{ fontSize: "10px", fontWeight: 400, color: "rgba(255,255,255,0.2)", letterSpacing: "0.15em", display: "block", marginBottom: "14px" }}>内容</span>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    {CHALLENGE.contents.map((c) => (
-                      <div key={c} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.12)", lineHeight: 1.8 }}>・</span>
-                        <span style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.55)", lineHeight: 1.8 }}>{c}</span>
-                      </div>
-                    ))}
-                  </div>
+                <div style={{ width: "100%", height: "1px", background: "rgba(255,255,255,0.04)", marginBottom: "24px" }} />
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1px", background: "rgba(255,255,255,0.03)", borderRadius: "10px", overflow: "hidden", marginBottom: "24px" }}>
+                  {[
+                    { label: "期間", value: "100日" },
+                    { label: "初期テーマ", value: "背中ニキビ" },
+                    { label: "参加費", value: "無料" },
+                  ].map((s) => (
+                    <div key={s.label} style={{ background: "#030014", padding: "14px 8px", textAlign: "center" }}>
+                      <span style={{ fontSize: "9px", fontWeight: 400, color: "rgba(255,255,255,0.2)", letterSpacing: "0.1em", display: "block", marginBottom: "4px" }}>{s.label}</span>
+                      <span style={{ fontSize: "14px", fontWeight: 300, color: "rgba(255,255,255,0.75)" }}>{s.value}</span>
+                    </div>
+                  ))}
                 </div>
 
-                <div style={{ width: "100%", height: "1px", background: "rgba(255,255,255,0.04)", marginBottom: "28px" }} />
-
-                <div style={{ marginBottom: "28px" }}>
-                  <span style={{ fontSize: "10px", fontWeight: 400, color: "rgba(255,255,255,0.2)", letterSpacing: "0.15em", display: "block", marginBottom: "14px" }}>期待できること</span>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    {CHALLENGE.canExpect.map((c) => (
-                      <div key={c} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.12)", lineHeight: 1.8 }}>・</span>
-                        <span style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.55)", lineHeight: 1.8 }}>{c}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div style={{ width: "100%", height: "1px", background: "rgba(255,255,255,0.04)", marginBottom: "28px" }} />
-
-                <div style={{ marginBottom: "28px" }}>
-                  <span style={{ fontSize: "10px", fontWeight: 400, color: "rgba(255,255,255,0.2)", letterSpacing: "0.15em", display: "block", marginBottom: "14px" }}>保証できないこと</span>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    {CHALLENGE.cannotGuarantee.map((c) => (
-                      <div key={c} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.12)", lineHeight: 1.8 }}>・</span>
-                        <span style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.55)", lineHeight: 1.8 }}>{c}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div style={{ width: "100%", height: "1px", background: "rgba(255,255,255,0.04)", marginBottom: "28px" }} />
-
-                <p style={{ fontSize: "13px", fontWeight: 300, color: "rgba(255,255,255,0.35)", lineHeight: 2, textAlign: "center", marginBottom: "32px" }}>
-                  ただし<br />
-                  <span style={{ color: "rgba(255,255,255,0.6)" }}>何も変わらない日常を<br />少し前に進めることを目指す</span>
-                </p>
-
-                <a href={CHALLENGE.bookUrl} target="_blank" rel="noopener noreferrer"
+                <a href="/recovery"
                   style={{
-                    display: "flex", width: "100%", alignItems: "center", justifyContent: "center", gap: "8px",
-                    fontSize: "14px", fontWeight: 400, letterSpacing: "0.08em",
-                    background: "rgba(6,199,85,0.08)", border: "1px solid rgba(6,199,85,0.2)",
+                    display: "block", width: "100%", textAlign: "center",
+                    fontSize: "14px", fontWeight: 400, letterSpacing: "0.1em",
+                    background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.25)",
                     borderRadius: "100px", padding: "16px",
-                    color: "rgba(255,255,255,0.85)", textDecoration: "none",
+                    color: "#fff", textDecoration: "none",
                     transition: "all 400ms ease",
+                    animation: "matchGlow 3s ease-in-out infinite",
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(6,199,85,0.18)"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "rgba(6,199,85,0.4)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(6,199,85,0.08)"; e.currentTarget.style.color = "rgba(255,255,255,0.85)"; e.currentTarget.style.borderColor = "rgba(6,199,85,0.2)"; }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .348-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .349-.281.63-.63.63h-2.386c-.345 0-.627-.281-.627-.63V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.627-.631.627-.346 0-.626-.283-.626-.627V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.627-.631.627-.345 0-.627-.283-.627-.627V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.627H4.917c-.345 0-.63-.283-.63-.627V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .346-.281.63-.629.63M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
-                  LINEで予約する
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(139,92,246,0.2)"; e.currentTarget.style.borderColor = "rgba(139,92,246,0.45)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(139,92,246,0.1)"; e.currentTarget.style.borderColor = "rgba(139,92,246,0.25)"; }}>
+                  チャレンジに参加する
                 </a>
-                <p style={{ fontSize: "11px", fontWeight: 300, color: "rgba(255,255,255,0.15)", marginTop: "12px", textAlign: "center", lineHeight: 1.8 }}>
-                  友だち追加後「チャレンジ参加」と送信
-                </p>
               </div>
 
               <div className="a-fadeUp d4" style={{ marginTop: "28px" }}>
