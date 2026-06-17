@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useMemo, useEffect } from "react";
 import {
   C, SANS, SERIF, SEED_CASES, CATEGORIES, AGE_BANDS, GENDERS,
-  getPublishedCases, calcAggregate, fmtCost, fmtDuration,
+  getPublishedCases, hasContributed, calcAggregate, fmtCost, fmtDuration,
   type CategoryId, type CaseRecord, type Aggregate,
 } from "@/lib/recovery";
 
@@ -21,11 +21,12 @@ export default function CasesPage() {
   const [severity, setSeverity] = useState<number | "">("");
   const [budget, setBudget] = useState<number | "">("");
   const [published, setPublished] = useState<CaseRecord[]>([]);
+  const [contributed, setContributed] = useState(false);
 
   const [phase, setPhase] = useState<Phase>("ask");
   const [step, setStep] = useState(0);
 
-  useEffect(() => { setPublished(getPublishedCases()); }, []);
+  useEffect(() => { setPublished(getPublishedCases()); setContributed(hasContributed()); }, []);
 
   const allCases = useMemo(() => [...published, ...SEED_CASES], [published]);
 
@@ -181,32 +182,47 @@ export default function CasesPage() {
           </div>
         ))}
       </div>
-      <div style={{ padding: "22px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
-        {a.topActions.length > 0 && (
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 500, color: C.faint, letterSpacing: "0.1em", display: "block", marginBottom: "12px" }}>みんながまず始めたこと</span>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              {a.topActions.map((x, i) => (
-                <div key={x.label} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <span style={{ fontSize: "12px", fontWeight: 500, color: C.accent, minWidth: "18px" }}>{i + 1}</span>
-                  <span style={{ fontSize: "13px", color: C.ink, flex: 1, lineHeight: 1.5 }}>{x.label}</span>
-                  {x.count > 1 && <span style={{ fontSize: "11px", color: C.faint }}>{x.count}人</span>}
-                </div>
-              ))}
+      <div style={{ position: "relative", padding: "22px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
+        {/* ぼかし＋ロック（Give to Get） */}
+        <div style={{ filter: contributed ? "none" : "blur(5px)", userSelect: contributed ? "auto" : "none", pointerEvents: contributed ? "auto" : "none" }}>
+          {a.topActions.length > 0 && (
+            <div style={{ marginBottom: "20px" }}>
+              <span style={{ fontSize: "11px", fontWeight: 500, color: C.faint, letterSpacing: "0.1em", display: "block", marginBottom: "12px" }}>みんながまず始めたこと</span>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {a.topActions.map((x, i) => (
+                  <div key={x.label} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <span style={{ fontSize: "12px", fontWeight: 500, color: C.accent, minWidth: "18px" }}>{i + 1}</span>
+                    <span style={{ fontSize: "13px", color: C.ink, flex: 1, lineHeight: 1.5 }}>{x.label}</span>
+                    {x.count > 1 && <span style={{ fontSize: "11px", color: C.faint }}>{x.count}人</span>}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-        {a.topFailures.length > 0 && (
-          <div>
-            <span style={{ fontSize: "11px", fontWeight: 500, color: C.faint, letterSpacing: "0.1em", display: "block", marginBottom: "12px" }}>よくある遠回り・失敗</span>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              {a.topFailures.map((f) => (
-                <div key={f.label} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                  <span style={{ fontSize: "12px", color: C.faint, lineHeight: 1.6 }}>×</span>
-                  <span style={{ fontSize: "13px", color: C.sub, flex: 1, lineHeight: 1.6 }}>{f.label}</span>
-                </div>
-              ))}
+          )}
+          {a.topFailures.length > 0 && (
+            <div>
+              <span style={{ fontSize: "11px", fontWeight: 500, color: C.faint, letterSpacing: "0.1em", display: "block", marginBottom: "12px" }}>よくある遠回り・失敗</span>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {a.topFailures.map((f) => (
+                  <div key={f.label} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                    <span style={{ fontSize: "12px", color: C.faint, lineHeight: 1.6 }}>×</span>
+                    <span style={{ fontSize: "13px", color: C.sub, flex: 1, lineHeight: 1.6 }}>{f.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
+          )}
+        </div>
+
+        {!contributed && (
+          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "12px", padding: "24px", background: "linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0.92))" }}>
+            <span style={{ fontSize: "20px" }}>🔒</span>
+            <p style={{ fontSize: "13px", color: C.ink, textAlign: "center", lineHeight: 1.7, fontWeight: 500 }}>
+              「みんなが何から始めたか・どんな失敗をしたか」<br />は、記録を出した人だけに開きます。
+            </p>
+            <Link href="/cases/contribute" style={{ fontSize: "13px", fontWeight: 500, letterSpacing: "0.06em", background: C.accent, color: "#fff", borderRadius: "100px", padding: "12px 28px", textDecoration: "none" }}>
+              自分の記録を出して見る
+            </Link>
           </div>
         )}
       </div>
@@ -319,11 +335,14 @@ export default function CasesPage() {
       {phase === "browse" && (
         <>
           <section style={{ padding: "40px 24px 32px", maxWidth: "640px", margin: "0 auto" }}>
-            <div style={{ textAlign: "center", marginBottom: "32px" }}>
+            <div style={{ textAlign: "center", marginBottom: "24px" }}>
               <span style={{ fontSize: "11px", fontWeight: 500, letterSpacing: "0.25em", color: C.accent }}>IMPROVEMENT LIBRARY</span>
-              <h1 style={{ fontFamily: SERIF, fontSize: "24px", fontWeight: 500, lineHeight: 1.5, margin: "16px 0 0" }}>
+              <h1 style={{ fontFamily: SERIF, fontSize: "24px", fontWeight: 500, lineHeight: 1.5, margin: "16px 0 16px" }}>
                 似た人の改善を、検索する
               </h1>
+              <Link href="/cases/contribute" style={{ fontSize: "12px", fontWeight: 500, color: C.accent, border: `1px solid ${C.accent}`, borderRadius: "100px", padding: "9px 22px", textDecoration: "none", display: "inline-block" }}>
+                ＋ 自分の改善記録を投稿する
+              </Link>
             </div>
 
             <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "20px", padding: "24px 22px" }}>
@@ -394,10 +413,18 @@ export default function CasesPage() {
               {results.map((c) => (
                 <Link key={c.id} href={`/cases/${c.id}`} style={{ textDecoration: "none", color: "inherit" }}>
                   <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "22px 24px", transition: "all 300ms" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-                      <span style={{ fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", color: C.accent, background: C.accentSoft, padding: "5px 12px", borderRadius: "100px" }}>{c.categoryLabel}</span>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                      <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                        <span style={{ fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", color: C.accent, background: C.accentSoft, padding: "5px 12px", borderRadius: "100px" }}>{c.categoryLabel}</span>
+                        {c.verified && <span style={{ fontSize: "10px", fontWeight: 500, color: C.accent, border: `1px solid ${C.accent}`, borderRadius: "100px", padding: "4px 9px" }}>✓ 検証済み</span>}
+                      </div>
                       <span style={{ fontSize: "12px", color: C.faint }}>{c.ageBand}・{c.gender}</span>
                     </div>
+                    {(c.procedure || c.clinic) && (
+                      <p style={{ fontSize: "12px", color: C.sub, marginBottom: "10px" }}>
+                        {c.procedure}{c.clinic ? ` ・ ${c.clinic}` : ""}
+                      </p>
+                    )}
                     <p style={{ fontFamily: SERIF, fontSize: "17px", fontWeight: 500, lineHeight: 1.5, marginBottom: "18px" }}>{c.title}</p>
                     <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
                       {[

@@ -80,17 +80,44 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
         </Link>
 
         {/* Header */}
-        <div style={{ marginBottom: "32px" }}>
-          <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "16px" }}>
+        <div style={{ marginBottom: "28px" }}>
+          <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "16px", flexWrap: "wrap" }}>
             <span style={{ fontSize: "11px", fontWeight: 500, color: C.accent, background: C.accentSoft, padding: "5px 12px", borderRadius: "100px" }}>
               {c.categoryLabel}
             </span>
+            {c.verified && <span style={{ fontSize: "10px", fontWeight: 500, color: C.accent, border: `1px solid ${C.accent}`, borderRadius: "100px", padding: "4px 10px" }}>✓ 検証済み</span>}
             <span style={{ fontSize: "12px", color: C.faint }}>{c.ageBand}・{c.gender}・重症度{c.severity}</span>
           </div>
           <h1 style={{ fontFamily: SERIF, fontSize: "26px", fontWeight: 500, lineHeight: 1.5 }}>
             {c.title}
           </h1>
         </div>
+
+        {/* Clinic / procedure — 口コミより深い核 */}
+        {(c.clinic || c.procedure || c.worthIt !== undefined) && (
+          <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "20px 22px", marginBottom: "28px" }}>
+            {c.procedure && (
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: c.clinic || c.worthIt !== undefined ? "12px" : 0 }}>
+                <span style={{ fontSize: "12px", color: C.faint }}>受けた施術・方法</span>
+                <span style={{ fontSize: "13px", color: C.ink, textAlign: "right", flex: 1 }}>{c.procedure}</span>
+              </div>
+            )}
+            {c.clinic && (
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: c.worthIt !== undefined ? "12px" : 0 }}>
+                <span style={{ fontSize: "12px", color: C.faint }}>場所</span>
+                <span style={{ fontSize: "13px", color: C.ink, textAlign: "right", flex: 1 }}>{c.clinic}</span>
+              </div>
+            )}
+            {c.worthIt !== undefined && (
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
+                <span style={{ fontSize: "12px", color: C.faint }}>また受けるか</span>
+                <span style={{ fontSize: "13px", fontWeight: 500, color: c.worthIt ? C.accent : C.sub, textAlign: "right", flex: 1 }}>
+                  {c.worthIt ? "はい、また受ける" : "いいえ"}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Before / After */}
         <div style={{ display: "flex", gap: "12px", marginBottom: "16px" }}>

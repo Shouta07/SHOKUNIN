@@ -41,6 +41,11 @@ export interface CaseRecord {
   progress: { day: number; note: string }[];
   emotionChange: string;
   comment: string;
+  // クリニック単位の構造化アウトカム（口コミより深い情報）
+  clinic?: string;        // 受けた場所（任意・匿名表記可）
+  procedure?: string;     // 施術・治療法
+  verified?: boolean;     // 領収書等で検証済み
+  worthIt?: boolean;      // また受けるか（RealSelf型 Worth It）
 }
 
 export interface ChallengeData {
@@ -110,6 +115,10 @@ export const SEED_CASES: CaseRecord[] = [
     cost: 38000,
     improvementDegree: 72,
     title: "プールを諦めていた夏が、変わった",
+    clinic: "都内・一般皮膚科クリニック",
+    procedure: "保険診療＋外用薬（継続）",
+    verified: true,
+    worthIt: true,
     beforeNote: "背中全体に赤みと炎症。Tシャツの上からでも気になっていた。",
     afterNote: "炎症はほぼ収まり、色素沈着が残る程度。シャツが着られるようになった。",
     whatTheyDid: [
@@ -142,6 +151,10 @@ export const SEED_CASES: CaseRecord[] = [
     cost: 96000,
     improvementDegree: 58,
     title: "進行を止められた、それで十分だった",
+    clinic: "AGA専門クリニック（オンライン診療）",
+    procedure: "内服薬（フィナステリド系）",
+    verified: true,
+    worthIt: true,
     beforeNote: "頭頂部と生え際が後退。風が吹くたびに手で押さえていた。",
     afterNote: "劇的な増毛はないが、進行が止まり産毛が増えた。気にする頻度が激減。",
     whatTheyDid: [
@@ -173,6 +186,10 @@ export const SEED_CASES: CaseRecord[] = [
     cost: 22000,
     improvementDegree: 65,
     title: "握手が、怖くなくなるまで",
+    clinic: "皮膚科クリニック",
+    procedure: "塩化アルミニウム外用＋呼吸法",
+    verified: false,
+    worthIt: true,
     beforeNote: "手のひらから汗が滴るレベル。書類が湿る、人の手を握れない。",
     afterNote: "完全には止まらないが、日常で気にならない程度に。仕事中の不安が減った。",
     whatTheyDid: [
@@ -203,6 +220,10 @@ export const SEED_CASES: CaseRecord[] = [
     cost: 15000,
     improvementDegree: 70,
     title: "電車で隣に立てるようになった",
+    clinic: "セルフケア中心（市販品）",
+    procedure: "医療用デオドラント＋生活改善",
+    verified: false,
+    worthIt: true,
     beforeNote: "ワキガ体質。夏は特に自分でも分かるレベルで、人との距離が怖かった。",
     afterNote: "デオドラントと生活改善で日常レベルは気にならなく。再検討で手術は見送り。",
     whatTheyDid: [
@@ -234,6 +255,10 @@ export const SEED_CASES: CaseRecord[] = [
     cost: 28000,
     improvementDegree: 60,
     title: "結婚式のドレスのために始めた100日",
+    clinic: "美容皮膚科",
+    procedure: "ケミカルピーリング（月1回）",
+    verified: true,
+    worthIt: true,
     beforeNote: "肩から背中にかけてのニキビ跡。ドレス選びで初めて本気で向き合った。",
     afterNote: "新しい炎症はほぼ消失。跡は残るが、当日はメイクでカバーできる範囲に。",
     whatTheyDid: [
@@ -264,6 +289,10 @@ export const SEED_CASES: CaseRecord[] = [
     cost: 72000,
     improvementDegree: 50,
     title: "28歳で始めた、早すぎないかと思いながら",
+    clinic: "AGAクリニック",
+    procedure: "内服＋外用の併用",
+    verified: true,
+    worthIt: false,
     beforeNote: "若くして生え際が後退。年齢と現実のギャップに苦しんだ。",
     afterNote: "進行が緩やかに。劇的ではないが、毎日の不安が確実に減った。",
     whatTheyDid: [
@@ -525,6 +554,77 @@ export function getPublishedCases(): CaseRecord[] {
   } catch {
     return [];
   }
+}
+
+// ─── Give to Get（投稿した人だけ集合知の核が見れる） ───────────
+const CONTRIB_KEY = "recovery_contributed";
+
+export function hasContributed(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return localStorage.getItem(CONTRIB_KEY) === "1" || getPublishedCases().length > 0;
+  } catch {
+    return false;
+  }
+}
+
+export function markContributed(): void {
+  if (typeof window === "undefined") return;
+  try { localStorage.setItem(CONTRIB_KEY, "1"); } catch {}
+}
+
+// クリニックでの施術記録を直接、匿名アウトカム症例として投稿する。
+export interface ContributionInput {
+  category: CategoryId;
+  ageBand: string;
+  gender: string;
+  severity: number;
+  clinic: string;
+  procedure: string;
+  cost: number;
+  durationDays: number;
+  improvementDegree: number;
+  worthIt: boolean;
+  verified: boolean;
+  beforeNote: string;
+  afterNote: string;
+  whatTheyDid: string[];
+  failures: string[];
+  comment: string;
+}
+
+export function contributeCase(input: ContributionInput): CaseRecord {
+  const catLabel = CATEGORIES.find((c) => c.id === input.category)?.label ?? "その他";
+  const caseRecord: CaseRecord = {
+    id: `u_${crypto.randomUUID().slice(0, 8)}`,
+    category: input.category,
+    categoryLabel: catLabel,
+    ageBand: input.ageBand,
+    gender: input.gender,
+    severity: input.severity,
+    durationDays: input.durationDays,
+    cost: input.cost,
+    improvementDegree: input.improvementDegree,
+    title: input.comment.slice(0, 28) || `${catLabel}の記録`,
+    beforeNote: input.beforeNote,
+    afterNote: input.afterNote,
+    whatTheyDid: input.whatTheyDid.filter(Boolean),
+    failures: input.failures.filter(Boolean),
+    progress: [],
+    emotionChange: input.comment,
+    comment: input.comment,
+    clinic: input.clinic || undefined,
+    procedure: input.procedure || undefined,
+    verified: input.verified,
+    worthIt: input.worthIt,
+  };
+  try {
+    const all = getPublishedCases();
+    all.unshift(caseRecord);
+    localStorage.setItem(PUBLISHED_KEY, JSON.stringify(all));
+    markContributed();
+  } catch {}
+  return caseRecord;
 }
 
 // チャレンジ + 記録 + レポートから匿名症例（CaseRecord）を組成して公開する。
