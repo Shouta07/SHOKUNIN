@@ -380,6 +380,58 @@ export function daysSince(startDate: string): number {
 
 export const MILESTONES = [0, 7, 14, 30, 60, 100];
 
+// ─── Streak（継続）× 損失回避エンジン ───────────────────────────
+// Duolingo型。「次の1日が欲しい」より「積み上げを失いたくない」を握る。
+
+export const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100];
+
+export interface StreakInfo {
+  current: number;       // 現在の連続記録日数
+  longest: number;       // 最長
+  recordedToday: boolean;
+  atRisk: boolean;       // 昨日まで続いたが今日未記録（途切れ寸前）
+  nextMilestone: number;
+  daysToNext: number;
+}
+
+function dateKey(iso: string): number {
+  const d = new Date(iso);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+}
+
+export function calcStreak(records: DayRecord[]): StreakInfo {
+  const DAY = 86400000;
+  const todayD = new Date();
+  const today = new Date(todayD.getFullYear(), todayD.getMonth(), todayD.getDate()).getTime();
+
+  if (records.length === 0) {
+    return { current: 0, longest: 0, recordedToday: false, atRisk: false, nextMilestone: 3, daysToNext: 3 };
+  }
+
+  const days = Array.from(new Set(records.map((r) => dateKey(r.createdAt)))).sort((a, b) => a - b);
+
+  // 最長連続
+  let longest = 1, run = 1;
+  for (let i = 1; i < days.length; i++) {
+    if (days[i] - days[i - 1] === DAY) { run++; longest = Math.max(longest, run); } else { run = 1; }
+  }
+
+  // 現在の連続（今日または昨日で終わっていれば生存）
+  const last = days[days.length - 1];
+  const recordedToday = last === today;
+  let current = 0;
+  if (last === today || last === today - DAY) {
+    current = 1;
+    for (let i = days.length - 2; i >= 0; i--) {
+      if (days[i + 1] - days[i] === DAY) current++; else break;
+    }
+  }
+
+  const atRisk = last === today - DAY; // 昨日記録、今日まだ
+  const nextMilestone = STREAK_MILESTONES.find((m) => m > current) ?? 100;
+  return { current, longest, recordedToday, atRisk, nextMilestone, daysToNext: nextMilestone - current };
+}
+
 const CHS_KEY = "recovery_challenges";
 const REPORT_KEY = "recovery_reports";
 const PUBLISHED_KEY = "recovery_published_cases";

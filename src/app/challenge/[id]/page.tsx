@@ -5,7 +5,7 @@ import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   C, SANS, SERIF, MILESTONES,
-  getCurrentChallenge, getRecords, daysSince, calcImprovementScore,
+  getCurrentChallenge, getRecords, daysSince, calcImprovementScore, calcStreak,
   type ChallengeData, type DayRecord,
 } from "@/lib/recovery";
 
@@ -49,6 +49,7 @@ export default function ChallengeDashboard({ params }: { params: Promise<{ id: s
   const score = calcImprovementScore(records);
   const nextMilestone = MILESTONES.find((m) => m > days) ?? 100;
   const recordedDays = new Set(records.map((r) => r.day));
+  const streak = calcStreak(records);
 
   return (
     <div style={{ fontFamily: SANS, color: C.ink }}>
@@ -64,17 +65,75 @@ export default function ChallengeDashboard({ params }: { params: Promise<{ id: s
         <h1 style={{ fontFamily: SERIF, fontSize: "24px", fontWeight: 500, lineHeight: 1.5, marginBottom: "6px" }}>
           {challenge.nickname}さんの100日
         </h1>
-        <p style={{ fontSize: "13px", color: C.sub, marginBottom: "36px" }}>目標：{challenge.goal}</p>
+        <p style={{ fontSize: "13px", color: C.sub, marginBottom: "32px" }}>目標：{challenge.goal}</p>
+
+        {/* ── Streak hero（損失回避の核） ── */}
+        <div style={{
+          background: streak.recordedToday ? C.accent : C.surface,
+          border: `1px solid ${streak.recordedToday ? C.accent : streak.atRisk ? "#c2603f" : C.line}`,
+          borderRadius: "20px", padding: "28px 24px", marginBottom: "16px",
+          textAlign: "center", transition: "all 300ms",
+        }}>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: "8px" }}>
+            <span style={{ fontSize: "26px", lineHeight: 1 }}>🔥</span>
+            <span style={{ fontFamily: SERIF, fontSize: "52px", fontWeight: 500, lineHeight: 1, color: streak.recordedToday ? "#fff" : C.ink }}>
+              {streak.current}
+            </span>
+            <span style={{ fontSize: "14px", color: streak.recordedToday ? "rgba(255,255,255,0.7)" : C.sub }}>日連続</span>
+          </div>
+
+          {streak.recordedToday ? (
+            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.85)", lineHeight: 1.7, marginTop: "16px" }}>
+              今日も記録できました。<br />また明日、この火を絶やさないで。
+            </p>
+          ) : streak.current > 0 && streak.atRisk ? (
+            <>
+              <p style={{ fontSize: "13px", color: "#c2603f", fontWeight: 500, lineHeight: 1.7, marginTop: "16px" }}>
+                {streak.current}日の積み重ねが、今日で途切れます。
+              </p>
+              <button onClick={() => router.push("/recovery/record")}
+                style={{ marginTop: "18px", fontSize: "14px", fontWeight: 500, letterSpacing: "0.06em", background: "#c2603f", color: "#fff", border: "none", borderRadius: "100px", padding: "14px 40px", cursor: "pointer" }}>
+                記録して{streak.current + 1}日目にする
+              </button>
+            </>
+          ) : (
+            <>
+              <p style={{ fontSize: "13px", color: C.sub, lineHeight: 1.7, marginTop: "16px" }}>
+                {streak.current === 0 ? "今日から、最初の1日を。" : `今日記録すれば、${streak.current + 1}日連続。`}
+              </p>
+              <button onClick={() => router.push("/recovery/record")}
+                style={{ marginTop: "18px", fontSize: "14px", fontWeight: 500, letterSpacing: "0.06em", background: C.accent, color: "#fff", border: "none", borderRadius: "100px", padding: "14px 40px", cursor: "pointer" }}>
+                今日を記録する
+              </button>
+            </>
+          )}
+
+          {/* Progress to next streak milestone */}
+          {streak.current > 0 && (
+            <div style={{ marginTop: "22px" }}>
+              <div style={{ height: "5px", background: streak.recordedToday ? "rgba(255,255,255,0.2)" : C.lineSoft, borderRadius: "100px", overflow: "hidden" }}>
+                <div style={{ width: `${Math.min((streak.current / streak.nextMilestone) * 100, 100)}%`, height: "100%", background: streak.recordedToday ? "#fff" : C.accent, borderRadius: "100px" }} />
+              </div>
+              <p style={{ fontSize: "11px", color: streak.recordedToday ? "rgba(255,255,255,0.6)" : C.faint, marginTop: "8px" }}>
+                次の節目まであと {streak.daysToNext} 日（{streak.nextMilestone}日連続）
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Key metrics */}
         <div style={{ display: "flex", gap: "12px", marginBottom: "16px" }}>
-          <div style={{ flex: 1, background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "24px 20px", textAlign: "center" }}>
-            <span style={{ fontFamily: SERIF, fontSize: "40px", fontWeight: 500, color: C.ink, display: "block", lineHeight: 1 }}>{days}</span>
-            <span style={{ fontSize: "11px", color: C.faint, letterSpacing: "0.1em", marginTop: "8px", display: "block" }}>継続日数</span>
+          <div style={{ flex: 1, background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "22px 18px", textAlign: "center" }}>
+            <span style={{ fontFamily: SERIF, fontSize: "34px", fontWeight: 500, color: C.ink, display: "block", lineHeight: 1 }}>{days}</span>
+            <span style={{ fontSize: "11px", color: C.faint, letterSpacing: "0.1em", marginTop: "8px", display: "block" }}>経過日数</span>
           </div>
-          <div style={{ flex: 1, background: C.accent, borderRadius: "16px", padding: "24px 20px", textAlign: "center" }}>
-            <span style={{ fontFamily: SERIF, fontSize: "40px", fontWeight: 500, color: "#fff", display: "block", lineHeight: 1 }}>{score}</span>
-            <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.7)", letterSpacing: "0.1em", marginTop: "8px", display: "block" }}>Improvement Score</span>
+          <div style={{ flex: 1, background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "22px 18px", textAlign: "center" }}>
+            <span style={{ fontFamily: SERIF, fontSize: "34px", fontWeight: 500, color: C.ink, display: "block", lineHeight: 1 }}>{streak.longest}</span>
+            <span style={{ fontSize: "11px", color: C.faint, letterSpacing: "0.1em", marginTop: "8px", display: "block" }}>最長連続</span>
+          </div>
+          <div style={{ flex: 1, background: C.accent, borderRadius: "16px", padding: "22px 18px", textAlign: "center" }}>
+            <span style={{ fontFamily: SERIF, fontSize: "34px", fontWeight: 500, color: "#fff", display: "block", lineHeight: 1 }}>{score}</span>
+            <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.7)", letterSpacing: "0.1em", marginTop: "8px", display: "block" }}>Score</span>
           </div>
         </div>
 

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   C, SANS, SERIF,
-  getCurrentChallenge, getRecords, saveRecord, daysSince, getAIComment,
+  getCurrentChallenge, getRecords, saveRecord, daysSince, getAIComment, calcStreak,
   type ChallengeData, type DayRecord,
 } from "@/lib/recovery";
 
@@ -28,6 +28,7 @@ export default function RecordPage() {
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [aiComment, setAiComment] = useState<string | null>(null);
+  const [streakCount, setStreakCount] = useState(0);
 
   useEffect(() => {
     setMounted(true);
@@ -50,6 +51,7 @@ export default function RecordPage() {
     };
     saveRecord(rec);
     const all = getRecords(challenge.id);
+    setStreakCount(calcStreak(all).current);
     setAiComment(getAIComment(all, rec));
     setBusy(false);
   }, [challenge, busy, selfScore, careActions, vitality, note]);
@@ -75,9 +77,17 @@ export default function RecordPage() {
       <div style={{ fontFamily: SANS, color: C.ink, minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", padding: "48px 28px", textAlign: "center" }}>
         <div style={{ maxWidth: "420px" }}>
           <span style={{ fontSize: "11px", fontWeight: 500, letterSpacing: "0.2em", color: C.accent }}>RECORDED</span>
-          <h1 style={{ fontFamily: SERIF, fontSize: "26px", fontWeight: 500, lineHeight: 1.5, margin: "20px 0 36px" }}>
-            記録しました。
+
+          {/* Streak badge — 達成のドーパミン */}
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: "8px", margin: "24px 0 8px" }}>
+            <span style={{ fontSize: "30px", lineHeight: 1 }}>🔥</span>
+            <span style={{ fontFamily: SERIF, fontSize: "56px", fontWeight: 500, lineHeight: 1, color: C.ink }}>{streakCount}</span>
+            <span style={{ fontSize: "15px", color: C.sub }}>日連続</span>
+          </div>
+          <h1 style={{ fontFamily: SERIF, fontSize: "20px", fontWeight: 500, lineHeight: 1.5, margin: "0 0 36px", color: C.sub }}>
+            {streakCount >= 2 ? "途切れさせなかった。" : "最初の一日を、残せた。"}
           </h1>
+
           <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "18px", padding: "28px 26px", marginBottom: "36px", textAlign: "left" }}>
             <span style={{ fontSize: "10px", fontWeight: 500, letterSpacing: "0.15em", color: C.faint, textTransform: "uppercase", display: "block", marginBottom: "14px" }}>
               His Recoveries より
