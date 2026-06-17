@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useMemo, useEffect } from "react";
 import {
   C, SANS, SERIF, SEED_CASES, CATEGORIES, AGE_BANDS, GENDERS,
-  getPublishedCases, fmtCost, fmtDuration, type CategoryId, type CaseRecord,
+  getPublishedCases, calcAggregate, fmtCost, fmtDuration, type CategoryId, type CaseRecord,
 } from "@/lib/recovery";
 
 export default function CasesPage() {
@@ -29,6 +29,19 @@ export default function CasesPage() {
       return true;
     });
   }, [allCases, cat, age, gender, severity, budget]);
+
+  const agg = useMemo(() => calcAggregate(results), [results]);
+
+  const hasFilter = Boolean(cat || age || gender || severity !== "" || budget !== "");
+  const filterLabel = useMemo(() => {
+    const parts: string[] = [];
+    if (age) parts.push(age);
+    if (gender) parts.push(gender);
+    if (cat) parts.push(CATEGORIES.find((c) => c.id === cat)?.label ?? "");
+    if (severity !== "") parts.push(`重症度${severity}以上`);
+    if (budget !== "") parts.push(`予算${fmtCost(budget as number)}以内`);
+    return parts.filter(Boolean).join("・");
+  }, [cat, age, gender, severity, budget]);
 
   const chip = (active: boolean): React.CSSProperties => ({
     fontSize: "13px", fontWeight: 400, padding: "9px 18px", borderRadius: "100px",
@@ -117,6 +130,73 @@ export default function CasesPage() {
           </div>
         </div>
       </section>
+
+      {/* ── 集合知サマリー（Aggregate Intelligence） ── */}
+      {agg.count > 0 && (
+        <section style={{ padding: "0 24px 28px", maxWidth: "640px", margin: "0 auto" }}>
+          <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "20px", overflow: "hidden" }}>
+            <div style={{ padding: "24px 24px 20px", borderBottom: `1px solid ${C.lineSoft}` }}>
+              <span style={{ fontSize: "11px", fontWeight: 500, letterSpacing: "0.12em", color: C.accent }}>
+                {hasFilter ? "あなたと似た人の集合知" : "改善体験の集合知"}
+              </span>
+              <p style={{ fontFamily: SERIF, fontSize: "18px", fontWeight: 500, lineHeight: 1.5, marginTop: "10px" }}>
+                {filterLabel ? `「${filterLabel}」に近い ` : "登録された "}
+                <span style={{ color: C.accent }}>{agg.count}人</span>
+                {filterLabel ? "の記録" : "人の記録"}
+              </p>
+            </div>
+
+            {/* Headline numbers */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1px", background: C.lineSoft }}>
+              {[
+                { label: "改善した割合", value: `${agg.improvedRate}%`, big: true },
+                { label: "費用の中央値", value: fmtCost(agg.medianCost) },
+                { label: "平均改善期間", value: fmtDuration(agg.avgDuration) },
+              ].map((m) => (
+                <div key={m.label} style={{ background: C.surface, padding: "20px 8px", textAlign: "center" }}>
+                  <span style={{ fontFamily: SERIF, fontSize: m.big ? "28px" : "18px", fontWeight: 500, color: m.big ? C.accent : C.ink, display: "block", lineHeight: 1 }}>{m.value}</span>
+                  <span style={{ fontSize: "10px", color: C.faint, marginTop: "8px", display: "block", letterSpacing: "0.05em" }}>{m.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Top actions / failures */}
+            <div style={{ padding: "22px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
+              {agg.topActions.length > 0 && (
+                <div>
+                  <span style={{ fontSize: "11px", fontWeight: 500, color: C.faint, letterSpacing: "0.1em", display: "block", marginBottom: "12px" }}>みんながまず始めたこと</span>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    {agg.topActions.map((a, i) => (
+                      <div key={a.label} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                        <span style={{ fontSize: "12px", fontWeight: 500, color: C.accent, minWidth: "18px" }}>{i + 1}</span>
+                        <span style={{ fontSize: "13px", color: C.ink, flex: 1, lineHeight: 1.5 }}>{a.label}</span>
+                        {a.count > 1 && <span style={{ fontSize: "11px", color: C.faint }}>{a.count}人</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {agg.topFailures.length > 0 && (
+                <div>
+                  <span style={{ fontSize: "11px", fontWeight: 500, color: C.faint, letterSpacing: "0.1em", display: "block", marginBottom: "12px" }}>よくある遠回り・失敗</span>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    {agg.topFailures.map((f) => (
+                      <div key={f.label} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                        <span style={{ fontSize: "12px", color: C.faint, lineHeight: 1.6 }}>×</span>
+                        <span style={{ fontSize: "13px", color: C.sub, flex: 1, lineHeight: 1.6 }}>{f.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <p style={{ fontSize: "10px", color: C.faint, textAlign: "center", padding: "0 24px 18px", lineHeight: 1.6 }}>
+              ※ 件数が増えるほど精度が上がります。これは医療判断ではありません。
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* ── Results ── */}
       <section style={{ padding: "0 24px 100px", maxWidth: "640px", margin: "0 auto" }}>

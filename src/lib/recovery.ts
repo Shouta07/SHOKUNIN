@@ -302,6 +302,58 @@ export function getCaseById(id: string): CaseRecord | undefined {
   return getPublishedCases().find((c) => c.id === id);
 }
 
+// ─── 集合知（Aggregate Intelligence） ───────────────────────────
+// 個別症例では出せない「自分と似た人たちの集合知」。
+// 食べログの★、Glassdoorの年収中央値に当たる、サービスの核心的付加価値。
+
+export interface Aggregate {
+  count: number;
+  improvedRate: number;   // 改善度50%以上の割合
+  avgImprovement: number;
+  avgCost: number;
+  medianCost: number;
+  avgDuration: number;
+  topActions: { label: string; count: number }[];
+  topFailures: { label: string; count: number }[];
+}
+
+function rank(items: string[]): { label: string; count: number }[] {
+  const map = new Map<string, number>();
+  for (const raw of items) {
+    const label = raw.trim();
+    if (!label) continue;
+    map.set(label, (map.get(label) ?? 0) + 1);
+  }
+  return Array.from(map.entries())
+    .map(([label, count]) => ({ label, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
+function median(nums: number[]): number {
+  if (nums.length === 0) return 0;
+  const s = [...nums].sort((a, b) => a - b);
+  const mid = Math.floor(s.length / 2);
+  return s.length % 2 ? s[mid] : Math.round((s[mid - 1] + s[mid]) / 2);
+}
+
+export function calcAggregate(cases: CaseRecord[]): Aggregate {
+  const count = cases.length;
+  if (count === 0) {
+    return { count: 0, improvedRate: 0, avgImprovement: 0, avgCost: 0, medianCost: 0, avgDuration: 0, topActions: [], topFailures: [] };
+  }
+  const improved = cases.filter((c) => c.improvementDegree >= 50).length;
+  return {
+    count,
+    improvedRate: Math.round((improved / count) * 100),
+    avgImprovement: Math.round(cases.reduce((s, c) => s + c.improvementDegree, 0) / count),
+    avgCost: Math.round(cases.reduce((s, c) => s + c.cost, 0) / count),
+    medianCost: median(cases.map((c) => c.cost)),
+    avgDuration: Math.round(cases.reduce((s, c) => s + c.durationDays, 0) / count),
+    topActions: rank(cases.flatMap((c) => c.whatTheyDid)).slice(0, 3),
+    topFailures: rank(cases.flatMap((c) => c.failures)).slice(0, 3),
+  };
+}
+
 // 改善スコア（簡易計算）。将来は画像AIの状態変化を組み込む。
 export function calcImprovementScore(records: DayRecord[]): number {
   if (records.length === 0) return 0;
