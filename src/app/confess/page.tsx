@@ -5,11 +5,11 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 // ─── Data ────────────────────────────────────────────────────────
 
 const CATEGORIES = [
-  { id: "smell" as const, label: "体臭・ワキガ", en: "Body Odor", sub: "近づくのが怖い" },
-  { id: "sweat" as const, label: "汗", en: "Sweating", sub: "止まらない" },
-  { id: "skin" as const, label: "肌・老け", en: "Skin / Aging", sub: "鏡を見たくない" },
-  { id: "hair" as const, label: "薄毛", en: "Hair Loss", sub: "気づかれてる" },
-  { id: "breath" as const, label: "口臭", en: "Bad Breath", sub: "距離を取ってしまう" },
+  { id: "aga" as const, label: "薄毛・AGA", en: "Hair Loss", sub: "気づかれてる気がする" },
+  { id: "ed" as const, label: "ED・性機能", en: "ED", sub: "誰にも言えない" },
+  { id: "phimosis" as const, label: "包茎", en: "Phimosis", sub: "ずっと避けてきた" },
+  { id: "hyperhidrosis" as const, label: "多汗症", en: "Sweating", sub: "手が止まらない" },
+  { id: "body_odor" as const, label: "体臭・ワキガ", en: "Body Odor", sub: "近づくのが怖い" },
 ];
 type CategoryId = (typeof CATEGORIES)[number]["id"];
 
@@ -51,30 +51,7 @@ const CITIES = [
 ];
 
 const SEED_VOICES: Record<CategoryId, string[]> = {
-  smell: [
-    "電車で隣の人が離れた瞬間、全部わかった。",
-    "彼女に「なんか匂う」って言われて、3日眠れなかった。",
-    "制汗剤を3本持ち歩いてる。それでも不安。",
-    "夏が来るのが怖い。毎年。",
-    "誰にも聞けないから、ずっと一人で調べてた。",
-    "職場でデスクの配置が変わった日、俺のせいだと思った。",
-  ],
-  sweat: [
-    "握手を求められた瞬間、頭が真っ白になった。",
-    "書類を渡す時、紙が湿るのが恥ずかしい。",
-    "スーツの脇が変色してるのを、後輩に見られた。",
-    "好きな人の手を握れない。それだけのことができない。",
-    "面接で手汗がひどくて、何も集中できなかった。",
-    "「暑くないのに何で汗かいてるの？」が一番辛い。",
-  ],
-  skin: [
-    "同期の集合写真、俺だけ明らかに老けてた。",
-    "久しぶりに会った友人に「疲れてる？」って言われた。それだけ。",
-    "鏡を見るたびに、父親に似てきてる気がして怖い。",
-    "日焼け止めなんて塗ったことなかった。今さら後悔してる。",
-    "マッチングアプリの写真と実物が違いすぎて、会うのが怖い。",
-  ],
-  hair: [
+  aga: [
     "美容師に「頭頂部、薄くなってきてますね」って言われた日のこと、今でも覚えてる。",
     "風が吹くたびに、手で押さえてしまう。",
     "父親がハゲてるから、いつか来るって分かってた。でも28は早すぎる。",
@@ -82,17 +59,38 @@ const SEED_VOICES: Record<CategoryId, string[]> = {
     "後ろから撮られた写真を見て、初めて現実を知った。",
     "AGAクリニックのサイトを何回開いたか分からない。でも予約できない。",
   ],
-  breath: [
-    "話しかけた時、相手が少し引いた。あの0.5秒が忘れられない。",
-    "エレベーターで2人きりになると、口を閉じたまま黙ってしまう。",
-    "歯磨きは1日3回してる。それでも不安が消えない。",
-    "打ち合わせ中、手で口を覆ってしまう癖がついた。",
-    "飲み会で近くで話すのが怖くて、端の席を選ぶようになった。",
+  ed: [
+    "一度の失敗が、ずっと頭から離れない。",
+    "プレッシャーで悪循環になっていく自分が怖い。",
+    "誰にも相談できなくて、何年も一人で抱えてる。",
+    "対面で相談するのが恥ずかしくて、ずっと放置してる。",
+    "ネットの怪しい情報ばかり見て、余計に不安になった。",
+  ],
+  phimosis: [
+    "思春期からずっと気にしてる。人に言える類いの悩みじゃない。",
+    "人と比べては、勝手に落ち込んでた。",
+    "ネットの過激な広告が怖くて、どこを信じればいいか分からない。",
+    "カウンセリングに行く勇気が、何年も出なかった。",
+    "料金が不透明で、相談する前から不安だった。",
+  ],
+  hyperhidrosis: [
+    "握手を求められた瞬間、頭が真っ白になった。",
+    "書類を渡す時、紙が湿るのが恥ずかしい。",
+    "スーツの脇が変色してるのを、後輩に見られた。",
+    "好きな人の手を握れない。それだけのことができない。",
+    "「暑くないのに何で汗かいてるの？」が一番辛い。",
+  ],
+  body_odor: [
+    "電車で隣の人が離れた瞬間、全部わかった。",
+    "彼女に「なんか匂う」って言われて、3日眠れなかった。",
+    "制汗剤を3本持ち歩いてる。それでも不安。",
+    "夏が来るのが怖い。毎年。",
+    "職場でデスクの配置が変わった日、俺のせいだと思った。",
   ],
 };
 
 const SEED_COUNTS: Record<CategoryId, number> = {
-  smell: 47, sweat: 38, skin: 52, hair: 63, breath: 41,
+  aga: 63, ed: 38, phimosis: 29, hyperhidrosis: 41, body_odor: 47,
 };
 
 const CHALLENGE = {
@@ -596,7 +594,7 @@ export default function ConfessPage() {
                   ))}
                 </div>
 
-                <a href="/cases"
+                <a href={cat ? `/cases?c=${cat}` : "/cases"}
                   style={{
                     display: "block", width: "100%", textAlign: "center",
                     fontSize: "14px", fontWeight: 400, letterSpacing: "0.1em",

@@ -4,7 +4,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
 
 export default function PosterPage() {
-  const [url, setUrl] = useState("https://shokunin-coral.vercel.app/confess");
+  const [url, setUrl] = useState("https://shokunin-neon.vercel.app/confess");
 
   return (
     <>
