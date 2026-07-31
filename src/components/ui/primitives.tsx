@@ -49,23 +49,42 @@ export function Field({
   label,
   hint,
   required,
+  optional,
+  error,
+  htmlFor,
   children,
   className,
 }: {
   label: string;
   hint?: string;
   required?: boolean;
+  optional?: boolean;
+  error?: string;
+  htmlFor?: string;
   children: React.ReactNode;
   className?: string;
 }) {
   return (
     <div className={cn("space-y-2", className)}>
-      <div className="flex items-baseline gap-1.5">
-        <span className="text-[13px] font-medium text-ink">{label}</span>
-        {required && <span className="text-[11px] text-critical">必須</span>}
+      <div className="flex items-baseline gap-2">
+        <label
+          htmlFor={htmlFor}
+          className="text-[13px] font-medium text-ink"
+        >
+          {label}
+        </label>
+        {required && (
+          <span className="text-[11px] font-medium text-critical">必須</span>
+        )}
+        {optional && <span className="text-[11px] text-subtle">任意</span>}
       </div>
       {hint && <p className="text-[12px] leading-snug text-muted">{hint}</p>}
       {children}
+      {error && (
+        <p role="alert" className="text-[12px] font-medium text-critical">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -73,7 +92,8 @@ export function Field({
 /* ── Input / Textarea / Select ── */
 const control =
   "w-full rounded-[var(--radius-control)] border border-line bg-surface px-3.5 text-[15px] text-ink " +
-  "placeholder:text-subtle transition-colors focus:border-ink focus:outline-none";
+  "placeholder:text-subtle transition-colors focus:border-ink focus:outline-none " +
+  "aria-[invalid=true]:border-critical";
 
 export const Input = React.forwardRef<
   HTMLInputElement,

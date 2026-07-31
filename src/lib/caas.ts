@@ -157,6 +157,89 @@ export const LIVE_TIMELINE: { time: string; label: string; pct: number }[] = [
   { time: "11:48", label: "動作確認・お客様へご説明", pct: 100 },
 ];
 
+// ─── 施工先・連絡先（派遣に必須の情報） ───
+export interface Contact {
+  postal: string;
+  address: string;
+  building: string;
+  name: string;
+  phone: string;
+  email: string;
+  parking: string;
+  note: string;
+}
+
+export const EMPTY_CONTACT: Contact = {
+  postal: "",
+  address: "",
+  building: "",
+  name: "",
+  phone: "",
+  email: "",
+  parking: "",
+  note: "",
+};
+
+export const PARKING_OPTIONS = ["敷地内にあり", "近隣コインP", "なし・要相談"];
+
+/* 検証：必須項目と形式。エラーが無ければ空オブジェクトを返す。 */
+export type ContactErrors = Partial<Record<keyof Contact, string>>;
+
+export function validateContact(c: Contact): ContactErrors {
+  const e: ContactErrors = {};
+  const digits = (s: string) => s.replace(/[^0-9]/g, "");
+
+  if (!c.postal.trim()) e.postal = "郵便番号を入力してください";
+  else if (digits(c.postal).length !== 7) e.postal = "7桁で入力してください";
+
+  if (!c.address.trim()) e.address = "住所を入力してください";
+
+  if (!c.name.trim()) e.name = "お名前を入力してください";
+
+  if (!c.phone.trim()) e.phone = "電話番号を入力してください";
+  else if (![10, 11].includes(digits(c.phone).length))
+    e.phone = "10〜11桁で入力してください";
+
+  if (c.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email))
+    e.email = "メールアドレスの形式が正しくありません";
+
+  return e;
+}
+
+export const REQUIRED_CONTACT_FIELDS: (keyof Contact)[] = [
+  "postal",
+  "address",
+  "name",
+  "phone",
+];
+
+/* 郵便番号 → 住所。公開APIを試し、失敗時はローカル表にフォールバック。 */
+const POSTAL_FALLBACK: Record<string, string> = {
+  "1500043": "東京都渋谷区道玄坂",
+  "1600023": "東京都新宿区西新宿",
+  "1710022": "東京都豊島区南池袋",
+  "1080075": "東京都港区港南",
+  "2200005": "神奈川県横浜市西区南幸",
+  "3300846": "埼玉県さいたま市大宮区大和田町",
+};
+
+export async function lookupPostal(raw: string): Promise<string | null> {
+  const code = raw.replace(/[^0-9]/g, "");
+  if (code.length !== 7) return null;
+  try {
+    const res = await fetch(
+      `https://zipcloud.ibsnet.co.jp/api/search?zipcode=${code}`,
+      { signal: AbortSignal.timeout(4000) },
+    );
+    const json = await res.json();
+    const r = json?.results?.[0];
+    if (r) return `${r.address1}${r.address2}${r.address3}`;
+  } catch {
+    /* オフライン・API不達時はフォールバック */
+  }
+  return POSTAL_FALLBACK[code] ?? null;
+}
+
 export interface Project {
   id: string;
   serviceId: string;
@@ -164,6 +247,7 @@ export interface Project {
   slotId: string;
   stage: number;      // index into STAGES
   createdAt: string;
+  contact?: Contact;
 }
 
 const KEY = "caas_project";

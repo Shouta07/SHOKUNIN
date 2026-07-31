@@ -11,6 +11,11 @@ import {
   AVAILABILITY,
   RATING_AXES,
   DAY_PRICING,
+  PARKING_OPTIONS,
+  EMPTY_CONTACT,
+  REQUIRED_CONTACT_FIELDS,
+  validateContact,
+  lookupPostal,
   fmtSlot,
   slotMultiplier,
   priceForSlot,
@@ -18,14 +23,23 @@ import {
   fmtYen,
   type Service,
   type Craftsman,
+  type Contact,
 } from "@/lib/caas";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Eyebrow, Steps, Row, Badge } from "@/components/ui/primitives";
+import {
+  Eyebrow,
+  Steps,
+  Row,
+  Badge,
+  Field,
+  Input,
+  Textarea,
+} from "@/components/ui/primitives";
 import { cn } from "@/lib/utils";
 
-type Phase = "intro" | "service" | "slot" | "craftsman" | "confirm";
-const FLOW: Phase[] = ["service", "slot", "craftsman", "confirm"];
+type Phase = "intro" | "service" | "slot" | "craftsman" | "details" | "confirm";
+const FLOW: Phase[] = ["service", "slot", "craftsman", "details", "confirm"];
 
 export default function CaasBooking() {
   const router = useRouter();
@@ -34,12 +48,55 @@ export default function CaasBooking() {
   const [slotId, setSlotId] = useState("");
   const [craftsman, setCraftsman] = useState<Craftsman | null>(null);
 
+  const [contact, setContact] = useState<Contact>(EMPTY_CONTACT);
+  const [touched, setTouched] = useState<Set<string>>(new Set());
+  const [showAllErrors, setShowAllErrors] = useState(false);
+  const [postalBusy, setPostalBusy] = useState(false);
+  const [postalMsg, setPostalMsg] = useState("");
+
   const step = FLOW.indexOf(phase) + 1;
   const total = service ? priceForSlot(service.price, slotId) : 0;
   const mult = slotId ? slotMultiplier(slotId) : 1;
 
+  const errors = validateContact(contact);
+  const contactValid = Object.keys(errors).length === 0;
+  const errFor = (k: keyof Contact) =>
+    showAllErrors || touched.has(k) ? errors[k] : undefined;
+
+  const set = (k: keyof Contact, v: string) =>
+    setContact((c) => ({ ...c, [k]: v }));
+  const blur = (k: keyof Contact) =>
+    setTouched((t) => new Set(t).add(k));
+
+  /* 郵便番号が7桁になったら住所を自動補完 */
+  const onPostal = async (v: string) => {
+    set("postal", v);
+    setPostalMsg("");
+    if (v.replace(/[^0-9]/g, "").length !== 7) return;
+    setPostalBusy(true);
+    const found = await lookupPostal(v);
+    setPostalBusy(false);
+    if (found) {
+      set("address", found);
+      setPostalMsg("住所を自動入力しました");
+    } else {
+      setPostalMsg("該当する住所が見つかりません。手入力してください");
+    }
+  };
+
+  const goDetails = () => {
+    if (!contactValid) {
+      setShowAllErrors(true);
+      const first = REQUIRED_CONTACT_FIELDS.find((f) => errors[f]);
+      document.getElementById(first ?? "postal")?.focus();
+      return;
+    }
+    setShowAllErrors(false);
+    setPhase("confirm");
+  };
+
   const confirm = () => {
-    if (!service || !slotId || !craftsman) return;
+    if (!service || !slotId || !craftsman || !contactValid) return;
     saveProject({
       id: crypto.randomUUID(),
       serviceId: service.id,
@@ -47,6 +104,7 @@ export default function CaasBooking() {
       slotId,
       stage: 0,
       createdAt: new Date().toISOString(),
+      contact,
     });
     router.push("/caas/project");
   };
@@ -342,7 +400,185 @@ export default function CaasBooking() {
         </section>
       )}
 
-      {/* ── 4. Confirm ── */}
+      {/* ── 4. Details — 施工先と連絡先 ── */}
+      {phase === "details" && (
+        <section className="animate-rise pt-8">
+          <h2 className="text-2xl font-semibold text-ink">施工先と連絡先</h2>
+          <p className="mt-2 text-sm text-muted">
+            当日の訪問先と、ご連絡先を入力してください。
+          </p>
+
+          {/* 施工先 */}
+          <Card className="mt-7 space-y-5 p-5">
+            <Eyebrow>施工先</Eyebrow>
+
+            <Field
+              label="郵便番号"
+              required
+              htmlFor="postal"
+              error={errFor("postal")}
+              hint={postalBusy ? "検索中…" : postalMsg || undefined}
+            >
+              <Input
+                id="postal"
+                name="postal-code"
+                autoComplete="postal-code"
+                inputMode="numeric"
+                placeholder="150-0043"
+                maxLength={8}
+                value={contact.postal}
+                aria-invalid={!!errFor("postal")}
+                onChange={(e) => onPostal(e.target.value)}
+                onBlur={() => blur("postal")}
+                className="max-w-[180px]"
+              />
+            </Field>
+
+            <Field
+              label="住所"
+              required
+              htmlFor="address"
+              error={errFor("address")}
+            >
+              <Input
+                id="address"
+                name="address-line1"
+                autoComplete="address-line1"
+                placeholder="東京都渋谷区道玄坂1-2-3"
+                value={contact.address}
+                aria-invalid={!!errFor("address")}
+                onChange={(e) => set("address", e.target.value)}
+                onBlur={() => blur("address")}
+              />
+            </Field>
+
+            <Field label="建物名・部屋番号" optional htmlFor="building">
+              <Input
+                id="building"
+                name="address-line2"
+                autoComplete="address-line2"
+                placeholder="〇〇ビル 3F"
+                value={contact.building}
+                onChange={(e) => set("building", e.target.value)}
+              />
+            </Field>
+
+            <Field
+              label="駐車スペース"
+              optional
+              hint="職人の車両を停められる場所の有無"
+            >
+              <div className="flex flex-wrap gap-2">
+                {PARKING_OPTIONS.map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    aria-pressed={contact.parking === p}
+                    onClick={() =>
+                      set("parking", contact.parking === p ? "" : p)
+                    }
+                    className={cn(
+                      "tap rounded-[var(--radius-control)] border px-3.5 text-[13px] font-medium transition-colors",
+                      contact.parking === p
+                        ? "border-ink bg-ink text-white"
+                        : "border-line bg-surface text-ink hover:border-subtle",
+                    )}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </Field>
+          </Card>
+
+          {/* ご連絡先 */}
+          <Card className="mt-3 space-y-5 p-5">
+            <Eyebrow>ご連絡先</Eyebrow>
+
+            <Field
+              label="お名前"
+              required
+              htmlFor="name"
+              error={errFor("name")}
+            >
+              <Input
+                id="name"
+                name="name"
+                autoComplete="name"
+                placeholder="山田 太郎"
+                value={contact.name}
+                aria-invalid={!!errFor("name")}
+                onChange={(e) => set("name", e.target.value)}
+                onBlur={() => blur("name")}
+              />
+            </Field>
+
+            <Field
+              label="電話番号"
+              required
+              htmlFor="phone"
+              hint="当日の到着連絡に使用します"
+              error={errFor("phone")}
+            >
+              <Input
+                id="phone"
+                name="tel"
+                type="tel"
+                autoComplete="tel"
+                inputMode="tel"
+                placeholder="09012345678"
+                value={contact.phone}
+                aria-invalid={!!errFor("phone")}
+                onChange={(e) => set("phone", e.target.value)}
+                onBlur={() => blur("phone")}
+                className="max-w-[240px]"
+              />
+            </Field>
+
+            <Field
+              label="メールアドレス"
+              optional
+              htmlFor="email"
+              hint="予約確認と完了報告書をお送りします"
+              error={errFor("email")}
+            >
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                inputMode="email"
+                placeholder="you@example.com"
+                value={contact.email}
+                aria-invalid={!!errFor("email")}
+                onChange={(e) => set("email", e.target.value)}
+                onBlur={() => blur("email")}
+              />
+            </Field>
+
+            <Field
+              label="ご要望・現地の状況"
+              optional
+              htmlFor="note"
+              hint="設置場所の希望、注意点など"
+            >
+              <Textarea
+                id="note"
+                rows={3}
+                placeholder="レジ裏の天井付近に設置したい"
+                value={contact.note}
+                onChange={(e) => set("note", e.target.value)}
+              />
+            </Field>
+          </Card>
+
+          <p className="mt-4 text-[12px] leading-relaxed text-muted">
+            入力内容は工事の実施のみに使用します。
+          </p>
+        </section>
+      )}
+
+      {/* ── 5. Confirm ── */}
       {phase === "confirm" && service && craftsman && (
         <section className="animate-rise pt-8">
           <h2 className="text-2xl font-semibold text-ink">内容の確認</h2>
@@ -351,7 +587,11 @@ export default function CaasBooking() {
               ["工事", service.label],
               ["日時", fmtSlot(slotId)],
               ["担当", `${craftsman.name}（★${craftsman.rating}）`],
-              ["所要時間", service.duration],
+              [
+                "施工先",
+                `〒${contact.postal}　${contact.address}${contact.building ? ` ${contact.building}` : ""}`,
+              ],
+              ["ご連絡先", `${contact.name}　${contact.phone}`],
             ].map(([l, v]) => (
               <div key={l} className="flex justify-between gap-6 px-5 py-3.5">
                 <dt className="shrink-0 text-[13px] text-muted">{l}</dt>
@@ -360,6 +600,14 @@ export default function CaasBooking() {
                 </dd>
               </div>
             ))}
+            <div className="px-5 py-3">
+              <button
+                onClick={() => setPhase("details")}
+                className="text-[13px] font-medium text-brand"
+              >
+                入力内容を修正する
+              </button>
+            </div>
 
             <div className="space-y-2 px-5 py-4">
               <div className="flex justify-between text-[13px]">
@@ -425,8 +673,13 @@ export default function CaasBooking() {
             <Button
               size="lg"
               disabled={!craftsman}
-              onClick={() => setPhase("confirm")}
+              onClick={() => setPhase("details")}
             >
+              次へ
+            </Button>
+          )}
+          {phase === "details" && (
+            <Button size="lg" onClick={goDetails}>
               確認へ
             </Button>
           )}

@@ -164,8 +164,50 @@ export default function CaasProject() {
         </ol>
       </header>
 
+      {/* ── Site & contact ── */}
+      {project.contact && (
+        <Card className="mt-8 p-5">
+          <Eyebrow>施工先</Eyebrow>
+          <p className="mt-2.5 text-sm leading-relaxed text-ink">
+            〒{project.contact.postal}
+            <br />
+            {project.contact.address}
+            {project.contact.building && ` ${project.contact.building}`}
+          </p>
+          <dl className="mt-4 space-y-2 border-t border-line-2 pt-3.5">
+            <div className="flex justify-between gap-4">
+              <dt className="text-[13px] text-muted">ご担当</dt>
+              <dd className="text-[13px] font-medium text-ink">
+                {project.contact.name}
+              </dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-[13px] text-muted">連絡先</dt>
+              <dd className="tnum text-[13px] font-medium text-ink">
+                <a href={`tel:${project.contact.phone}`} className="text-brand">
+                  {project.contact.phone}
+                </a>
+              </dd>
+            </div>
+            {project.contact.parking && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-[13px] text-muted">駐車</dt>
+                <dd className="text-[13px] font-medium text-ink">
+                  {project.contact.parking}
+                </dd>
+              </div>
+            )}
+          </dl>
+          {project.contact.note && (
+            <p className="mt-4 border-l border-line pl-3.5 text-[13px] leading-relaxed text-muted">
+              {project.contact.note}
+            </p>
+          )}
+        </Card>
+      )}
+
       {/* ── Assigned craftsman ── */}
-      <Card className="mt-8 flex items-center gap-3.5 p-4">
+      <Card className="mt-3 flex items-center gap-3.5 p-4">
         <span className="grid size-10 shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-white">
           {craftsman.initial}
         </span>
