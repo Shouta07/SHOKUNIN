@@ -59,11 +59,11 @@ function Wordmark({ href }: { href: string }) {
   return (
     <Link href={href} className="flex items-center gap-2.5">
       <span className="grid size-7 place-items-center rounded-[7px] bg-brand text-[13px] font-bold text-brand-fg">
-        S
+        C
       </span>
       <span className="leading-tight">
         <span className="block text-[14px] font-semibold tracking-tight text-ink">
-          Safie Field Works
+          CaaS
         </span>
         <span className="block text-[10px] tracking-wide text-subtle">
           Construction as a Service
@@ -107,7 +107,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
         <p className="text-[11px] leading-relaxed text-subtle">
-          セーフィーフィールドワークス
+          工事の受発注プラットフォーム
         </p>
       </aside>
 

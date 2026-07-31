@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Shell from "@/components/caas/Shell";
 
 export const metadata: Metadata = {
-  title: "Safie Field Works — Construction as a Service",
+  title: "CaaS — Construction as a Service",
   description:
     "見積から施工完了まで、電話ゼロで。担当職人を選び、施工の様子を画面で確認できます。",
   openGraph: {
-    title: "Safie Field Works — Construction as a Service",
+    title: "CaaS — Construction as a Service",
     description: "見積から施工完了まで、電話ゼロで。",
     locale: "ja_JP",
     type: "website",

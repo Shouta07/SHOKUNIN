@@ -115,7 +115,7 @@ export default function CaasBooking() {
       <div className="mx-auto max-w-2xl px-5 lg:px-10">
         {/* Hero: what it is · who it's for · one action */}
         <section className="pt-14 pb-16 lg:pt-24 lg:pb-20">
-          <Eyebrow>Safie Field Works ／ 防犯カメラ・電気設備の工事</Eyebrow>
+          <Eyebrow>防犯カメラ・電気設備の工事</Eyebrow>
           <h1 className="mt-5 text-[27px] font-semibold leading-[1.35] text-ink sm:text-[34px] sm:leading-[1.25] lg:text-[46px] lg:leading-[1.2]">
             見積から施工完了まで、
             <br />

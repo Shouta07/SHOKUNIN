@@ -4,7 +4,7 @@
 // 見た目のトークンは src/app/globals.css の @theme に集約。
 // このファイルはドメインのデータとロジックのみを持つ。
 
-// ─── サービス（Safie現場に寄せた工事種別） ───
+// ─── サービス（工事種別） ───
 export interface Service {
   id: string;
   label: string;
@@ -130,7 +130,7 @@ export function nextBundleTier(n: number): { need: number; rate: number } | null
 export interface DocSection { title: string; items: string[]; }
 export const AI_DOC_SECTIONS: DocSection[] = [
   { title: "実施内容", items: ["防犯カメラ 2台 設置（入口・レジ）", "クラウド録画の初期設定", "スマホアプリ連携・動作確認"] },
-  { title: "使用機材・型番", items: ["屋内カメラ SFV-210 ×2", "PoEスイッチ 5ポート ×1", "LANケーブル CAT6 15m"] },
+  { title: "使用機材・型番", items: ["屋内カメラ ×2", "PoEスイッチ 5ポート ×1", "LANケーブル CAT6 15m"] },
   { title: "お客様のご要望（録音より）", items: ["レジ手元がはっきり映るように", "夜間もカラーで見たい", "配線はできるだけ隠したい"] },
   { title: "申し送り・注意事項", items: ["屋外への増設時は防水処理が必要", "録画は30日で自動上書き設定"] },
   { title: "次回メンテナンス", items: ["6ヶ月後にレンズ清掃・画角確認を推奨"] },
