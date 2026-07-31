@@ -36,7 +36,6 @@ export default function RemoteSurvey() {
           {/* preview call */}
           <div style={{ position: "relative", aspectRatio: "16/10", borderRadius: "18px", overflow: "hidden", background: "linear-gradient(160deg,#33414f,#212a34)", marginBottom: "24px", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <div style={{ textAlign: "center", color: "rgba(255,255,255,0.75)" }}>
-              <div style={{ fontSize: "34px" }}>🎥</div>
               <div style={{ fontSize: "13px", marginTop: "6px" }}>ビデオ通話で現地をご案内</div>
             </div>
             <div style={{ position: "absolute", top: "12px", left: "12px", display: "flex", gap: "6px", alignItems: "center", background: "rgba(0,0,0,0.4)", borderRadius: "100px", padding: "5px 11px" }}>
@@ -44,7 +43,7 @@ export default function RemoteSurvey() {
               <span style={{ fontSize: "11px", fontWeight: 700, color: "#fff" }}>現調員が待機中</span>
             </div>
             {/* PIP */}
-            <div style={{ position: "absolute", bottom: "12px", right: "12px", width: "78px", height: "58px", borderRadius: "10px", background: "#1a2430", border: "2px solid rgba(255,255,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px" }}>👷</div>
+            <div style={{ position: "absolute", bottom: "12px", right: "12px", width: "78px", height: "58px", borderRadius: "10px", background: "#1a2430", border: "1px solid rgba(255,255,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "rgba(255,255,255,0.75)" }}>現調員</div>
           </div>
 
           <button onClick={() => setStarted(true)}
@@ -74,17 +73,16 @@ export default function RemoteSurvey() {
             <span style={{ fontSize: "11px", fontWeight: 700, color: "#fff" }}>LIVE 現地調査中</span>
           </div>
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.85)" }}>
-            <div style={{ fontSize: "30px" }}>📍</div>
-            <div style={{ fontSize: "16px", fontWeight: 700, marginTop: "6px" }}>{z.label}</div>
+            <div style={{ fontSize: "16px", fontWeight: 700 }}>{z.label}</div>
             <div style={{ fontSize: "11px", opacity: 0.7, marginTop: "2px" }}>{z.hint}</div>
           </div>
-          <div style={{ position: "absolute", bottom: "12px", right: "12px", width: "72px", height: "54px", borderRadius: "10px", background: "#1a2430", border: "2px solid rgba(255,255,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px" }}>👷</div>
+          <div style={{ position: "absolute", bottom: "12px", right: "12px", width: "72px", height: "54px", borderRadius: "10px", background: "#1a2430", border: "1px solid rgba(255,255,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "rgba(255,255,255,0.75)" }}>現調員</div>
         </div>
 
         {/* surveyor suggestion */}
         <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "16px 18px", marginBottom: "14px" }}>
           <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
-            <div style={{ width: "34px", height: "34px", borderRadius: "50%", background: C.accent, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", flexShrink: 0 }}>👷</div>
+            <div style={{ width: "34px", height: "34px", borderRadius: "50%", background: C.accent, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, flexShrink: 0 }}>現</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: "12px", color: C.faint }}>現調員より</div>
               <p style={{ fontSize: "14px", lineHeight: 1.7, marginTop: "3px" }}>ここには <b>{svc?.label}</b> がおすすめです。{z.reason}</p>

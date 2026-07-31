@@ -32,7 +32,7 @@ export default function CaasAcademy() {
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: "16px", fontWeight: 700 }}>{me.name}</div>
               <div style={{ display: "flex", gap: "8px", alignItems: "center", marginTop: "3px" }}>
-                <span style={{ fontSize: "11px", fontWeight: 700, color: "#fff", background: C.amber, borderRadius: "100px", padding: "3px 10px" }}>🏅 {me.level}</span>
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#fff", background: C.ink, borderRadius: "2px", padding: "4px 10px" }}>{me.level}</span>
                 <span style={{ fontSize: "12px", color: C.sub }}>総合 ★{me.rating}（{me.reviews}件）</span>
               </div>
             </div>
@@ -41,14 +41,13 @@ export default function CaasAcademy() {
           <div style={{ display: "flex", gap: "8px" }}>
             {RATING_AXES.map((ax) => (
               <div key={ax.key} style={{ flex: 1, textAlign: "center" }}>
-                <div style={{ fontSize: "14px" }}>{ax.icon}</div>
-                <div style={{ fontSize: "15px", fontWeight: 700, marginTop: "2px" }}>{me.axes[ax.key].toFixed(1)}</div>
-                <div style={{ fontSize: "9px", color: C.faint }}>{ax.label}</div>
+                <div style={{ fontSize: "16px", fontWeight: 700 }}>{me.axes[ax.key].toFixed(1)}</div>
+                <div style={{ fontSize: "9px", color: C.faint, marginTop: "2px" }}>{ax.label}</div>
               </div>
             ))}
           </div>
           <p style={{ fontSize: "11px", color: C.sub, marginTop: "14px", lineHeight: 1.6, background: C.accentSoft, borderRadius: "10px", padding: "10px 12px" }}>
-            💬 顧客の声：{me.hospitalityQuote}
+            顧客の声：{me.hospitalityQuote}
           </p>
         </div>
 
@@ -63,7 +62,6 @@ export default function CaasAcademy() {
                 <button onClick={() => setOpenCat(open ? "" : cat.id)}
                   style={{ width: "100%", textAlign: "left", background: "none", border: "none", cursor: "pointer", padding: "16px 18px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                    <span style={{ fontSize: "22px" }}>{cat.icon}</span>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                         <span style={{ fontSize: "15px", fontWeight: 600 }}>{cat.label}</span>
@@ -96,8 +94,7 @@ export default function CaasAcademy() {
                     {playing && cat.modules.some((m) => m.id === playing) && (
                       <div style={{ marginTop: "10px", borderRadius: "12px", overflow: "hidden", background: "linear-gradient(135deg,#2b3542,#1a2430)", aspectRatio: "16/9", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
                         <div style={{ textAlign: "center", color: "rgba(255,255,255,0.7)" }}>
-                          <div style={{ fontSize: "30px" }}>▶</div>
-                          <div style={{ fontSize: "11px", marginTop: "4px" }}>{cat.modules.find((m) => m.id === playing)?.title}</div>
+                          <div style={{ fontSize: "11px", letterSpacing: "0.06em" }}>▶ {cat.modules.find((m) => m.id === playing)?.title}</div>
                         </div>
                         <span style={{ position: "absolute", top: "10px", left: "10px", fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>現場撮影マニュアル</span>
                       </div>

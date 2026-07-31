@@ -121,12 +121,11 @@ export default function CaasProject() {
             {recording && (
               <>
                 <p style={{ fontSize: "11px", color: C.faint, lineHeight: 1.6, marginBottom: "12px" }}>お客様の許可のもと記録。AIが完成図書と申し送りを自動生成します。</p>
-                <div style={{ display: "flex", gap: "8px" }}>
-                  {[{ i: "👷", t: "職人の負担減", d: "書類作成が自動化" }, { i: "😊", t: "顧客満足", d: "証跡と説明が残る" }, { i: "🧠", t: "ナレッジ蓄積", d: "SFWに技術が貯まる" }].map((b) => (
-                    <div key={b.t} style={{ flex: 1, background: C.bg, borderRadius: "10px", padding: "10px 8px", textAlign: "center" }}>
-                      <div style={{ fontSize: "16px" }}>{b.i}</div>
-                      <div style={{ fontSize: "11px", fontWeight: 700, marginTop: "3px" }}>{b.t}</div>
-                      <div style={{ fontSize: "9px", color: C.faint, marginTop: "1px", lineHeight: 1.4 }}>{b.d}</div>
+                <div style={{ display: "flex", borderTop: `1px solid ${C.lineSoft}`, paddingTop: "12px" }}>
+                  {[{ t: "職人の負担減", d: "書類作成が自動化" }, { t: "顧客満足", d: "証跡と説明が残る" }, { t: "ナレッジ蓄積", d: "SFWに技術が貯まる" }].map((b) => (
+                    <div key={b.t} style={{ flex: 1, textAlign: "center", padding: "0 4px" }}>
+                      <div style={{ fontSize: "12px", fontWeight: 700 }}>{b.t}</div>
+                      <div style={{ fontSize: "9px", color: C.faint, marginTop: "3px", lineHeight: 1.4 }}>{b.d}</div>
                     </div>
                   ))}
                 </div>
@@ -184,8 +183,7 @@ export default function CaasProject() {
               </div>
               <div style={{ position: "absolute", top: "12px", right: "12px", fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>現場カメラ・Safie</div>
               <div style={{ textAlign: "center", color: "rgba(255,255,255,0.5)" }}>
-                <div style={{ fontSize: "34px", marginBottom: "6px" }}>📹</div>
-                <div style={{ fontSize: "12px" }}>施工の様子を配信中</div>
+                <div style={{ fontSize: "12px", letterSpacing: "0.08em" }}>施工の様子を配信中</div>
               </div>
               <div style={{ position: "absolute", bottom: "12px", left: "12px", right: "12px", fontSize: "12px", color: "#fff", fontWeight: 600 }}>
                 {shownTimeline[shownTimeline.length - 1]?.label ?? "まもなく開始します"}
@@ -208,7 +206,7 @@ export default function CaasProject() {
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {[...shownTimeline].reverse().map((t) => (
                 <div key={t.time} style={{ display: "flex", gap: "12px", alignItems: "center", background: C.surface, border: `1px solid ${C.line}`, borderRadius: "14px", padding: "10px 12px" }}>
-                  <div style={{ width: "56px", height: "56px", borderRadius: "10px", background: "linear-gradient(135deg,#dbe3ec,#c8d3df)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" }}>📷</div>
+                  <div style={{ width: "56px", height: "56px", borderRadius: "4px", background: C.bg, border: `1px solid ${C.line}`, flexShrink: 0 }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: "13px", fontWeight: 600 }}>{t.label}</div>
                     <div style={{ fontSize: "11px", color: C.faint, marginTop: "2px" }}>{t.time}</div>
@@ -222,9 +220,8 @@ export default function CaasProject() {
         {/* done */}
         {stage.id === "done" && (
           <div style={{ animation: "cUp 400ms ease both" }}>
-            <div style={{ background: "#eafaf1", border: `1px solid ${C.ok}33`, borderRadius: "14px", padding: "18px 20px", marginBottom: "16px", textAlign: "center" }}>
-              <div style={{ fontSize: "26px", marginBottom: "6px" }}>🎉</div>
-              <div style={{ fontSize: "16px", fontWeight: 700, color: C.ok }}>工事が完了しました</div>
+            <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "4px", padding: "18px 20px", marginBottom: "16px" }}>
+              <div style={{ fontSize: "16px", fontWeight: 700 }}>工事が完了しました</div>
               <p style={{ fontSize: "13px", color: C.sub, marginTop: "6px" }}>お疲れさまでした。完了報告書と保証書をお届けします。</p>
             </div>
 
@@ -232,30 +229,26 @@ export default function CaasProject() {
             <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
               {["Before", "After"].map((l) => (
                 <div key={l} style={{ flex: 1 }}>
-                  <div style={{ aspectRatio: "4/3", borderRadius: "12px", background: l === "After" ? "linear-gradient(135deg,#dce9dc,#cfe0cf)" : "linear-gradient(135deg,#e7e2da,#ddd6cb)", border: `1px solid ${C.line}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", color: C.faint, fontWeight: 600 }}>{l}</div>
+                  <div style={{ aspectRatio: "4/3", borderRadius: "4px", background: C.bg, border: `1px solid ${C.line}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", letterSpacing: "0.1em", color: C.faint, fontWeight: 600, textTransform: "uppercase" }}>{l}</div>
                 </div>
               ))}
             </div>
 
             {/* warranty */}
-            <div style={{ background: C.surface, border: `1px solid ${C.amber}44`, borderRadius: "16px", padding: "18px 20px", marginBottom: "16px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-                <span style={{ fontSize: "20px" }}>🛡️</span>
-                <span style={{ fontSize: "15px", fontWeight: 700 }}>保証書（1年間）</span>
-              </div>
+            <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "4px", padding: "18px 20px", marginBottom: "16px" }}>
+              <div style={{ fontSize: "15px", fontWeight: 700, marginBottom: "6px" }}>保証書（1年間）</div>
               <p style={{ fontSize: "13px", color: C.sub, lineHeight: 1.7 }}>施工箇所の不具合は1年間無償対応。この画面からいつでも呼び出せます。</p>
             </div>
 
             {/* AI完成図書（録音→自動生成） */}
             <SectionTitle>AI完成図書（たたき）</SectionTitle>
             <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "18px 20px", marginBottom: "16px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "9px", marginBottom: "14px" }}>
-                <span style={{ fontSize: "18px" }}>🤖</span>
+              <div style={{ marginBottom: "8px" }}>
                 <span style={{ fontSize: "13px", color: C.sub, lineHeight: 1.6 }}>現場の映像・音声からAIが自動生成しました。職人の手入力はゼロ。</span>
               </div>
               {AI_DOC_SECTIONS.map((sec) => (
                 <div key={sec.title} style={{ paddingTop: "12px", marginTop: "12px", borderTop: `1px solid ${C.lineSoft}` }}>
-                  <div style={{ fontSize: "12px", fontWeight: 700, color: C.accent, marginBottom: "8px" }}>{sec.title}</div>
+                  <div style={{ fontSize: "11px", fontWeight: 700, color: C.faint, letterSpacing: "0.08em", marginBottom: "8px" }}>{sec.title}</div>
                   {sec.items.map((it) => (
                     <div key={it} style={{ display: "flex", gap: "8px", alignItems: "flex-start", marginBottom: "5px" }}>
                       <span style={{ color: C.faint, fontSize: "12px", lineHeight: 1.6 }}>・</span>
@@ -265,8 +258,8 @@ export default function CaasProject() {
                 </div>
               ))}
               <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
-                <button style={{ flex: 1, fontSize: "13px", fontWeight: 600, color: "#fff", background: C.accent, border: "none", borderRadius: "10px", padding: "11px", cursor: "pointer" }}>PDFで受け取る</button>
-                <button style={{ flex: 1, fontSize: "13px", fontWeight: 600, color: C.ink, background: C.surface, border: `1px solid ${C.line}`, borderRadius: "10px", padding: "11px", cursor: "pointer" }}>内容を修正</button>
+                <button style={{ flex: 1, fontSize: "13px", fontWeight: 600, color: "#fff", background: C.ink, border: "none", borderRadius: "2px", padding: "12px", cursor: "pointer" }}>PDFで受け取る</button>
+                <button style={{ flex: 1, fontSize: "13px", fontWeight: 600, color: C.ink, background: C.surface, border: `1px solid ${C.line}`, borderRadius: "2px", padding: "12px", cursor: "pointer" }}>内容を修正</button>
               </div>
               <p style={{ fontSize: "10px", color: C.faint, marginTop: "12px", lineHeight: 1.6 }}>この記録はSFWのナレッジとして蓄積され、次の現場の品質向上に使われます（個人情報は除外）。</p>
             </div>

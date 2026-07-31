@@ -64,11 +64,11 @@ export default function CaasSites() {
 
         {/* actions */}
         <div style={{ display: "flex", gap: "10px", marginBottom: "18px", flexWrap: "wrap" }}>
-          <button onClick={exportCSV} style={{ fontSize: "13px", fontWeight: 600, color: "#fff", background: C.accent, border: "none", borderRadius: "10px", padding: "11px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: "7px" }}>
-            ⬇ CSVエクスポート
+          <button onClick={exportCSV} style={{ fontSize: "13px", fontWeight: 600, color: "#fff", background: C.ink, border: "none", borderRadius: "2px", padding: "11px 20px", cursor: "pointer" }}>
+            CSVエクスポート
           </button>
-          <button onClick={() => setAdding(!adding)} style={{ fontSize: "13px", fontWeight: 600, color: C.ink, background: C.surface, border: `1px solid ${C.line}`, borderRadius: "10px", padding: "11px 18px", cursor: "pointer" }}>
-            ＋ 拠点を追加
+          <button onClick={() => setAdding(!adding)} style={{ fontSize: "13px", fontWeight: 600, color: C.ink, background: C.surface, border: `1px solid ${C.line}`, borderRadius: "2px", padding: "11px 18px", cursor: "pointer" }}>
+            拠点を追加
           </button>
           <button onClick={() => { navigator.clipboard?.writeText(buildSitesCSV(sites)); setCopied(true); setTimeout(() => setCopied(false), 1600); }}
             style={{ fontSize: "13px", fontWeight: 600, color: C.sub, background: "none", border: `1px solid ${C.line}`, borderRadius: "10px", padding: "11px 18px", cursor: "pointer" }}>
@@ -128,19 +128,19 @@ export default function CaasSites() {
         </div>
 
         {/* CSV / kintone note */}
-        <div style={{ background: C.accentSoft, borderRadius: "12px", padding: "14px 16px", marginTop: "18px", fontSize: "12px", color: C.sub, lineHeight: 1.8 }}>
-          💡 エクスポートしたCSV（UTF-8・BOM付き）は、kintoneや基幹システムにそのまま取り込めます。将来はAPI連携で自動同期も可能です。
+        <div style={{ borderLeft: `2px solid ${C.line}`, paddingLeft: "14px", marginTop: "18px", fontSize: "12px", color: C.sub, lineHeight: 1.8 }}>
+          エクスポートしたCSV（UTF-8・BOM付き）は、kintoneや基幹システムにそのまま取り込めます。将来はAPI連携で自動同期も可能です。
         </div>
 
         {/* Referral campaign */}
-        <div style={{ marginTop: "28px", background: "linear-gradient(135deg, #2f6bed, #4f6ef7)", borderRadius: "18px", padding: "24px", color: "#fff" }}>
-          <div style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", opacity: 0.85 }}>REFERRAL CAMPAIGN</div>
+        <div style={{ marginTop: "28px", background: C.surface, border: `1px solid ${C.line}`, borderRadius: "4px", padding: "24px" }}>
+          <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.14em", color: C.faint, textTransform: "uppercase" }}>Referral</div>
           <h2 style={{ fontSize: "19px", fontWeight: 700, margin: "10px 0 8px", lineHeight: 1.4 }}>紹介で、双方に {fmtYen(REFERRAL.rewardYou)} 分クーポン</h2>
-          <p style={{ fontSize: "13px", opacity: 0.9, lineHeight: 1.7, marginBottom: "16px" }}>{REFERRAL.message}</p>
+          <p style={{ fontSize: "13px", color: C.sub, lineHeight: 1.7, marginBottom: "16px" }}>{REFERRAL.message}</p>
           <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-            <div style={{ background: "rgba(255,255,255,0.15)", borderRadius: "10px", padding: "12px 18px", fontSize: "17px", fontWeight: 700, letterSpacing: "0.08em" }}>{REFERRAL.code}</div>
-            <button onClick={() => { navigator.clipboard?.writeText(REFERRAL.code); }} style={{ fontSize: "13px", fontWeight: 700, color: C.accent, background: "#fff", border: "none", borderRadius: "10px", padding: "12px 20px", cursor: "pointer" }}>
-              紹介コードをコピー
+            <div style={{ background: C.bg, border: `1px solid ${C.line}`, borderRadius: "2px", padding: "12px 18px", fontSize: "17px", fontWeight: 700, letterSpacing: "0.08em" }}>{REFERRAL.code}</div>
+            <button onClick={() => { navigator.clipboard?.writeText(REFERRAL.code); }} style={{ fontSize: "13px", fontWeight: 600, color: "#fff", background: C.ink, border: "none", borderRadius: "2px", padding: "13px 20px", cursor: "pointer" }}>
+              コードをコピー
             </button>
           </div>
         </div>

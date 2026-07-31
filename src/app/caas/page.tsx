@@ -39,8 +39,8 @@ export default function CaasBooking() {
   const btn = (label: string, onClick: () => void, primary = true, disabled = false): React.ReactNode => (
     <button onClick={onClick} disabled={disabled}
       style={{ width: "100%", fontSize: "15px", fontWeight: 600, letterSpacing: "0.02em",
-        background: disabled ? C.lineSoft : primary ? C.accent : C.surface, color: disabled ? C.faint : primary ? "#fff" : C.ink,
-        border: primary ? "none" : `1px solid ${C.line}`, borderRadius: "14px", padding: "16px", cursor: disabled ? "default" : "pointer", transition: "all 200ms" }}>
+        background: disabled ? C.lineSoft : primary ? C.ink : C.surface, color: disabled ? C.faint : primary ? "#fff" : C.ink,
+        border: primary ? "none" : `1px solid ${C.line}`, borderRadius: "2px", padding: "16px", cursor: disabled ? "default" : "pointer", transition: "all 200ms" }}>
       {label}
     </button>
   );
@@ -103,18 +103,17 @@ export default function CaasBooking() {
         {phase === "service" && (
           <div style={{ paddingTop: "8px" }}>
             <Progress n={1} />
-            <h2 style={{ fontSize: "22px", fontWeight: 700, marginBottom: "6px" }}>どんな工事ですか？</h2>
-            <p style={{ fontSize: "14px", color: C.sub, marginBottom: "24px" }}>選ぶと、すぐに見積が出ます。</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <h2 style={{ fontSize: "22px", fontWeight: 700, marginBottom: "6px", letterSpacing: "-0.01em" }}>どんな工事ですか</h2>
+            <p style={{ fontSize: "14px", color: C.sub, marginBottom: "20px" }}>選ぶと、すぐに見積が出ます。</p>
+            <div style={{ borderTop: `1px solid ${C.line}` }}>
               {SERVICES.map((s) => (
                 <button key={s.id} onClick={() => { setService(s); setPhase("quote"); }}
-                  style={{ display: "flex", alignItems: "center", gap: "14px", width: "100%", textAlign: "left", background: C.surface, border: `1px solid ${C.line}`, borderRadius: "14px", padding: "16px 18px", cursor: "pointer", transition: "all 200ms" }}>
-                  <span style={{ fontSize: "26px" }}>{s.icon}</span>
+                  style={{ display: "flex", alignItems: "center", gap: "14px", width: "100%", textAlign: "left", background: "none", border: "none", borderBottom: `1px solid ${C.line}`, padding: "18px 2px", cursor: "pointer" }}>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: "15px", fontWeight: 600 }}>{s.label}</div>
+                    <div style={{ fontSize: "16px", fontWeight: 600 }}>{s.label}</div>
                     <div style={{ fontSize: "12px", color: C.faint, marginTop: "3px" }}>{s.duration}・{s.desc}</div>
                   </div>
-                  <span style={{ color: C.faint }}>›</span>
+                  <span style={{ color: C.faint, fontSize: "15px" }}>→</span>
                 </button>
               ))}
             </div>
@@ -134,17 +133,14 @@ export default function CaasBooking() {
               </div>
             ) : (
               <div style={{ animation: "caasUp 500ms ease both" }}>
-                <div style={{ fontSize: "13px", fontWeight: 600, color: C.accent, marginBottom: "10px" }}>お見積り（税込・目安）</div>
-                <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "18px", padding: "28px 24px", marginBottom: "20px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "22px" }}>
-                    <span style={{ fontSize: "28px" }}>{service.icon}</span>
-                    <div>
-                      <div style={{ fontSize: "16px", fontWeight: 600 }}>{service.label}</div>
-                      <div style={{ fontSize: "12px", color: C.faint }}>{service.duration}</div>
-                    </div>
+                <div style={{ fontSize: "11px", fontWeight: 600, color: C.faint, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "12px" }}>お見積り（税込・目安）</div>
+                <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "4px", padding: "26px 24px", marginBottom: "20px" }}>
+                  <div style={{ marginBottom: "20px" }}>
+                    <div style={{ fontSize: "16px", fontWeight: 600 }}>{service.label}</div>
+                    <div style={{ fontSize: "12px", color: C.faint, marginTop: "2px" }}>{service.duration}</div>
                   </div>
                   <div style={{ display: "flex", alignItems: "baseline", gap: "8px", paddingTop: "20px", borderTop: `1px solid ${C.lineSoft}` }}>
-                    <span style={{ fontSize: "40px", fontWeight: 700, letterSpacing: "-0.02em" }}>{fmtYen(service.price)}</span>
+                    <span style={{ fontSize: "40px", fontWeight: 700, letterSpacing: "-0.03em" }}>{fmtYen(service.price)}</span>
                     <span style={{ fontSize: "13px", color: C.sub }}>〜</span>
                   </div>
                   <p style={{ fontSize: "12px", color: C.faint, marginTop: "10px", lineHeight: 1.7 }}>
@@ -167,11 +163,11 @@ export default function CaasBooking() {
 
             {/* legend */}
             <div style={{ display: "flex", gap: "14px", marginBottom: "14px", fontSize: "12px", color: C.sub, flexWrap: "wrap" }}>
-              <span><b style={{ color: C.ok }}>○</b> 空き</span>
-              <span><b style={{ color: C.amber }}>△</b> 残少</span>
-              <span><b style={{ color: C.faint }}>×</b> 満</span>
-              <span style={{ color: "#e5484d" }}>⚡ 特急</span>
-              <span style={{ color: C.ok }}>お得</span>
+              <span><b>○</b> 空き</span>
+              <span><b>△</b> 残少</span>
+              <span><b>×</b> 満</span>
+              <span style={{ color: "#c2603f" }}>特急=近日</span>
+              <span style={{ color: C.ok }}>お得=先の日</span>
             </div>
 
             {/* grid */}
@@ -243,35 +239,28 @@ export default function CaasBooking() {
                 const sel = craftsman?.id === c.id;
                 return (
                   <button key={c.id} onClick={() => setCraftsman(c)}
-                    style={{ textAlign: "left", width: "100%", background: C.surface, border: `1.5px solid ${sel ? C.accent : C.line}`, borderRadius: "16px", padding: "18px", cursor: "pointer", transition: "all 200ms" }}>
+                    style={{ textAlign: "left", width: "100%", background: sel ? C.bg : C.surface, border: `1px solid ${sel ? C.ink : C.line}`, borderRadius: "4px", padding: "18px", cursor: "pointer", transition: "all 200ms" }}>
                     <div style={{ display: "flex", gap: "14px", alignItems: "center" }}>
-                      <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: c.color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", fontWeight: 700, flexShrink: 0 }}>{c.initial}</div>
+                      <div style={{ width: "46px", height: "46px", borderRadius: "50%", background: C.ink, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", fontWeight: 700, flexShrink: 0 }}>{c.initial}</div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <span style={{ fontSize: "15px", fontWeight: 600 }}>{c.name}</span>
-                        </div>
+                        <div style={{ fontSize: "15px", fontWeight: 600 }}>{c.name}</div>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "3px" }}>
-                          <span style={{ fontSize: "13px", fontWeight: 600, color: C.amber }}>★ {c.rating}</span>
-                          <span style={{ fontSize: "12px", color: C.faint }}>({c.reviews}件)・{c.area}・{c.years}年</span>
+                          <span style={{ fontSize: "13px", fontWeight: 600 }}>★ {c.rating}</span>
+                          <span style={{ fontSize: "12px", color: C.faint }}>{c.reviews}件・{c.area}・{c.years}年・{c.level}</span>
                         </div>
                       </div>
-                      {sel && <span style={{ color: C.accent, fontSize: "18px" }}>✓</span>}
+                      {sel && <span style={{ color: C.ink, fontSize: "16px" }}>✓</span>}
                     </div>
-                    {/* Uber型 ホスピタリティ多軸 */}
-                    <div style={{ display: "flex", gap: "6px", marginTop: "12px" }}>
+                    {/* ホスピタリティ多軸 */}
+                    <div style={{ display: "flex", marginTop: "14px", borderTop: `1px solid ${C.lineSoft}`, paddingTop: "12px" }}>
                       {RATING_AXES.map((ax) => (
-                        <div key={ax.key} style={{ flex: 1, background: C.bg, borderRadius: "10px", padding: "8px 4px", textAlign: "center" }}>
-                          <div style={{ fontSize: "13px" }}>{ax.icon}</div>
-                          <div style={{ fontSize: "12px", fontWeight: 700, color: C.ink, marginTop: "2px" }}>{c.axes[ax.key].toFixed(1)}</div>
-                          <div style={{ fontSize: "9px", color: C.faint }}>{ax.label}</div>
+                        <div key={ax.key} style={{ flex: 1, textAlign: "center" }}>
+                          <div style={{ fontSize: "14px", fontWeight: 700, color: C.ink }}>{c.axes[ax.key].toFixed(1)}</div>
+                          <div style={{ fontSize: "10px", color: C.faint, marginTop: "2px" }}>{ax.label}</div>
                         </div>
                       ))}
                     </div>
-                    <div style={{ display: "flex", gap: "6px", marginTop: "10px", flexWrap: "wrap", alignItems: "center" }}>
-                      <span style={{ fontSize: "10px", fontWeight: 700, color: "#fff", background: C.amber, borderRadius: "100px", padding: "3px 9px" }}>🏅 {c.level}</span>
-                      {c.badges.slice(0, 2).map((b) => <span key={b} style={{ fontSize: "10px", color: C.accent, background: C.accentSoft, borderRadius: "100px", padding: "3px 9px" }}>{b}</span>)}
-                    </div>
-                    <p style={{ fontSize: "12px", color: C.sub, marginTop: "10px" }}>{c.hospitalityQuote}</p>
+                    <p style={{ fontSize: "12px", color: C.sub, marginTop: "12px" }}>{c.hospitalityQuote}</p>
                   </button>
                 );
               })}
@@ -286,7 +275,7 @@ export default function CaasBooking() {
             <h2 style={{ fontSize: "22px", fontWeight: 700, marginBottom: "24px" }}>この内容で予約します</h2>
             <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "18px", padding: "22px 24px", marginBottom: "20px" }}>
               {[
-                { l: "工事", v: `${service.icon} ${service.label}` },
+                { l: "工事", v: service.label },
                 { l: "日時", v: fmtSlot(slotId) },
                 { l: "担当", v: `${craftsman.name}（★${craftsman.rating}）` },
               ].map((r, i, arr) => (

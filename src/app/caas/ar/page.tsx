@@ -68,7 +68,7 @@ export default function ArSim() {
 
         {/* mission */}
         <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "14px", padding: "14px 16px", marginBottom: "14px" }}>
-          <div style={{ fontSize: "12px", fontWeight: 700, color: C.faint, marginBottom: "10px" }}>🎯 設置ミッション（達成で +50pt）</div>
+          <div style={{ fontSize: "12px", fontWeight: 700, color: C.faint, marginBottom: "10px" }}>設置ミッション（達成で +50pt）</div>
           {missions.map((m) => (
             <div key={m.label} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "4px 0" }}>
               <span style={{ width: "20px", height: "20px", borderRadius: "50%", background: m.done ? C.ok : C.bg, border: `1.5px solid ${m.done ? C.ok : C.line}`, color: "#fff", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{m.done ? "✓" : ""}</span>
@@ -79,7 +79,7 @@ export default function ArSim() {
 
         {/* mode toggle */}
         <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
-          {([["photo", "📷 写真で配置"], ["live", "📡 ライブAR"]] as ["photo" | "live", string][]).map(([k, l]) => (
+          {([["photo", "写真で配置"], ["live", "ライブAR"]] as ["photo" | "live", string][]).map(([k, l]) => (
             <button key={k} onClick={() => setMode(k)}
               style={{ flex: 1, fontSize: "12px", fontWeight: 700, padding: "10px", borderRadius: "10px", cursor: "pointer", fontFamily: SANS,
                 background: mode === k ? C.accent : C.surface, color: mode === k ? "#fff" : C.sub, border: `1px solid ${mode === k ? C.accent : C.line}` }}>
@@ -115,7 +115,6 @@ export default function ArSim() {
               <div style={{ position: "absolute", left: `${c.x}%`, top: `${c.y}%`, width: "46%", height: "46%", transform: "translate(-50%,-50%)", borderRadius: "50%", background: `radial-gradient(circle, ${C.accent}55 0%, ${C.accent}22 45%, transparent 70%)`, pointerEvents: "none" }} />
               <button onClick={(e) => remove(c.id, e)}
                 style={{ position: "absolute", left: `${c.x}%`, top: `${c.y}%`, transform: "translate(-50%,-50%)", width: "34px", height: "34px", borderRadius: "50%", background: C.accent, border: "2px solid #fff", color: "#fff", fontSize: "15px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.3)" }}>
-                📷
               </button>
             </div>
           ))}
@@ -123,7 +122,6 @@ export default function ArSim() {
           {/* empty hint */}
           {cams.length === 0 && (
             <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", pointerEvents: "none", color: "rgba(255,255,255,0.7)" }}>
-              <div style={{ fontSize: "30px", marginBottom: "8px" }}>👆</div>
               <div style={{ fontSize: "13px" }}>タップして、カメラを設置</div>
               <div style={{ fontSize: "11px", opacity: 0.6, marginTop: "4px" }}>青い円が監視範囲です</div>
             </div>
@@ -132,7 +130,6 @@ export default function ArSim() {
           {/* celebration */}
           {celebrate && (
             <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(20,32,43,0.55)", animation: "arFade 300ms ease both" }}>
-              <div style={{ fontSize: "44px", animation: "arPop 500ms cubic-bezier(0.22,1,0.36,1) both" }}>🎉</div>
               <div style={{ fontSize: "18px", fontWeight: 800, color: "#fff", marginTop: "8px" }}>死角ゼロ設計 達成！</div>
               <div style={{ fontSize: "14px", color: "#fff", marginTop: "4px", fontWeight: 700 }}>+50 pt</div>
             </div>

@@ -23,10 +23,9 @@ export default function Industries() {
         <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "6px", marginBottom: "20px" }}>
           {INDUSTRIES.map((i) => (
             <button key={i.id} onClick={() => setSel(i.id)}
-              style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: "5px", padding: "12px 14px", borderRadius: "14px", cursor: "pointer", fontFamily: SANS,
-                background: sel === i.id ? C.accent : C.surface, border: `1px solid ${sel === i.id ? C.accent : C.line}`, color: sel === i.id ? "#fff" : C.ink, minWidth: "76px" }}>
-              <span style={{ fontSize: "22px" }}>{i.icon}</span>
-              <span style={{ fontSize: "12px", fontWeight: 600 }}>{i.label}</span>
+              style={{ flexShrink: 0, padding: "11px 18px", borderRadius: "2px", cursor: "pointer", fontFamily: SANS, fontSize: "13px", fontWeight: 600,
+                background: sel === i.id ? C.ink : C.surface, border: `1px solid ${sel === i.id ? C.ink : C.line}`, color: sel === i.id ? "#fff" : C.ink, whiteSpace: "nowrap" }}>
+              {i.label}
             </button>
           ))}
         </div>
@@ -69,12 +68,12 @@ export default function Industries() {
         </div>
 
         <button onClick={() => router.push("/caas")}
-          style={{ width: "100%", fontSize: "15px", fontWeight: 700, color: "#fff", background: C.accent, border: "none", borderRadius: "14px", padding: "16px", cursor: "pointer" }}>
+          style={{ width: "100%", fontSize: "15px", fontWeight: 600, color: "#fff", background: C.ink, border: "none", borderRadius: "2px", padding: "16px", cursor: "pointer" }}>
           {ind.label}向けの見積を出す
         </button>
 
-        <div style={{ background: C.accentSoft, borderRadius: "12px", padding: "14px 16px", marginTop: "18px", fontSize: "12px", color: C.sub, lineHeight: 1.8 }}>
-          🔑 ログイン（ID/パスワード）後は、貴社の業種・業態・規模に合わせて「似た会社の導入例」を自動で比較表示します。
+        <div style={{ borderLeft: `2px solid ${C.line}`, paddingLeft: "14px", marginTop: "18px", fontSize: "12px", color: C.sub, lineHeight: 1.8 }}>
+          ログイン（ID/パスワード）後は、貴社の業種・業態・規模に合わせて「似た会社の導入例」を自動で比較表示します。
         </div>
 
       </div>
