@@ -2,7 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { C, SANS, INDUSTRIES } from "@/lib/caas";
+import { INDUSTRIES } from "@/lib/caas";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Eyebrow, Badge, Meter } from "@/components/ui/primitives";
+import { cn } from "@/lib/utils";
 
 export default function Industries() {
   const router = useRouter();
@@ -10,73 +14,126 @@ export default function Industries() {
   const ind = INDUSTRIES.find((i) => i.id === sel)!;
 
   return (
-    <div style={{ fontFamily: SANS, color: C.ink }}>
-      <div style={{ maxWidth: "560px", margin: "0 auto", padding: "28px 20px 60px" }}>
+    <div className="mx-auto max-w-2xl px-5 pb-16 lg:px-10">
+      {/* ── Header ── */}
+      <header className="pt-8">
+        <Eyebrow>業界別の価値</Eyebrow>
+        <h1 className="mt-2 text-2xl font-semibold text-ink">
+          設備が、価値になる。
+        </h1>
+        <p className="mt-1.5 text-sm text-muted">
+          同業がどう使い、何を得たかを見る。
+        </p>
+      </header>
 
-        <div style={{ marginBottom: "18px" }}>
-          <div style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.12em", color: C.accent }}>VALUE BY INDUSTRY</div>
-          <h1 style={{ fontSize: "24px", fontWeight: 800, marginTop: "6px", lineHeight: 1.35 }}>この業界では、<br />設備がこう価値になる。</h1>
-          <p style={{ fontSize: "13px", color: C.sub, marginTop: "8px", lineHeight: 1.7 }}>設備はコストではなく、事業価値を上げる投資。同業がどう使い、何を得たかを見る。</p>
-        </div>
-
-        {/* industry picker */}
-        <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "6px", marginBottom: "20px" }}>
-          {INDUSTRIES.map((i) => (
-            <button key={i.id} onClick={() => setSel(i.id)}
-              style={{ flexShrink: 0, padding: "11px 18px", borderRadius: "2px", cursor: "pointer", fontFamily: SANS, fontSize: "13px", fontWeight: 600,
-                background: sel === i.id ? C.ink : C.surface, border: `1px solid ${sel === i.id ? C.ink : C.line}`, color: sel === i.id ? "#fff" : C.ink, whiteSpace: "nowrap" }}>
+      {/* ── Industry picker ── */}
+      <div
+        role="tablist"
+        aria-label="業界"
+        className="-mx-5 mt-6 flex gap-2 overflow-x-auto px-5 pb-1 lg:mx-0 lg:px-0"
+      >
+        {INDUSTRIES.map((i) => {
+          const on = sel === i.id;
+          return (
+            <button
+              key={i.id}
+              role="tab"
+              id={`tab-${i.id}`}
+              aria-selected={on}
+              aria-controls="industry-panel"
+              onClick={() => setSel(i.id)}
+              className={cn(
+                "tap shrink-0 whitespace-nowrap rounded-[var(--radius-control)] border px-4 text-[13px] font-medium transition-colors",
+                on
+                  ? "border-ink bg-ink text-white"
+                  : "border-line bg-surface text-ink hover:border-subtle",
+              )}
+            >
               {i.label}
             </button>
-          ))}
-        </div>
-
-        {/* adoption comparison */}
-        <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "20px", marginBottom: "14px" }}>
-          <div style={{ fontSize: "13px", color: C.sub, marginBottom: "12px" }}>{ind.label}の導入率</div>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: "6px", marginBottom: "10px" }}>
-            <span style={{ fontSize: "40px", fontWeight: 800, color: C.accent, lineHeight: 1 }}>{ind.adoption}%</span>
-            <span style={{ fontSize: "13px", color: C.sub, marginBottom: "5px" }}>が すでに導入済み</span>
-          </div>
-          <div style={{ height: "10px", background: C.lineSoft, borderRadius: "100px", overflow: "hidden", marginBottom: "8px" }}>
-            <div style={{ width: `${ind.adoption}%`, height: "100%", background: C.accent, borderRadius: "100px", transition: "width 400ms" }} />
-          </div>
-          <div style={{ fontSize: "12px", color: C.amber, fontWeight: 600 }}>あなたはまだ未導入 — 競合に差をつけられています</div>
-        </div>
-
-        {/* value metrics — 設備価値向上 */}
-        <div style={{ marginBottom: "8px", fontSize: "12px", fontWeight: 700, color: C.faint, letterSpacing: "0.06em" }}>導入で得られる価値</div>
-        <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
-          {ind.values.map((v) => (
-            <div key={v.label} style={{ flex: 1, background: C.surface, border: `1px solid ${C.line}`, borderRadius: "14px", padding: "16px 10px", textAlign: "center" }}>
-              <div style={{ fontSize: "19px", fontWeight: 800, color: C.ok }}>{v.value}</div>
-              <div style={{ fontSize: "11px", color: C.sub, marginTop: "4px", lineHeight: 1.4 }}>{v.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* typical setup */}
-        <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "18px 20px", marginBottom: "14px" }}>
-          <div style={{ fontSize: "12px", fontWeight: 700, color: C.faint, marginBottom: "12px" }}>この業界の定番構成</div>
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            {ind.setup.map((s) => <span key={s} style={{ fontSize: "13px", color: C.accent, background: C.accentSoft, borderRadius: "100px", padding: "8px 14px" }}>{s}</span>)}
-          </div>
-        </div>
-
-        {/* insight */}
-        <div style={{ borderLeft: `3px solid ${C.accent}`, paddingLeft: "16px", marginBottom: "24px" }}>
-          <p style={{ fontSize: "14px", color: C.ink, lineHeight: 1.9 }}>{ind.insight}</p>
-        </div>
-
-        <button onClick={() => router.push("/caas")}
-          style={{ width: "100%", fontSize: "15px", fontWeight: 600, color: "#fff", background: C.ink, border: "none", borderRadius: "2px", padding: "16px", cursor: "pointer" }}>
-          {ind.label}向けの見積を出す
-        </button>
-
-        <div style={{ borderLeft: `2px solid ${C.line}`, paddingLeft: "14px", marginTop: "18px", fontSize: "12px", color: C.sub, lineHeight: 1.8 }}>
-          ログイン（ID/パスワード）後は、貴社の業種・業態・規模に合わせて「似た会社の導入例」を自動で比較表示します。
-        </div>
-
+          );
+        })}
       </div>
+
+      <div
+        id="industry-panel"
+        role="tabpanel"
+        aria-labelledby={`tab-${ind.id}`}
+        className="animate-rise"
+        key={ind.id}
+      >
+        {/* ── Adoption ── */}
+        <Card className="mt-4 p-5">
+          <Eyebrow>{ind.label}の導入率</Eyebrow>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="tnum text-4xl font-semibold leading-none text-ink">
+              {ind.adoption}
+              <span className="text-xl font-normal text-muted">%</span>
+            </span>
+            <span className="text-[13px] text-muted">が導入済み</span>
+          </div>
+          <Meter value={ind.adoption} className="mt-4" />
+          <p className="mt-3 text-[12px] text-warning">
+            貴社は未導入 — 同業に先行されています
+          </p>
+        </Card>
+
+        {/* ── Value metrics ── */}
+        <section className="mt-6">
+          <Eyebrow>導入で得られる価値</Eyebrow>
+          <dl className="mt-3 grid grid-cols-3 gap-3">
+            {ind.values.map((v) => {
+              const delta = v.value.includes("%");
+              return (
+                <Card key={v.label} className="p-4 text-center">
+                  <dt
+                    className={cn(
+                      "tnum text-lg font-semibold",
+                      delta ? "text-positive" : "text-ink",
+                    )}
+                  >
+                    {v.value}
+                  </dt>
+                  <dd className="mt-1 text-[11px] leading-snug text-muted">
+                    {v.label}
+                  </dd>
+                </Card>
+              );
+            })}
+          </dl>
+        </section>
+
+        {/* ── Typical setup ── */}
+        <section className="mt-6">
+          <Eyebrow>この業界の定番構成</Eyebrow>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {ind.setup.map((s) => (
+              <Badge key={s} className="px-2.5 py-1 text-[12px]">
+                {s}
+              </Badge>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Insight ── */}
+        <p className="mt-6 border-l border-line pl-4 text-sm leading-relaxed text-ink">
+          {ind.insight}
+        </p>
+      </div>
+
+      {/* ── CTA ── */}
+      <Button
+        size="lg"
+        full
+        className="mt-8"
+        onClick={() => router.push("/caas")}
+      >
+        {ind.label}向けの見積を出す
+      </Button>
+
+      <p className="mt-4 border-l border-line pl-4 text-[12px] leading-relaxed text-muted">
+        ログイン後は、貴社の業種・規模に合わせて似た会社の導入例を自動で比較表示します。
+      </p>
     </div>
   );
 }

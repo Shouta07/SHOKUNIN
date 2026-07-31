@@ -2,140 +2,178 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { C, SANS, SURVEY_ZONES, getService, fmtYen } from "@/lib/caas";
+import { SURVEY_ZONES, getService, fmtYen } from "@/lib/caas";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Eyebrow, Steps, LiveDot } from "@/components/ui/primitives";
 
 export default function RemoteSurvey() {
   const router = useRouter();
   const [started, setStarted] = useState(false);
   const [zone, setZone] = useState(0);
-  const [plan, setPlan] = useState<string[]>([]); // zone ids added
+  const [plan, setPlan] = useState<string[]>([]);
 
   const z = SURVEY_ZONES[zone];
   const svc = getService(z.serviceId);
   const inPlan = plan.includes(z.id);
-  const total = plan.reduce((s, id) => {
-    const zz = SURVEY_ZONES.find((x) => x.id === id);
-    return s + (getService(zz?.serviceId ?? "")?.price ?? 0);
-  }, 0);
+  const total = plan.reduce(
+    (s, id) =>
+      s +
+      (getService(SURVEY_ZONES.find((x) => x.id === id)?.serviceId ?? "")
+        ?.price ?? 0),
+    0,
+  );
   const last = zone === SURVEY_ZONES.length - 1;
 
-  const toggle = () => setPlan((p) => (inPlan ? p.filter((x) => x !== z.id) : [...p, z.id]));
+  const toggle = () =>
+    setPlan((p) => (inPlan ? p.filter((x) => x !== z.id) : [...p, z.id]));
 
+  /* ── Intro ── */
   if (!started) {
     return (
-      <div style={{ fontFamily: SANS, color: C.ink }}>
-        <div style={{ maxWidth: "480px", margin: "0 auto", padding: "40px 20px 60px" }}>
-          <div style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.12em", color: C.accent }}>REMOTE SURVEY</div>
-          <h1 style={{ fontSize: "27px", fontWeight: 800, lineHeight: 1.35, margin: "12px 0 14px" }}>
-            現地に行かず、<br />スマホ片手に現地調査。
+      <div className="mx-auto max-w-2xl px-5 pb-16 lg:px-10">
+        <header className="pt-12 lg:pt-20">
+          <Eyebrow>リモート現地調査</Eyebrow>
+          <h1 className="mt-4 text-[30px] font-semibold leading-[1.25] text-ink lg:text-[38px]">
+            現地に行かずに、
+            <br />
+            設備プランを決める。
           </h1>
-          <p style={{ fontSize: "14px", color: C.sub, lineHeight: 1.9, marginBottom: "28px" }}>
-            web面談をつなぎ、施設をぐるりと映すだけ。プロと一緒に、理想の設備プランをその場で描きます。
+          <p className="mt-4 max-w-[34ch] text-[15px] leading-[1.8] text-muted">
+            ビデオ通話をつなぎ、施設を映すだけ。担当者と一緒にその場でプランを組み立てます。
           </p>
+        </header>
 
-          {/* preview call */}
-          <div style={{ position: "relative", aspectRatio: "16/10", borderRadius: "18px", overflow: "hidden", background: "linear-gradient(160deg,#33414f,#212a34)", marginBottom: "24px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ textAlign: "center", color: "rgba(255,255,255,0.75)" }}>
-              <div style={{ fontSize: "13px", marginTop: "6px" }}>ビデオ通話で現地をご案内</div>
-            </div>
-            <div style={{ position: "absolute", top: "12px", left: "12px", display: "flex", gap: "6px", alignItems: "center", background: "rgba(0,0,0,0.4)", borderRadius: "100px", padding: "5px 11px" }}>
-              <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: C.live, animation: "svPulse 1.2s infinite" }} />
-              <span style={{ fontSize: "11px", fontWeight: 700, color: "#fff" }}>現調員が待機中</span>
-            </div>
-            {/* PIP */}
-            <div style={{ position: "absolute", bottom: "12px", right: "12px", width: "78px", height: "58px", borderRadius: "10px", background: "#1a2430", border: "1px solid rgba(255,255,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "rgba(255,255,255,0.75)" }}>現調員</div>
+        <div className="relative mt-8 aspect-video overflow-hidden rounded-[var(--radius-card)] bg-ink">
+          <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-md bg-black/50 px-2 py-1">
+            <LiveDot />
+            <span className="text-[11px] font-semibold text-white">
+              担当者が待機中
+            </span>
           </div>
-
-          <button onClick={() => setStarted(true)}
-            style={{ width: "100%", fontSize: "15px", fontWeight: 700, color: "#fff", background: C.accent, border: "none", borderRadius: "14px", padding: "16px", cursor: "pointer" }}>
-            現地調査をはじめる
-          </button>
-          <p style={{ fontSize: "11px", color: C.faint, textAlign: "center", marginTop: "12px" }}>所要 約10分・無料</p>
+          <div className="absolute inset-0 grid place-items-center">
+            <span className="text-[13px] text-white/50">
+              ビデオ通話で現地をご案内
+            </span>
+          </div>
         </div>
-        <style>{`@keyframes svPulse{0%,100%{opacity:1}50%{opacity:.3}}`}</style>
+
+        <div className="mt-8">
+          <Button size="lg" onClick={() => setStarted(true)}>
+            調査をはじめる
+          </Button>
+          <p className="mt-3 text-[13px] text-muted">所要 約10分・無料</p>
+        </div>
       </div>
     );
   }
 
+  /* ── Walkthrough ── */
   return (
-    <div style={{ fontFamily: SANS, color: C.ink }}>
-      <div style={{ maxWidth: "480px", margin: "0 auto", padding: "20px 20px 60px" }}>
+    <div className="mx-auto max-w-2xl px-5 pb-40 lg:px-10">
+      <div className="pt-6">
+        <Steps total={SURVEY_ZONES.length} current={zone + 1} />
+        <p className="mt-3 text-[12px] text-muted">
+          {zone + 1} / {SURVEY_ZONES.length}
+        </p>
+      </div>
 
-        {/* progress */}
-        <div style={{ display: "flex", gap: "5px", marginBottom: "16px" }}>
-          {SURVEY_ZONES.map((_, i) => <div key={i} style={{ flex: 1, height: "3px", borderRadius: "100px", background: i <= zone ? C.accent : C.line }} />)}
+      {/* Video */}
+      <div className="relative mt-4 aspect-video overflow-hidden rounded-[var(--radius-card)] bg-ink">
+        <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-md bg-black/50 px-2 py-1">
+          <LiveDot />
+          <span className="text-[11px] font-semibold text-white">調査中</span>
         </div>
-
-        {/* video walkthrough */}
-        <div style={{ position: "relative", aspectRatio: "16/11", borderRadius: "18px", overflow: "hidden", background: z.scene, marginBottom: "14px" }}>
-          <div style={{ position: "absolute", top: "12px", left: "12px", display: "flex", gap: "6px", alignItems: "center", background: "rgba(0,0,0,0.4)", borderRadius: "100px", padding: "5px 11px" }}>
-            <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: C.live, animation: "svPulse 1.2s infinite" }} />
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#fff" }}>LIVE 現地調査中</span>
-          </div>
-          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.85)" }}>
-            <div style={{ fontSize: "16px", fontWeight: 700 }}>{z.label}</div>
-            <div style={{ fontSize: "11px", opacity: 0.7, marginTop: "2px" }}>{z.hint}</div>
-          </div>
-          <div style={{ position: "absolute", bottom: "12px", right: "12px", width: "72px", height: "54px", borderRadius: "10px", background: "#1a2430", border: "1px solid rgba(255,255,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "rgba(255,255,255,0.75)" }}>現調員</div>
+        <div className="absolute inset-0 grid place-content-center text-center">
+          <span className="text-base font-semibold text-white">{z.label}</span>
+          <span className="mt-1 text-[12px] text-white/60">{z.hint}</span>
         </div>
+      </div>
 
-        {/* surveyor suggestion */}
-        <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "16px 18px", marginBottom: "14px" }}>
-          <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
-            <div style={{ width: "34px", height: "34px", borderRadius: "50%", background: C.accent, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, flexShrink: 0 }}>現</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: "12px", color: C.faint }}>現調員より</div>
-              <p style={{ fontSize: "14px", lineHeight: 1.7, marginTop: "3px" }}>ここには <b>{svc?.label}</b> がおすすめです。{z.reason}</p>
-            </div>
-          </div>
-          <button onClick={toggle}
-            style={{ width: "100%", marginTop: "14px", fontSize: "14px", fontWeight: 700, borderRadius: "12px", padding: "13px", cursor: "pointer", fontFamily: SANS,
-              background: inPlan ? C.ok : C.accentSoft, color: inPlan ? "#fff" : C.accent, border: "none" }}>
-            {inPlan ? `✓ プランに追加済み（${fmtYen(svc?.price ?? 0)}）` : `＋ このプランに追加（${fmtYen(svc?.price ?? 0)}）`}
-          </button>
+      {/* Recommendation */}
+      <Card className="mt-3 p-5">
+        <Eyebrow>担当者の提案</Eyebrow>
+        <p className="mt-2.5 text-sm leading-relaxed text-ink">
+          ここには <span className="font-semibold">{svc?.label}</span> をおすすめします。{z.reason}
+        </p>
+        <div className="mt-4 flex items-center justify-between gap-4 border-t border-line-2 pt-4">
+          <span className="tnum text-[15px] font-semibold text-ink">
+            {fmtYen(svc?.price ?? 0)}
+          </span>
+          <Button
+            variant={inPlan ? "secondary" : "primary"}
+            onClick={toggle}
+            aria-pressed={inPlan}
+          >
+            {inPlan ? "プランから外す" : "プランに追加"}
+          </Button>
         </div>
+      </Card>
 
-        {/* nav */}
-        <div style={{ display: "flex", gap: "10px", marginBottom: "22px" }}>
-          {zone > 0 && (
-            <button onClick={() => setZone(zone - 1)} style={{ flex: 1, fontSize: "13px", fontWeight: 600, color: C.sub, background: C.surface, border: `1px solid ${C.line}`, borderRadius: "12px", padding: "13px", cursor: "pointer" }}>← 戻る</button>
-          )}
-          {!last ? (
-            <button onClick={() => setZone(zone + 1)} style={{ flex: 2, fontSize: "14px", fontWeight: 700, color: "#fff", background: C.accent, border: "none", borderRadius: "12px", padding: "13px", cursor: "pointer" }}>次の場所へ →</button>
-          ) : (
-            <button onClick={() => router.push("/caas")} disabled={plan.length === 0}
-              style={{ flex: 2, fontSize: "14px", fontWeight: 700, color: "#fff", background: plan.length ? C.accent : C.lineSoft, border: "none", borderRadius: "12px", padding: "13px", cursor: plan.length ? "pointer" : "default" }}>
-              プランで見積もる
-            </button>
-          )}
-        </div>
-
-        {/* plan */}
-        <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "16px 18px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: plan.length ? "12px" : 0 }}>
-            <span style={{ fontSize: "13px", fontWeight: 700 }}>理想の設備プラン</span>
-            <span style={{ fontSize: "16px", fontWeight: 800 }}>{fmtYen(total)}〜</span>
-          </div>
+      {/* Plan summary */}
+      <section className="mt-6">
+        <Eyebrow>現在のプラン</Eyebrow>
+        <Card className="mt-3">
           {plan.length === 0 ? (
-            <p style={{ fontSize: "12px", color: C.faint }}>気になった場所で「追加」すると、ここに積み上がります。</p>
+            <p className="p-5 text-[13px] text-muted">
+              追加した設備がここに表示されます。
+            </p>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <dl className="divide-y divide-line-2">
               {plan.map((id) => {
                 const zz = SURVEY_ZONES.find((x) => x.id === id)!;
                 const s = getService(zz.serviceId);
                 return (
-                  <div key={id} style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                    <span style={{ color: C.sub }}>{zz.label}・{s?.label}</span>
-                    <span style={{ fontWeight: 600 }}>{fmtYen(s?.price ?? 0)}</span>
+                  <div
+                    key={id}
+                    className="flex justify-between gap-4 px-5 py-3"
+                  >
+                    <dt className="text-[13px] text-muted">
+                      {zz.label}・{s?.label}
+                    </dt>
+                    <dd className="tnum text-[13px] font-medium text-ink">
+                      {fmtYen(s?.price ?? 0)}
+                    </dd>
                   </div>
                 );
               })}
+            </dl>
+          )}
+        </Card>
+      </section>
+
+      {/* Sticky nav */}
+      <div className="pb-safe fixed inset-x-0 bottom-16 z-30 border-t border-line bg-surface/95 backdrop-blur-md lg:bottom-0">
+        <div className="mx-auto flex max-w-2xl items-center gap-3 px-5 py-3 lg:px-10">
+          <div className="min-w-0 flex-1">
+            <div className="text-[12px] text-muted">
+              {plan.length}件のプラン
             </div>
+            <div className="tnum text-[17px] font-semibold text-ink">
+              {fmtYen(total)}
+              <span className="text-[12px] font-normal text-muted">〜</span>
+            </div>
+          </div>
+          {zone > 0 && (
+            <Button variant="secondary" onClick={() => setZone(zone - 1)}>
+              戻る
+            </Button>
+          )}
+          {!last ? (
+            <Button size="lg" onClick={() => setZone(zone + 1)}>
+              次へ
+            </Button>
+          ) : (
+            <Button
+              size="lg"
+              disabled={plan.length === 0}
+              onClick={() => router.push("/caas")}
+            >
+              見積に進む
+            </Button>
           )}
         </div>
-
       </div>
-      <style>{`@keyframes svPulse{0%,100%{opacity:1}50%{opacity:.3}}`}</style>
     </div>
   );
 }

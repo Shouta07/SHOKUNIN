@@ -1,22 +1,8 @@
 // CaaS (Construction as a Service) — プロトタイプ用 共有モジュール
 // エンド顧客の「予約 → 施工ライブ進捗 → 完了 → メンテ再依頼」体験のデータ層。
 
-export const C = {
-  bg: "#f5f7fa",
-  surface: "#ffffff",
-  ink: "#15202b",
-  sub: "#5a6673",
-  faint: "#9aa4b0",
-  line: "rgba(21,32,43,0.10)",
-  lineSoft: "rgba(21,32,43,0.055)",
-  accent: "#2f6bed",       // trust blue
-  accentSoft: "#e9effe",
-  live: "#e5484d",         // 現場LIVE
-  ok: "#2fa96b",           // 完了
-  amber: "#f59e0b",        // 注意・保証
-};
-
-export const SANS = "'Inter', 'Hiragino Sans', 'Noto Sans JP', sans-serif";
+// 見た目のトークンは src/app/globals.css の @theme に集約。
+// このファイルはドメインのデータとロジックのみを持つ。
 
 // ─── サービス（Safie現場に寄せた工事種別） ───
 export interface Service {

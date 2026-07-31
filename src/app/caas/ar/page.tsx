@@ -2,170 +2,246 @@
 
 import { useRouter } from "next/navigation";
 import { useRef, useState, useEffect } from "react";
-import { C, SANS, getPoints, addPoints, levelOf } from "@/lib/caas";
+import { getPoints, addPoints, levelOf } from "@/lib/caas";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Eyebrow, Meter, Badge, LiveDot } from "@/components/ui/primitives";
+import { cn } from "@/lib/utils";
 
-interface Cam { id: string; x: number; y: number; }
+interface Cam {
+  id: string;
+  x: number;
+  y: number;
+}
 
-const coverageOf = (n: number) => (n === 0 ? 0 : Math.round(100 * (1 - Math.pow(0.5, n))));
+const coverageOf = (n: number) =>
+  n === 0 ? 0 : Math.round(100 * (1 - Math.pow(0.5, n)));
 
 export default function ArSim() {
   const router = useRouter();
   const sceneRef = useRef<HTMLDivElement>(null);
   const [cams, setCams] = useState<Cam[]>([]);
-  const [mode, setMode] = useState<"photo" | "live">("photo");
+  const [live, setLive] = useState(false);
   const [points, setPoints] = useState(0);
   const [awarded, setAwarded] = useState(false);
-  const [celebrate, setCelebrate] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => { setMounted(true); setPoints(getPoints()); }, []);
+  useEffect(() => {
+    setMounted(true);
+    setPoints(getPoints());
+  }, []);
 
   const cov = coverageOf(cams.length);
-  const covColor = cov >= 80 ? C.ok : cov >= 40 ? C.amber : C.live;
-  const missions = [
-    { label: "カメラを2台以上 置く", done: cams.length >= 2 },
-    { label: "カバー率 80% 以上にする", done: cov >= 80 },
+  const goals = [
+    { label: "カメラを2台以上置く", done: cams.length >= 2 },
+    { label: "カバー率80%以上にする", done: cov >= 80 },
   ];
-  const allDone = missions.every((m) => m.done);
+  const allDone = goals.every((g) => g.done);
 
   useEffect(() => {
     if (allDone && !awarded && mounted) {
       setAwarded(true);
       setPoints(addPoints(50));
-      setCelebrate(true);
-      const t = setTimeout(() => setCelebrate(false), 2600);
-      return () => clearTimeout(t);
     }
   }, [allDone, awarded, mounted]);
 
   const place = (e: React.MouseEvent) => {
-    const el = sceneRef.current; if (!el) return;
+    const el = sceneRef.current;
+    if (!el) return;
     const r = el.getBoundingClientRect();
-    const x = ((e.clientX - r.left) / r.width) * 100;
-    const y = ((e.clientY - r.top) / r.height) * 100;
-    setCams((p) => [...p, { id: crypto.randomUUID(), x, y }]);
+    setCams((p) => [
+      ...p,
+      {
+        id: crypto.randomUUID(),
+        x: ((e.clientX - r.left) / r.width) * 100,
+        y: ((e.clientY - r.top) / r.height) * 100,
+      },
+    ]);
   };
-  const remove = (id: string, e: React.MouseEvent) => { e.stopPropagation(); setCams((p) => p.filter((c) => c.id !== id)); };
 
-  if (!mounted) return <div style={{ minHeight: "100dvh", background: C.bg }} />;
+  if (!mounted) return <div className="min-h-dvh bg-canvas" />;
   const lv = levelOf(points);
 
   return (
-    <div style={{ fontFamily: SANS, color: C.ink }}>
-      <div style={{ maxWidth: "480px", margin: "0 auto", padding: "28px 20px 60px" }}>
-
-        {/* header + points */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px" }}>
-          <div>
-            <div style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.12em", color: C.accent }}>AR SIMULATION</div>
-            <h1 style={{ fontSize: "23px", fontWeight: 700, marginTop: "6px" }}>設置シミュレーション</h1>
-          </div>
-          <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "100px", padding: "8px 14px", textAlign: "right" }}>
-            <div style={{ fontSize: "15px", fontWeight: 800, color: C.accent }}>{points}<span style={{ fontSize: "10px" }}>pt</span></div>
-            <div style={{ fontSize: "9px", color: C.faint }}>{lv.name}</div>
-          </div>
+    <div className="mx-auto max-w-2xl px-5 pb-32 lg:px-10">
+      <header className="flex items-start justify-between gap-4 pt-8">
+        <div>
+          <Eyebrow>AR設置プラン</Eyebrow>
+          <h1 className="mt-2 text-2xl font-semibold text-ink">
+            配置を試す
+          </h1>
+          <p className="mt-1.5 text-sm text-muted">
+            画面をタップしてカメラを置くと、監視範囲が表示されます。
+          </p>
         </div>
+        <div className="shrink-0 text-right">
+          <div className="tnum text-lg font-semibold text-ink">
+            {points}
+            <span className="text-[11px] font-normal text-muted">pt</span>
+          </div>
+          <div className="mt-0.5 text-[11px] text-muted">{lv.name}</div>
+        </div>
+      </header>
 
-        {/* mission */}
-        <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "14px", padding: "14px 16px", marginBottom: "14px" }}>
-          <div style={{ fontSize: "12px", fontWeight: 700, color: C.faint, marginBottom: "10px" }}>設置ミッション（達成で +50pt）</div>
-          {missions.map((m) => (
-            <div key={m.label} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "4px 0" }}>
-              <span style={{ width: "20px", height: "20px", borderRadius: "50%", background: m.done ? C.ok : C.bg, border: `1.5px solid ${m.done ? C.ok : C.line}`, color: "#fff", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{m.done ? "✓" : ""}</span>
-              <span style={{ fontSize: "13px", color: m.done ? C.sub : C.ink, textDecoration: m.done ? "line-through" : "none" }}>{m.label}</span>
-            </div>
+      {/* Goals */}
+      <Card className="mt-6 p-5">
+        <Eyebrow>目標</Eyebrow>
+        <ul className="mt-3 space-y-2">
+          {goals.map((g) => (
+            <li key={g.label} className="flex items-center gap-2.5">
+              <span
+                className={cn(
+                  "grid size-5 shrink-0 place-items-center rounded-full border text-[10px] font-semibold",
+                  g.done
+                    ? "border-positive bg-positive text-white"
+                    : "border-line text-transparent",
+                )}
+              >
+                ✓
+              </span>
+              <span
+                className={cn(
+                  "text-[13px]",
+                  g.done ? "text-muted line-through" : "text-ink",
+                )}
+              >
+                {g.label}
+              </span>
+            </li>
           ))}
-        </div>
+        </ul>
+        {allDone && (
+          <p className="mt-3 border-t border-line-2 pt-3 text-[13px] font-medium text-positive">
+            死角のない配置になりました（+50pt）
+          </p>
+        )}
+      </Card>
 
-        {/* mode toggle */}
-        <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
-          {([["photo", "写真で配置"], ["live", "ライブAR"]] as ["photo" | "live", string][]).map(([k, l]) => (
-            <button key={k} onClick={() => setMode(k)}
-              style={{ flex: 1, fontSize: "12px", fontWeight: 700, padding: "10px", borderRadius: "10px", cursor: "pointer", fontFamily: SANS,
-                background: mode === k ? C.accent : C.surface, color: mode === k ? "#fff" : C.sub, border: `1px solid ${mode === k ? C.accent : C.line}` }}>
-              {l}
-            </button>
-          ))}
-        </div>
-
-        {/* AR scene */}
-        <div ref={sceneRef} onClick={place}
-          style={{ position: "relative", width: "100%", aspectRatio: "3/4", borderRadius: "18px", overflow: "hidden", cursor: "crosshair",
-            background: "linear-gradient(160deg,#3a4656 0%,#232c38 55%,#1a212b 100%)", border: `1px solid ${C.line}` }}>
-          {/* perspective floor grid */}
-          <svg viewBox="0 0 100 133" preserveAspectRatio="none" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.18 }}>
-            {[...Array(7)].map((_, i) => <line key={"v" + i} x1={10 + i * 13} y1="70" x2={-20 + i * 28} y2="133" stroke="#fff" strokeWidth="0.3" />)}
-            {[80, 95, 112, 133].map((y, i) => <line key={"h" + i} x1="0" x2="100" y1={y} y2={y} stroke="#fff" strokeWidth="0.3" />)}
-          </svg>
-          {/* room hints */}
-          <div style={{ position: "absolute", top: "16%", left: "12%", width: "26%", height: "22%", border: "1.5px solid rgba(255,255,255,0.18)", borderRadius: "4px" }} />
-          <div style={{ position: "absolute", top: "17%", left: "14%", fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>窓</div>
-          <div style={{ position: "absolute", top: "14%", right: "14%", width: "14%", height: "40%", border: "1.5px solid rgba(255,255,255,0.18)", borderRadius: "4px" }} />
-          <div style={{ position: "absolute", top: "15%", right: "15%", fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>入口</div>
-
-          {/* camera UI badge */}
-          <div style={{ position: "absolute", top: "10px", left: "12px", display: "flex", alignItems: "center", gap: "6px", background: "rgba(0,0,0,0.35)", borderRadius: "100px", padding: "4px 10px" }}>
-            <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: mode === "live" ? C.live : "rgba(255,255,255,0.6)", animation: mode === "live" ? "arPulse 1.2s ease-in-out infinite" : "none" }} />
-            <span style={{ fontSize: "10px", fontWeight: 700, color: "#fff", letterSpacing: "0.06em" }}>{mode === "live" ? "AR LIVE" : "PHOTO"}</span>
-          </div>
-
-          {/* coverage + cameras */}
-          {cams.map((c) => (
-            <div key={c.id}>
-              <div style={{ position: "absolute", left: `${c.x}%`, top: `${c.y}%`, width: "46%", height: "46%", transform: "translate(-50%,-50%)", borderRadius: "50%", background: `radial-gradient(circle, ${C.accent}55 0%, ${C.accent}22 45%, transparent 70%)`, pointerEvents: "none" }} />
-              <button onClick={(e) => remove(c.id, e)}
-                style={{ position: "absolute", left: `${c.x}%`, top: `${c.y}%`, transform: "translate(-50%,-50%)", width: "34px", height: "34px", borderRadius: "50%", background: C.accent, border: "2px solid #fff", color: "#fff", fontSize: "15px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.3)" }}>
-              </button>
-            </div>
-          ))}
-
-          {/* empty hint */}
-          {cams.length === 0 && (
-            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", pointerEvents: "none", color: "rgba(255,255,255,0.7)" }}>
-              <div style={{ fontSize: "13px" }}>タップして、カメラを設置</div>
-              <div style={{ fontSize: "11px", opacity: 0.6, marginTop: "4px" }}>青い円が監視範囲です</div>
-            </div>
-          )}
-
-          {/* celebration */}
-          {celebrate && (
-            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(20,32,43,0.55)", animation: "arFade 300ms ease both" }}>
-              <div style={{ fontSize: "18px", fontWeight: 800, color: "#fff", marginTop: "8px" }}>死角ゼロ設計 達成！</div>
-              <div style={{ fontSize: "14px", color: "#fff", marginTop: "4px", fontWeight: 700 }}>+50 pt</div>
-            </div>
-          )}
-        </div>
-
-        {/* coverage meter */}
-        <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "14px", padding: "16px 18px", margin: "14px 0" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-            <span style={{ fontSize: "13px", fontWeight: 600 }}>監視カバー率</span>
-            <span style={{ fontSize: "16px", fontWeight: 800, color: covColor }}>{cov}%</span>
-          </div>
-          <div style={{ height: "10px", background: C.lineSoft, borderRadius: "100px", overflow: "hidden" }}>
-            <div style={{ width: `${cov}%`, height: "100%", background: covColor, borderRadius: "100px", transition: "all 400ms ease" }} />
-          </div>
-          <div style={{ fontSize: "12px", color: C.sub, marginTop: "10px" }}>
-            設置台数 <b>{cams.length}台</b>
-            {cams.length > 0 && <button onClick={() => setCams([])} style={{ marginLeft: "10px", fontSize: "11px", color: C.faint, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>リセット</button>}
-          </div>
-        </div>
-
-        {/* CTA */}
-        <button onClick={() => router.push("/caas")}
-          style={{ width: "100%", fontSize: "15px", fontWeight: 700, color: "#fff", background: cams.length ? C.accent : C.lineSoft, border: "none", borderRadius: "14px", padding: "16px", cursor: cams.length ? "pointer" : "default" }}>
-          この配置で見積もる（{cams.length}台）
-        </button>
-        <p style={{ fontSize: "11px", color: C.faint, textAlign: "center", marginTop: "12px", lineHeight: 1.7 }}>
-          本番はスマホのカメラをかざして、実際の部屋にカメラを重ねて配置できます。
-        </p>
+      {/* Mode */}
+      <div
+        role="tablist"
+        className="mt-3 inline-flex rounded-[var(--radius-control)] bg-line-2 p-0.5"
+      >
+        {(
+          [
+            [false, "写真で配置"],
+            [true, "ライブAR"],
+          ] as [boolean, string][]
+        ).map(([v, l]) => (
+          <button
+            key={l}
+            role="tab"
+            aria-selected={live === v}
+            onClick={() => setLive(v)}
+            className={cn(
+              "rounded-[6px] px-4 py-2 text-[13px] font-medium transition-colors",
+              live === v
+                ? "bg-surface text-ink shadow-[var(--shadow-e1)]"
+                : "text-muted hover:text-ink",
+            )}
+          >
+            {l}
+          </button>
+        ))}
       </div>
 
-      <style>{`
-        @keyframes arPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-        @keyframes arPop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes arFade { from { opacity: 0; } to { opacity: 1; } }
-      `}</style>
+      {/* Scene */}
+      <div
+        ref={sceneRef}
+        onClick={place}
+        className="relative mt-3 aspect-[4/3] cursor-crosshair overflow-hidden rounded-[var(--radius-card)] bg-ink"
+      >
+        <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-md bg-black/40 px-2 py-1">
+          {live && <LiveDot />}
+          <span className="text-[10px] font-semibold tracking-wide text-white">
+            {live ? "AR LIVE" : "PHOTO"}
+          </span>
+        </div>
+
+        {/* Room hints */}
+        <div className="absolute left-[12%] top-[16%] h-[22%] w-[26%] rounded border border-white/20">
+          <span className="absolute left-1.5 top-1 text-[10px] text-white/40">
+            窓
+          </span>
+        </div>
+        <div className="absolute right-[14%] top-[14%] h-[40%] w-[14%] rounded border border-white/20">
+          <span className="absolute left-1.5 top-1 text-[10px] text-white/40">
+            入口
+          </span>
+        </div>
+
+        {/* Cameras + coverage */}
+        {cams.map((c) => (
+          <div key={c.id}>
+            <span
+              className="pointer-events-none absolute size-[46%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/15"
+              style={{ left: `${c.x}%`, top: `${c.y}%` }}
+            />
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setCams((p) => p.filter((x) => x.id !== c.id));
+              }}
+              aria-label="カメラを取り消す"
+              className="absolute size-8 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-brand"
+              style={{ left: `${c.x}%`, top: `${c.y}%` }}
+            />
+          </div>
+        ))}
+
+        {cams.length === 0 && (
+          <div className="pointer-events-none absolute inset-0 grid place-content-center text-center">
+            <span className="text-[13px] text-white/70">
+              タップしてカメラを設置
+            </span>
+            <span className="mt-1 text-[11px] text-white/40">
+              円が監視範囲です
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Coverage */}
+      <Card className="mt-3 p-5">
+        <div className="flex items-baseline justify-between">
+          <span className="text-[13px] font-medium text-ink">監視カバー率</span>
+          <span className="tnum text-lg font-semibold text-ink">{cov}%</span>
+        </div>
+        <Meter value={cov} className="mt-3" />
+        <div className="mt-3 flex items-center justify-between">
+          <span className="tnum text-[13px] text-muted">
+            設置 {cams.length}台
+          </span>
+          {cams.length > 0 && (
+            <Button variant="ghost" size="sm" onClick={() => setCams([])}>
+              リセット
+            </Button>
+          )}
+        </div>
+      </Card>
+
+      <p className="mt-4 text-[12px] leading-relaxed text-muted">
+        本番ではスマートフォンのカメラをかざし、実際の部屋に機器を重ねて配置できます。
+      </p>
+
+      {/* Sticky CTA */}
+      <div className="pb-safe fixed inset-x-0 bottom-16 z-30 border-t border-line bg-surface/95 backdrop-blur-md lg:bottom-0">
+        <div className="mx-auto flex max-w-2xl items-center gap-4 px-5 py-3 lg:px-10">
+          <div className="flex-1">
+            <div className="text-[12px] text-muted">配置したカメラ</div>
+            <div className="tnum text-[17px] font-semibold text-ink">
+              {cams.length}台
+            </div>
+          </div>
+          <Button
+            size="lg"
+            disabled={cams.length === 0}
+            onClick={() => router.push("/caas")}
+          >
+            この配置で見積もる
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
