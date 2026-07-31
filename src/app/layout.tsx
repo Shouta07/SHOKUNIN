@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import BottomNav from "@/components/layout/BottomNav";
 
 export const metadata: Metadata = {
-  title: "His Recoveries - 誰にも言えなかった、あの瞬間",
+  title: "CaaS — Construction as a Service",
   description:
-    "男の恥に、共感で寄り添うメディア。体臭・多汗症・薄毛・口臭・肌——誰にも相談できなかった悩みを、俺たちは知っている。",
+    "工事を、頼みたくなる体験に。予約から施工ライブ、完了、メンテナンスまで一貫した顧客体験。",
   openGraph: {
-    title: "His Recoveries - 誰にも言えなかった、あの瞬間",
-    description: "男の恥に、共感で寄り添うメディア。",
+    title: "CaaS — Construction as a Service",
+    description: "工事を、頼みたくなる体験に。",
     locale: "ja_JP",
     type: "website",
   },
@@ -23,7 +22,6 @@ export default function RootLayout({
     <html lang="ja">
       <body className="antialiased">
         <main>{children}</main>
-        <BottomNav />
       </body>
     </html>
   );
