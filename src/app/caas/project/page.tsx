@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
-  C, SANS, STAGES, LIVE_TIMELINE, RATING_AXES, CROSS_SELL, getProject, saveProject, clearProject,
+  C, SANS, STAGES, LIVE_TIMELINE, RATING_AXES, CROSS_SELL, AI_DOC_SECTIONS,
+  getProject, saveProject, clearProject,
   getService, getCraftsman, fmtSlot, fmtYen, type Project,
 } from "@/lib/caas";
 
@@ -12,6 +13,7 @@ export default function CaasProject() {
   const [project, setProject] = useState<Project | null>(null);
   const [mounted, setMounted] = useState(false);
   const [livePct, setLivePct] = useState(0);
+  const [recording, setRecording] = useState(true); // お客様の許可のもとON
 
   useEffect(() => { setMounted(true); setProject(getProject()); }, []);
 
@@ -102,6 +104,36 @@ export default function CaasProject() {
           </div>
           <button style={{ fontSize: "12px", fontWeight: 600, color: C.accent, background: C.accentSoft, border: "none", borderRadius: "100px", padding: "9px 15px", cursor: "pointer" }}>メッセージ</button>
         </div>
+
+        {/* 現場レコーディング（映像＋音声）— 3方よし */}
+        {(stage.id === "pre" || stage.id === "live") && (
+          <div style={{ background: C.surface, border: `1px solid ${recording ? C.live : C.line}`, borderRadius: "16px", padding: "16px 18px", marginBottom: "16px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: recording ? "12px" : 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
+                <span style={{ width: "9px", height: "9px", borderRadius: "50%", background: recording ? C.live : C.faint, animation: recording ? "cPulse 1.2s infinite" : "none" }} />
+                <span style={{ fontSize: "14px", fontWeight: 700 }}>現場レコーディング（映像＋音声）</span>
+              </div>
+              <button onClick={() => setRecording(!recording)}
+                style={{ width: "44px", height: "26px", borderRadius: "100px", border: "none", cursor: "pointer", background: recording ? C.live : C.line, position: "relative", transition: "all 200ms" }}>
+                <span style={{ position: "absolute", top: "3px", left: recording ? "21px" : "3px", width: "20px", height: "20px", borderRadius: "50%", background: "#fff", transition: "left 200ms" }} />
+              </button>
+            </div>
+            {recording && (
+              <>
+                <p style={{ fontSize: "11px", color: C.faint, lineHeight: 1.6, marginBottom: "12px" }}>お客様の許可のもと記録。AIが完成図書と申し送りを自動生成します。</p>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  {[{ i: "👷", t: "職人の負担減", d: "書類作成が自動化" }, { i: "😊", t: "顧客満足", d: "証跡と説明が残る" }, { i: "🧠", t: "ナレッジ蓄積", d: "SFWに技術が貯まる" }].map((b) => (
+                    <div key={b.t} style={{ flex: 1, background: C.bg, borderRadius: "10px", padding: "10px 8px", textAlign: "center" }}>
+                      <div style={{ fontSize: "16px" }}>{b.i}</div>
+                      <div style={{ fontSize: "11px", fontWeight: 700, marginTop: "3px" }}>{b.t}</div>
+                      <div style={{ fontSize: "9px", color: C.faint, marginTop: "1px", lineHeight: 1.4 }}>{b.d}</div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
 
         {/* booked */}
         {stage.id === "booked" && (
@@ -212,6 +244,31 @@ export default function CaasProject() {
                 <span style={{ fontSize: "15px", fontWeight: 700 }}>保証書（1年間）</span>
               </div>
               <p style={{ fontSize: "13px", color: C.sub, lineHeight: 1.7 }}>施工箇所の不具合は1年間無償対応。この画面からいつでも呼び出せます。</p>
+            </div>
+
+            {/* AI完成図書（録音→自動生成） */}
+            <SectionTitle>AI完成図書（たたき）</SectionTitle>
+            <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "18px 20px", marginBottom: "16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "9px", marginBottom: "14px" }}>
+                <span style={{ fontSize: "18px" }}>🤖</span>
+                <span style={{ fontSize: "13px", color: C.sub, lineHeight: 1.6 }}>現場の映像・音声からAIが自動生成しました。職人の手入力はゼロ。</span>
+              </div>
+              {AI_DOC_SECTIONS.map((sec) => (
+                <div key={sec.title} style={{ paddingTop: "12px", marginTop: "12px", borderTop: `1px solid ${C.lineSoft}` }}>
+                  <div style={{ fontSize: "12px", fontWeight: 700, color: C.accent, marginBottom: "8px" }}>{sec.title}</div>
+                  {sec.items.map((it) => (
+                    <div key={it} style={{ display: "flex", gap: "8px", alignItems: "flex-start", marginBottom: "5px" }}>
+                      <span style={{ color: C.faint, fontSize: "12px", lineHeight: 1.6 }}>・</span>
+                      <span style={{ fontSize: "13px", color: C.ink, lineHeight: 1.6 }}>{it}</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+              <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
+                <button style={{ flex: 1, fontSize: "13px", fontWeight: 600, color: "#fff", background: C.accent, border: "none", borderRadius: "10px", padding: "11px", cursor: "pointer" }}>PDFで受け取る</button>
+                <button style={{ flex: 1, fontSize: "13px", fontWeight: 600, color: C.ink, background: C.surface, border: `1px solid ${C.line}`, borderRadius: "10px", padding: "11px", cursor: "pointer" }}>内容を修正</button>
+              </div>
+              <p style={{ fontSize: "10px", color: C.faint, marginTop: "12px", lineHeight: 1.6 }}>この記録はSFWのナレッジとして蓄積され、次の現場の品質向上に使われます（個人情報は除外）。</p>
             </div>
 
             {/* review — Uber型 ホスピタリティ査定 */}

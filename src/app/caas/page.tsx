@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
-  C, SANS, SERVICES, CRAFTSMEN, DAYS, BANDS, AVAILABILITY, RATING_AXES, fmtSlot,
-  saveProject, fmtYen,
+  C, SANS, SERVICES, CRAFTSMEN, DAYS, BANDS, AVAILABILITY, RATING_AXES, DAY_PRICING, fmtSlot,
+  slotMultiplier, priceForSlot, saveProject, fmtYen,
   type Service, type Craftsman,
 } from "@/lib/caas";
 
@@ -180,25 +180,31 @@ export default function CaasBooking() {
           <div style={{ paddingTop: "8px" }}>
             <Progress n={3} />
             <h2 style={{ fontSize: "22px", fontWeight: 700, marginBottom: "6px" }}>職人の空き枠から選ぶ</h2>
-            <p style={{ fontSize: "14px", color: C.sub, marginBottom: "20px" }}>電話のやり取りは不要。空いている枠をタップ。</p>
+            <p style={{ fontSize: "14px", color: C.sub, marginBottom: "16px" }}>近日ほど<b>特急料金</b>、先の日ほどお得。空き枠をタップ。</p>
 
             {/* legend */}
-            <div style={{ display: "flex", gap: "16px", marginBottom: "14px", fontSize: "12px", color: C.sub }}>
-              <span><b style={{ color: C.ok }}>○</b> 空きあり</span>
-              <span><b style={{ color: C.amber }}>△</b> 残りわずか</span>
-              <span><b style={{ color: C.faint }}>×</b> 満枠</span>
+            <div style={{ display: "flex", gap: "14px", marginBottom: "14px", fontSize: "12px", color: C.sub, flexWrap: "wrap" }}>
+              <span><b style={{ color: C.ok }}>○</b> 空き</span>
+              <span><b style={{ color: C.amber }}>△</b> 残少</span>
+              <span><b style={{ color: C.faint }}>×</b> 満</span>
+              <span style={{ color: "#e5484d" }}>⚡ 特急</span>
+              <span style={{ color: C.ok }}>お得</span>
             </div>
 
             {/* grid */}
             <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "10px", overflowX: "auto" }}>
-              <div style={{ display: "grid", gridTemplateColumns: `56px repeat(${DAYS.length}, 1fr)`, gap: "6px", minWidth: "340px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: `56px repeat(${DAYS.length}, 1fr)`, gap: "6px", minWidth: "360px" }}>
                 <div />
-                {DAYS.map((d) => (
-                  <div key={d.id} style={{ textAlign: "center", padding: "4px 0" }}>
-                    <div style={{ fontSize: "12px", fontWeight: 600 }}>{d.label}</div>
-                    <div style={{ fontSize: "10px", color: d.dow === "土" ? "#2f6bed" : d.dow === "日" ? "#e5484d" : C.faint }}>{d.dow}</div>
-                  </div>
-                ))}
+                {DAYS.map((d) => {
+                  const pr = DAY_PRICING[d.id];
+                  return (
+                    <div key={d.id} style={{ textAlign: "center", padding: "4px 0" }}>
+                      <div style={{ fontSize: "12px", fontWeight: 600 }}>{d.label}</div>
+                      <div style={{ fontSize: "10px", color: d.dow === "土" ? "#2f6bed" : d.dow === "日" ? "#e5484d" : C.faint }}>{d.dow}</div>
+                      {pr && <div style={{ fontSize: "9px", fontWeight: 700, color: pr.color, marginTop: "2px" }}>{pr.tag}</div>}
+                    </div>
+                  );
+                })}
                 {BANDS.map((b) => (
                   <FragmentRow key={b.id}>
                     <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", paddingLeft: "4px" }}>
@@ -227,9 +233,16 @@ export default function CaasBooking() {
               </div>
             </div>
 
-            {slotId && (
-              <div style={{ marginTop: "14px", fontSize: "13px", color: C.accent, fontWeight: 600, textAlign: "center" }}>
-                選択中：{fmtSlot(slotId)}
+            {slotId && service && (
+              <div style={{ marginTop: "14px", background: C.bg, borderRadius: "12px", padding: "12px 14px", textAlign: "center" }}>
+                <div style={{ fontSize: "13px", color: C.accent, fontWeight: 600 }}>選択中：{fmtSlot(slotId)}</div>
+                {slotMultiplier(slotId) !== 1 && (
+                  <div style={{ fontSize: "12px", color: C.sub, marginTop: "4px" }}>
+                    {slotMultiplier(slotId) > 1
+                      ? <>特急料金 <b style={{ color: "#e5484d" }}>+{Math.round((slotMultiplier(slotId) - 1) * 100)}%</b> → {fmtYen(priceForSlot(service.price, slotId))}</>
+                      : <>お得料金 <b style={{ color: C.ok }}>−{Math.round((1 - slotMultiplier(slotId)) * 100)}%</b> → {fmtYen(priceForSlot(service.price, slotId))}</>}
+                  </div>
+                )}
               </div>
             )}
             <div style={{ marginTop: "20px" }}>{btn("担当を選ぶ", () => setPhase("craftsman"), true, !slotId)}</div>
@@ -299,9 +312,17 @@ export default function CaasBooking() {
                   <span style={{ fontSize: "14px", fontWeight: 600, textAlign: "right" }}>{r.v}</span>
                 </div>
               ))}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: "18px", paddingTop: "16px", borderTop: `1px solid ${C.line}` }}>
+              {slotMultiplier(slotId) !== 1 && (
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: "14px", fontSize: "12px" }}>
+                  <span style={{ color: C.faint }}>基本料金 {fmtYen(service.price)} ＋ {slotMultiplier(slotId) > 1 ? "特急" : "お得"}調整</span>
+                  <span style={{ color: slotMultiplier(slotId) > 1 ? "#e5484d" : C.ok, fontWeight: 600 }}>
+                    {slotMultiplier(slotId) > 1 ? "+" : "−"}{Math.abs(Math.round((slotMultiplier(slotId) - 1) * 100))}%
+                  </span>
+                </div>
+              )}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: "14px", paddingTop: "16px", borderTop: `1px solid ${C.line}` }}>
                 <span style={{ fontSize: "13px", color: C.faint }}>お支払い目安</span>
-                <span style={{ fontSize: "24px", fontWeight: 700 }}>{fmtYen(service.price)}〜</span>
+                <span style={{ fontSize: "24px", fontWeight: 700 }}>{fmtYen(priceForSlot(service.price, slotId))}〜</span>
               </div>
             </div>
             {btn("予約を確定する", confirm)}

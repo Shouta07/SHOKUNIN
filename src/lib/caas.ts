@@ -106,6 +106,32 @@ export function fmtSlot(slotId: string): string {
   return `${day.label}(${day.dow}) ${band.label} ${band.time}`;
 }
 
+// ダイナミックプライシング：近日ほど高い（特急プラン）。空き枠の需給を価格に反映。
+export const DAY_PRICING: Record<string, { mult: number; tag: string; color: string }> = {
+  d1: { mult: 1.5, tag: "特急", color: "#e5484d" },
+  d2: { mult: 1.3, tag: "特急", color: "#f59e0b" },
+  d3: { mult: 1.15, tag: "やや混雑", color: "#f59e0b" },
+  d4: { mult: 1.0, tag: "標準", color: "#5a6673" },
+  d5: { mult: 0.9, tag: "お得", color: "#2fa96b" },
+};
+export function slotMultiplier(slotId: string): number {
+  const d = slotId.split("|")[0];
+  return DAY_PRICING[d]?.mult ?? 1;
+}
+export function priceForSlot(base: number, slotId: string): number {
+  return Math.round(base * slotMultiplier(slotId));
+}
+
+// AI完成図書（録音→自動生成のたたき）
+export interface DocSection { title: string; items: string[]; }
+export const AI_DOC_SECTIONS: DocSection[] = [
+  { title: "実施内容", items: ["防犯カメラ 2台 設置（入口・レジ）", "クラウド録画の初期設定", "スマホアプリ連携・動作確認"] },
+  { title: "使用機材・型番", items: ["屋内カメラ SFV-210 ×2", "PoEスイッチ 5ポート ×1", "LANケーブル CAT6 15m"] },
+  { title: "お客様のご要望（録音より）", items: ["レジ手元がはっきり映るように", "夜間もカラーで見たい", "配線はできるだけ隠したい"] },
+  { title: "申し送り・注意事項", items: ["屋外への増設時は防水処理が必要", "録画は30日で自動上書き設定"] },
+  { title: "次回メンテナンス", items: ["6ヶ月後にレンズ清掃・画角確認を推奨"] },
+];
+
 // ─── プロジェクト（案件）状態 ───
 export type StageId = "booked" | "pre" | "live" | "done" | "maintenance";
 
