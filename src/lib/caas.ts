@@ -324,3 +324,56 @@ export function naiveTotalKm(start: GeoPoint, jobs: Job[]): number {
   for (const j of jobs) { total += haversineKm(cur, j); cur = j; }
   return total;
 }
+
+// ─── リモート現調（web面談 × 施設ウォークスルー） ───
+export interface SurveyZone {
+  id: string;
+  label: string;
+  scene: string;       // 背景トーン
+  hint: string;
+  serviceId: string;
+  reason: string;
+}
+export const SURVEY_ZONES: SurveyZone[] = [
+  { id: "z1", label: "入口・エントランス", scene: "linear-gradient(160deg,#33414f,#212a34)", hint: "来訪者が最初に通る場所", serviceId: "camera", reason: "来訪者の記録と抑止。トラブル時の証跡になります。" },
+  { id: "z2", label: "レジ・受付", scene: "linear-gradient(160deg,#3a3746,#26232e)", hint: "金銭・個人情報を扱う場所", serviceId: "camera", reason: "金銭トラブルの証跡・スタッフの安心につながります。" },
+  { id: "z3", label: "バックヤード", scene: "linear-gradient(160deg,#2f3d3a,#1f2926)", hint: "在庫・裏口のある場所", serviceId: "sensor", reason: "裏口の異常検知・在庫管理を自動化できます。" },
+  { id: "z4", label: "駐車場・外周", scene: "linear-gradient(160deg,#2b3542,#191f27)", hint: "屋外・死角になりやすい場所", serviceId: "camera_add", reason: "車上荒らし・不審者対策。屋外カメラで死角を消します。" },
+];
+
+// ─── 業界別の活用・価値比較（設備＝価値向上として訴求） ───
+export interface Industry {
+  id: string;
+  label: string;
+  icon: string;
+  adoption: number;    // 業界の導入率(%)
+  setup: string[];     // 典型的な構成
+  values: { label: string; value: string }[];  // 導入で得られる価値
+  insight: string;
+}
+export const INDUSTRIES: Industry[] = [
+  { id: "food", label: "飲食店", icon: "🍽", adoption: 62,
+    setup: ["客席・厨房カメラ", "レジ周りカメラ", "入口カメラ"],
+    values: [{ label: "クレーム対応時間", value: "−40%" }, { label: "保険料", value: "−8%" }, { label: "深夜の安心感", value: "向上" }],
+    insight: "厨房・レジ・客席の3点が定番。トラブル時の証跡で保険・クレーム対応が激減し、スタッフが辞めにくくなります。" },
+  { id: "retail", label: "小売店", icon: "🛍", adoption: 71,
+    setup: ["店内広域カメラ", "レジカメラ", "バックヤードセンサー"],
+    values: [{ label: "万引き被害", value: "−35%" }, { label: "棚卸ロス", value: "−20%" }, { label: "資産価値", value: "向上" }],
+    insight: "死角のない配置が鍵。被害の可視化そのものが抑止力になり、店舗の資産価値・売却時評価も上がります。" },
+  { id: "clinic", label: "クリニック", icon: "🏥", adoption: 55,
+    setup: ["待合カメラ", "入退室センサー", "夜間防犯"],
+    values: [{ label: "患者の安心感", value: "向上" }, { label: "夜間侵入リスク", value: "−50%" }, { label: "スタッフ定着", value: "向上" }],
+    insight: "待合と入退室の管理が中心。患者・スタッフ双方の安心が、口コミと採用力に直結します。" },
+  { id: "office", label: "オフィス", icon: "🏢", adoption: 68,
+    setup: ["入退室管理", "サーバー室カメラ", "共用部カメラ"],
+    values: [{ label: "情報セキュリティ", value: "強化" }, { label: "勤怠管理", value: "自動化" }, { label: "企業価値", value: "向上" }],
+    insight: "入退室ログは情報セキュリティ認証(ISMS等)でも評価され、取引や企業価値の向上に効きます。" },
+  { id: "factory", label: "工場・倉庫", icon: "🏭", adoption: 58,
+    setup: ["広域カメラ", "危険区域センサー", "外周カメラ"],
+    values: [{ label: "労災", value: "−25%" }, { label: "在庫差異", value: "−30%" }, { label: "稼働可視化", value: "向上" }],
+    insight: "安全と在庫の可視化が価値。労災の減少は保険・採用・行政評価すべてにプラスです。" },
+  { id: "hotel", label: "ホテル・宿泊", icon: "🏨", adoption: 64,
+    setup: ["共用部カメラ", "入口カメラ", "駐車場カメラ"],
+    values: [{ label: "ゲストの安心感", value: "向上" }, { label: "クレーム対応", value: "−35%" }, { label: "レビュー評価", value: "向上" }],
+    insight: "共用部の安心設計がレビュー評価に直結。安全性は宿泊予約サイトの評価軸そのものです。" },
+];

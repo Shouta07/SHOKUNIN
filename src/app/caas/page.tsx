@@ -57,35 +57,61 @@ export default function CaasBooking() {
 
         {/* ── intro ── */}
         {phase === "intro" && (
-          <div style={{ paddingTop: "24px" }}>
-            <div style={{ fontSize: "13px", fontWeight: 600, color: C.accent, marginBottom: "16px" }}>CONSTRUCTION AS A SERVICE</div>
-            <h1 style={{ fontSize: "34px", fontWeight: 700, lineHeight: 1.35, letterSpacing: "-0.02em", marginBottom: "20px" }}>
-              工事を、<br />頼みたくなる体験に。
-            </h1>
-            <p style={{ fontSize: "15px", color: C.sub, lineHeight: 1.9, marginBottom: "40px" }}>
-              電話も、待ち時間も、不安もいらない。<br />
-              予約から施工の様子まで、すべてスマホで。
-            </p>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "40px" }}>
-              {[
-                { icon: "⚡", t: "その場で見積", d: "電話待ちなし。選んで即見積。" },
-                { icon: "👷", t: "担当職人が見える", d: "顔・評価・実績を見て選べる。" },
-                { icon: "📹", t: "現場をライブで確認", d: "施工の様子をリアルタイムで。" },
-                { icon: "🔧", t: "完了後もつながる", d: "点検リマインドとワンタップ再依頼。" },
-              ].map((f) => (
-                <div key={f.t} style={{ display: "flex", gap: "14px", alignItems: "flex-start", background: C.surface, border: `1px solid ${C.line}`, borderRadius: "14px", padding: "16px 18px" }}>
-                  <span style={{ fontSize: "22px" }}>{f.icon}</span>
-                  <div>
-                    <div style={{ fontSize: "15px", fontWeight: 600 }}>{f.t}</div>
-                    <div style={{ fontSize: "13px", color: C.sub, marginTop: "3px", lineHeight: 1.6 }}>{f.d}</div>
-                  </div>
+          <div style={{ paddingTop: "6px" }}>
+            {/* HERO */}
+            <div style={{ position: "relative", borderRadius: "24px", overflow: "hidden", padding: "30px 24px 26px", color: "#fff", marginBottom: "16px",
+              background: "linear-gradient(155deg,#13224a 0%,#1e3a8a 55%,#2f6bed 100%)" }}>
+              <div className="caas-blob b1" />
+              <div className="caas-blob b2" />
+              <div style={{ position: "relative" }}>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: "7px", background: "rgba(255,255,255,0.14)", borderRadius: "100px", padding: "6px 13px" }}>
+                  <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#ff5a5f", animation: "caasPulse 1.2s infinite" }} />
+                  <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.05em" }}>現場が見える工事</span>
                 </div>
+                <h1 style={{ fontSize: "33px", fontWeight: 800, lineHeight: 1.3, letterSpacing: "-0.02em", margin: "16px 0 14px" }}>
+                  工事を、<br />
+                  <span style={{ background: "linear-gradient(90deg,#7dd3fc,#c4b5fd)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>ワクワクする体験</span>に。
+                </h1>
+                <p style={{ fontSize: "14px", lineHeight: 1.85, color: "rgba(255,255,255,0.82)", marginBottom: "22px" }}>
+                  電話も待ち時間もなし。見積は最短30秒。<br />施工はライブで見えて、完了後もずっとつながる。
+                </p>
+                <div style={{ display: "flex", gap: "18px" }}>
+                  {[{ v: "30秒", l: "で見積" }, { v: "98%", l: "満足度" }, { v: "12,800+", l: "施工実績" }].map((s) => (
+                    <div key={s.l}>
+                      <div style={{ fontSize: "20px", fontWeight: 800 }}>{s.v}</div>
+                      <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.7)", marginTop: "1px" }}>{s.l}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* primary CTA */}
+            <button onClick={() => setPhase("service")}
+              style={{ width: "100%", fontSize: "16px", fontWeight: 700, letterSpacing: "0.02em", color: "#fff", background: C.accent, border: "none", borderRadius: "16px", padding: "18px", cursor: "pointer", boxShadow: "0 8px 24px rgba(47,107,237,0.28)", marginBottom: "18px" }}>
+              工事を依頼する　→
+            </button>
+
+            {/* entry grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              {[
+                { icon: "🪄", t: "AR設置シミュ", d: "置くだけで死角ゼロ設計", href: "/caas/ar", tint: "#7c5cff" },
+                { icon: "🎥", t: "リモート現調", d: "web面談で現地を調査", href: "/caas/survey", tint: "#0ea5a4" },
+                { icon: "📊", t: "業界別の価値", d: "同業はこう使っている", href: "/caas/industries", tint: "#2f6bed" },
+                { icon: "🏢", t: "多拠点・法人", d: "一括調整＋CSV連携", href: "/caas/sites", tint: "#f59e0b" },
+              ].map((e) => (
+                <button key={e.href} onClick={() => router.push(e.href)}
+                  style={{ textAlign: "left", background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "16px", cursor: "pointer" }}>
+                  <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: `${e.tint}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", marginBottom: "10px" }}>{e.icon}</div>
+                  <div style={{ fontSize: "14px", fontWeight: 700 }}>{e.t}</div>
+                  <div style={{ fontSize: "11px", color: C.sub, marginTop: "3px", lineHeight: 1.5 }}>{e.d}</div>
+                </button>
               ))}
             </div>
-            {btn("工事を依頼する", () => setPhase("service"))}
-            <div style={{ marginTop: "12px" }}>
-              {btn("🪄 ARで設置イメージを見る", () => router.push("/caas/ar"), false)}
+
+            {/* trust strip */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginTop: "22px", fontSize: "12px", color: C.faint }}>
+              <span>⭐️ 4.9</span><span>·</span><span>認定職人のみ</span><span>·</span><span>1年保証</span>
             </div>
           </div>
         )}
@@ -288,6 +314,12 @@ export default function CaasBooking() {
       <style>{`
         @keyframes caasDot { 0%,100% { opacity: .25; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
         @keyframes caasUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes caasPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes caasFloat1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(24px,18px) scale(1.15); } }
+        @keyframes caasFloat2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-20px,-16px) scale(1.1); } }
+        .caas-blob { position: absolute; border-radius: 50%; filter: blur(26px); opacity: 0.55; pointer-events: none; }
+        .caas-blob.b1 { width: 180px; height: 180px; top: -40px; right: -30px; background: radial-gradient(circle, #38bdf8, transparent 70%); animation: caasFloat1 9s ease-in-out infinite; }
+        .caas-blob.b2 { width: 150px; height: 150px; bottom: -50px; left: -20px; background: radial-gradient(circle, #a78bfa, transparent 70%); animation: caasFloat2 11s ease-in-out infinite; }
       `}</style>
     </div>
   );
