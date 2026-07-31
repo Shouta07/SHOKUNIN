@@ -14,7 +14,7 @@ export function Card({
     <div
       className={cn(
         "rounded-[var(--radius-card)] border bg-surface",
-        selected ? "border-ink" : "border-line",
+        selected ? "border-brand ring-1 ring-brand" : "border-line",
         interactive &&
           "cursor-pointer transition-colors duration-150 hover:border-subtle",
         className,

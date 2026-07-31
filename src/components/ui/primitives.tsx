@@ -169,7 +169,7 @@ export function Meter({
   return (
     <div className={cn("h-1.5 w-full rounded-full bg-line-2", className)}>
       <div
-        className="h-full rounded-full bg-ink transition-[width] duration-500"
+        className="h-full rounded-full bg-brand transition-[width] duration-500"
         style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
       />
     </div>

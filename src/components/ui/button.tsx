@@ -10,7 +10,7 @@ const base =
   "disabled:pointer-events-none disabled:opacity-40 active:scale-[0.99] whitespace-nowrap";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-ink text-white hover:bg-ink-2",
+  primary: "bg-brand text-brand-fg hover:bg-brand-strong",
   secondary: "bg-surface text-ink border border-line hover:bg-canvas",
   ghost: "bg-transparent text-muted hover:text-ink hover:bg-line-2",
   danger: "bg-critical text-white hover:opacity-90",

@@ -45,7 +45,7 @@ export default function Industries() {
               className={cn(
                 "tap shrink-0 whitespace-nowrap rounded-[var(--radius-control)] border px-4 text-[13px] font-medium transition-colors",
                 on
-                  ? "border-ink bg-ink text-white"
+                  ? "border-brand bg-brand text-brand-fg"
                   : "border-line bg-surface text-ink hover:border-subtle",
               )}
             >

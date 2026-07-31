@@ -16,10 +16,13 @@
   --color-surface: #ffffff;
   --color-canvas: #fafafa;
 
-  /* — Single accent, used sparingly — */
-  --color-brand: #1a56db;
+  /* — Brand: セーフィーグリーン（青みがかった緑／誠実さと安心感）—
+     ブランドガイドラインの正式値が入手できたら、この1行を差し替える。
+     白背景に対して 5.2:1、白文字を載せても 5.2:1（WCAG AA を両方向で充足）。 */
+  --color-brand: #0b7a64;
   --color-brand-fg: #ffffff;
-  --color-brand-soft: #eff4ff;
+  --color-brand-soft: #eaf4f1;
+  --color-brand-strong: #095f4e;
 
   /* — Semantic — */
   --color-positive: #15803d;

@@ -115,8 +115,8 @@ export default function CaasBooking() {
       <div className="mx-auto max-w-2xl px-5 lg:px-10">
         {/* Hero: what it is · who it's for · one action */}
         <section className="pt-14 pb-16 lg:pt-24 lg:pb-20">
-          <Eyebrow>防犯カメラ・電気設備の工事</Eyebrow>
-          <h1 className="mt-5 text-[34px] font-semibold leading-[1.2] text-ink lg:text-[46px]">
+          <Eyebrow>Safie Field Works ／ 防犯カメラ・電気設備の工事</Eyebrow>
+          <h1 className="mt-5 text-[27px] font-semibold leading-[1.35] text-ink sm:text-[34px] sm:leading-[1.25] lg:text-[46px] lg:leading-[1.2]">
             見積から施工完了まで、
             <br />
             電話ゼロで。
@@ -308,7 +308,7 @@ export default function CaasBooking() {
                               full
                                 ? "cursor-not-allowed border-line-2 bg-line-2 text-subtle"
                                 : sel
-                                  ? "border-ink bg-ink text-white"
+                                  ? "border-brand bg-brand text-brand-fg"
                                   : "border-line bg-surface text-ink hover:border-subtle",
                             )}
                           >
@@ -372,7 +372,7 @@ export default function CaasBooking() {
                       </div>
                     </div>
                     {sel && (
-                      <span aria-hidden className="text-ink">
+                      <span aria-hidden className="text-brand">
                         ✓
                       </span>
                     )}
@@ -480,7 +480,7 @@ export default function CaasBooking() {
                     className={cn(
                       "tap rounded-[var(--radius-control)] border px-3.5 text-[13px] font-medium transition-colors",
                       contact.parking === p
-                        ? "border-ink bg-ink text-white"
+                        ? "border-brand bg-brand text-brand-fg"
                         : "border-line bg-surface text-ink hover:border-subtle",
                     )}
                   >

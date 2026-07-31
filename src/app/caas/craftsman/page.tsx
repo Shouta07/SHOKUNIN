@@ -203,14 +203,14 @@ export default function CraftsmanPage() {
         <div className="animate-rise">
           <div className="mt-6 flex flex-wrap gap-4 text-[12px] text-muted">
             <span className="flex items-center gap-1.5">
-              <span className="size-2.5 rounded-sm bg-ink" />提供中
+              <span className="size-2.5 rounded-sm bg-brand" />提供中
             </span>
             <span className="flex items-center gap-1.5">
               <span className="size-2.5 rounded-sm bg-line-2 ring-1 ring-line" />
               非提供
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="size-2.5 rounded-sm bg-brand" />予約済（変更不可）
+              <span className="size-2.5 rounded-sm bg-ink" />予約済（変更不可）
             </span>
           </div>
 
@@ -257,9 +257,9 @@ export default function CraftsmanPage() {
                             className={cn(
                               "aspect-[1.3] w-full rounded-[var(--radius-control)] border text-[12px] font-semibold transition-colors",
                               booked
-                                ? "cursor-not-allowed border-brand bg-brand text-white"
+                                ? "cursor-not-allowed border-ink bg-ink text-white"
                                 : on
-                                  ? "border-ink bg-ink text-white"
+                                  ? "border-brand bg-brand text-brand-fg"
                                   : "border-line bg-surface text-subtle hover:border-subtle",
                             )}
                           >
@@ -282,7 +282,7 @@ export default function CraftsmanPage() {
               <div className="mt-0.5 text-[12px] text-muted">提供中の枠</div>
             </Card>
             <Card className="p-4">
-              <div className="tnum text-xl font-semibold text-brand">
+              <div className="tnum text-xl font-semibold text-ink">
                 {BOOKED.size}
               </div>
               <div className="mt-0.5 text-[12px] text-muted">予約済み</div>

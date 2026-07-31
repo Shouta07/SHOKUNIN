@@ -58,11 +58,16 @@ function RoleSwitch({ role }: { role: "customer" | "craftsman" }) {
 function Wordmark({ href }: { href: string }) {
   return (
     <Link href={href} className="flex items-center gap-2.5">
-      <span className="grid size-7 place-items-center rounded-[7px] bg-ink text-[13px] font-bold text-white">
-        C
+      <span className="grid size-7 place-items-center rounded-[7px] bg-brand text-[13px] font-bold text-brand-fg">
+        S
       </span>
-      <span className="text-[15px] font-semibold tracking-tight text-ink">
-        CaaS
+      <span className="leading-tight">
+        <span className="block text-[14px] font-semibold tracking-tight text-ink">
+          Safie Field Works
+        </span>
+        <span className="block text-[10px] tracking-wide text-subtle">
+          Construction as a Service
+        </span>
       </span>
     </Link>
   );
@@ -80,7 +85,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       <aside className="sticky top-0 hidden h-dvh flex-col justify-between border-r border-line bg-surface px-5 py-6 lg:flex">
         <div>
           <Wordmark href={home} />
-          <div className="mt-6">
+          <div className="mt-7">
             <RoleSwitch role={role} />
           </div>
           <nav className="mt-7 flex flex-col gap-0.5">
@@ -102,7 +107,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
         <p className="text-[11px] leading-relaxed text-subtle">
-          Construction as a Service
+          セーフィーフィールドワークス
         </p>
       </aside>
 
