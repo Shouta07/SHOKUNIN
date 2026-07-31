@@ -5,8 +5,9 @@ import { usePathname } from "next/navigation";
 import { C } from "@/lib/caas";
 
 const NAV = [
-  { href: "/caas", label: "依頼する", icon: "🧰" },
+  { href: "/caas", label: "依頼", icon: "🧰" },
   { href: "/caas/project", label: "マイ工事", icon: "📋" },
+  { href: "/caas/sites", label: "拠点", icon: "🏢" },
   { href: "/caas/academy", label: "職人", icon: "🎓" },
 ];
 

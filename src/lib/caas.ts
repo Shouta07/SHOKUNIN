@@ -182,3 +182,63 @@ export function skillProgress(cat: SkillCategory): number {
   if (cat.modules.length === 0) return 0;
   return Math.round(cat.modules.filter((m) => m.done).length / cat.modules.length * 100);
 }
+
+// ─── 多拠点 一括日程調整（法人アカウント）× CSVエクスポート（kintone連携） ───
+export type SiteStatus = "未定" | "調整中" | "確定" | "完了";
+export const SITE_STATUSES: SiteStatus[] = ["未定", "調整中", "確定", "完了"];
+
+export interface Site {
+  id: string;
+  name: string;
+  address: string;
+  serviceId: string;
+  slotId: string;      // `${dayId}|${bandId}` or ""
+  craftsmanId: string; // or ""
+  status: SiteStatus;
+}
+
+export const SITES: Site[] = [
+  { id: "st1", name: "渋谷店", address: "東京都渋谷区道玄坂1-2-3", serviceId: "camera", slotId: "d1|pm", craftsmanId: "t1", status: "確定" },
+  { id: "st2", name: "新宿東口店", address: "東京都新宿区新宿3-1-1", serviceId: "camera_add", slotId: "d2|am", craftsmanId: "t2", status: "調整中" },
+  { id: "st3", name: "横浜西口店", address: "神奈川県横浜市西区南幸2-1-1", serviceId: "sensor", slotId: "", craftsmanId: "", status: "未定" },
+  { id: "st4", name: "大宮支店", address: "埼玉県さいたま市大宮区桜木町1-1", serviceId: "camera", slotId: "d4|eve", craftsmanId: "t3", status: "確定" },
+  { id: "st5", name: "千葉ベイ店", address: "千葉県千葉市美浜区中瀬2-6", serviceId: "electric", slotId: "", craftsmanId: "", status: "未定" },
+];
+
+// kintone等に流し込むためのCSV（BOM付き・UTF-8）
+export function buildSitesCSV(sites: Site[]): string {
+  const header = ["拠点名", "住所", "工事種別", "希望日時", "担当職人", "金額(目安)", "ステータス"];
+  const rows = sites.map((s) => {
+    const svc = getService(s.serviceId);
+    const cra = getCraftsman(s.craftsmanId);
+    return [
+      s.name,
+      s.address,
+      svc?.label ?? "",
+      s.slotId ? fmtSlot(s.slotId) : "未定",
+      cra?.name ?? "未割当",
+      svc ? String(svc.price) : "",
+      s.status,
+    ];
+  });
+  const esc = (v: string) => `"${v.replace(/"/g, '""')}"`;
+  const body = [header, ...rows].map((r) => r.map(esc).join(",")).join("\r\n");
+  return "﻿" + body; // BOM for Excel/kintone
+}
+
+// ─── マーケティング：クロスセル（他設備の依頼契機） ───
+export interface CrossSell { serviceId: string; hook: string; }
+export const CROSS_SELL: CrossSell[] = [
+  { serviceId: "camera_add", hook: "同じ職人がそのまま増設できます" },
+  { serviceId: "sensor", hook: "人感・開閉センサーで防犯を強化" },
+  { serviceId: "aircon", hook: "繁忙期前に。今なら同時割引" },
+  { serviceId: "electric", hook: "コンセント増設・配線もまとめて" },
+];
+
+// ─── マーケティング：紹介キャンペーン ───
+export const REFERRAL = {
+  code: "CAAS-2026",
+  rewardYou: 5000,
+  rewardFriend: 5000,
+  message: "紹介した方・された方の双方に次回工事で使えるクーポンを進呈。",
+};

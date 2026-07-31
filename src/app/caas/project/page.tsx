@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
-  C, SANS, STAGES, LIVE_TIMELINE, RATING_AXES, getProject, saveProject, clearProject,
+  C, SANS, STAGES, LIVE_TIMELINE, RATING_AXES, CROSS_SELL, getProject, saveProject, clearProject,
   getService, getCraftsman, fmtSlot, fmtYen, type Project,
 } from "@/lib/caas";
 
@@ -259,6 +259,29 @@ export default function CaasProject() {
 
             <div style={{ textAlign: "center", padding: "20px" }}>
               <p style={{ fontSize: "13px", color: C.sub, lineHeight: 1.8 }}>この工事の記録はすべて保存されています。<br />次も、電話も待ち時間もいりません。</p>
+            </div>
+          </div>
+        )}
+
+        {/* Cross-sell — 他設備の依頼契機（done / maintenance） */}
+        {(stage.id === "done" || stage.id === "maintenance") && (
+          <div style={{ marginTop: "8px" }}>
+            <SectionTitle>この機会に、こんな工事も</SectionTitle>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {CROSS_SELL.filter((x) => x.serviceId !== project.serviceId).slice(0, 3).map((x) => {
+                const svc = getService(x.serviceId)!;
+                return (
+                  <button key={x.serviceId} onClick={() => { clearProject(); router.push("/caas"); }}
+                    style={{ display: "flex", alignItems: "center", gap: "14px", width: "100%", textAlign: "left", background: C.surface, border: `1px solid ${C.line}`, borderRadius: "14px", padding: "14px 16px", cursor: "pointer" }}>
+                    <span style={{ fontSize: "24px" }}>{svc.icon}</span>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: "14px", fontWeight: 600 }}>{svc.label}</div>
+                      <div style={{ fontSize: "12px", color: C.accent, marginTop: "2px" }}>{x.hook}</div>
+                    </div>
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: C.accent }}>{fmtYen(svc.price)}〜</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
