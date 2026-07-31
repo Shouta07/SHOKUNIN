@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import {
   C, SANS, BANDS, HOME_BASE, TODAY_JOBS, TRAVEL_YEN_PER_KM, AVG_KMH,
-  optimizeRoute, naiveTotalKm, getService, fmtYen, type GeoPoint,
+  optimizeRoute, naiveTotalKm, getService, fmtYen, mapsEmbedSrc, mapsDirUrl,
 } from "@/lib/caas";
 
 const WEEK = [
@@ -68,18 +68,28 @@ export default function CraftsmanPage() {
         {/* ── ROUTE ── */}
         {tab === "route" && (
           <>
-            {/* savings banner */}
-            <div style={{ background: "linear-gradient(135deg,#2fa96b,#28c07a)", borderRadius: "16px", padding: "18px 20px", color: "#fff", marginBottom: "16px" }}>
-              <div style={{ fontSize: "12px", opacity: 0.9, fontWeight: 600 }}>最短ルートで移動を最適化</div>
-              <div style={{ display: "flex", gap: "20px", marginTop: "10px" }}>
-                <div><div style={{ fontSize: "22px", fontWeight: 800 }}>{route.totalKm.toFixed(1)}<span style={{ fontSize: "12px" }}>km</span></div><div style={{ fontSize: "11px", opacity: 0.85 }}>総移動</div></div>
-                <div><div style={{ fontSize: "22px", fontWeight: 800 }}>{min(route.totalKm)}<span style={{ fontSize: "12px" }}>分</span></div><div style={{ fontSize: "11px", opacity: 0.85 }}>移動時間</div></div>
-                <div><div style={{ fontSize: "22px", fontWeight: 800 }}>−{savedKm.toFixed(1)}<span style={{ fontSize: "12px" }}>km</span></div><div style={{ fontSize: "11px", opacity: 0.85 }}>無駄削減</div></div>
+            {/* savings */}
+            <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "18px 20px", marginBottom: "16px" }}>
+              <div style={{ fontSize: "12px", color: C.faint, fontWeight: 600, marginBottom: "12px" }}>最短ルートで移動を最適化</div>
+              <div style={{ display: "flex", gap: "24px" }}>
+                <div><div style={{ fontSize: "22px", fontWeight: 700 }}>{route.totalKm.toFixed(1)}<span style={{ fontSize: "12px", color: C.sub }}>km</span></div><div style={{ fontSize: "11px", color: C.faint, marginTop: "2px" }}>総移動</div></div>
+                <div><div style={{ fontSize: "22px", fontWeight: 700 }}>{min(route.totalKm)}<span style={{ fontSize: "12px", color: C.sub }}>分</span></div><div style={{ fontSize: "11px", color: C.faint, marginTop: "2px" }}>移動時間</div></div>
+                <div><div style={{ fontSize: "22px", fontWeight: 700, color: C.ok }}>−{savedKm.toFixed(1)}<span style={{ fontSize: "12px" }}>km</span></div><div style={{ fontSize: "11px", color: C.faint, marginTop: "2px" }}>無駄削減</div></div>
               </div>
             </div>
 
-            {/* schematic map */}
-            <RouteMap order={route.order} />
+            {/* Google Map（実地図） */}
+            <div style={{ borderRadius: "16px", overflow: "hidden", border: `1px solid ${C.line}` }}>
+              <iframe
+                title="本日のルート"
+                src={mapsEmbedSrc(HOME_BASE, route.order)}
+                width="100%" height="240" style={{ border: 0, display: "block" }}
+                loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+            </div>
+            <a href={mapsDirUrl(HOME_BASE, route.order)} target="_blank" rel="noopener noreferrer"
+              style={{ display: "block", textAlign: "center", fontSize: "13px", fontWeight: 600, color: C.accent, textDecoration: "none", marginTop: "10px" }}>
+              Google Mapで経路を開く →
+            </a>
 
             {/* cost */}
             <div style={{ display: "flex", gap: "10px", margin: "16px 0" }}>
@@ -166,35 +176,6 @@ export default function CraftsmanPage() {
   );
 }
 
-// ── 距離可視化：直線ルートの概念図 ──
-function RouteMap({ order }: { order: GeoPoint[] & { name?: string }[] }) {
-  const pts: (GeoPoint & { label: string; home?: boolean })[] = [
-    { ...HOME_BASE, label: "S", home: true },
-    ...order.map((j, i) => ({ lat: j.lat, lng: j.lng, label: String(i + 1) })),
-  ];
-  const lats = pts.map((p) => p.lat), lngs = pts.map((p) => p.lng);
-  const minLat = Math.min(...lats), maxLat = Math.max(...lats);
-  const minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
-  const pad = 12;
-  const px = (p: GeoPoint) => pad + (maxLng === minLng ? 50 : ((p.lng - minLng) / (maxLng - minLng)) * (100 - 2 * pad));
-  const py = (p: GeoPoint) => pad + (maxLat === minLat ? 50 : ((maxLat - p.lat) / (maxLat - minLat)) * (100 - 2 * pad));
-  const line = pts.map((p) => `${px(p).toFixed(1)},${py(p).toFixed(1)}`).join(" ");
-
-  return (
-    <div style={{ background: "#eef2f7", border: `1px solid ${C.line}`, borderRadius: "16px", overflow: "hidden", height: "220px" }}>
-      <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style={{ width: "100%", height: "100%" }}>
-        <polyline points={line} fill="none" stroke={C.accent} strokeWidth="0.8" strokeDasharray="2 1.5" strokeLinecap="round" opacity="0.7" />
-        {pts.map((p, i) => (
-          <g key={i}>
-            <circle cx={px(p)} cy={py(p)} r={p.home ? 3.4 : 3} fill={p.home ? C.ink : C.accent} />
-            <text x={px(p)} y={py(p) + 1.4} fontSize="3.2" fill="#fff" fontWeight="700" textAnchor="middle">{p.label}</text>
-          </g>
-        ))}
-      </svg>
-    </div>
-  );
-}
-
 function Stop({ idx, name, sub, km, home }: { idx: number; name: string; sub: string; km?: number; home?: boolean }) {
   return (
     <div>
@@ -205,7 +186,7 @@ function Stop({ idx, name, sub, km, home }: { idx: number; name: string; sub: st
         </div>
       )}
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: home ? C.ink : C.accent, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, flexShrink: 0 }}>{home ? "🏠" : idx}</div>
+        <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: home ? C.ink : C.accent, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, flexShrink: 0 }}>{home ? "出" : idx}</div>
         <div style={{ flex: 1, background: C.surface, border: `1px solid ${C.line}`, borderRadius: "12px", padding: "12px 16px" }}>
           <div style={{ fontSize: "14px", fontWeight: 600 }}>{name}</div>
           <div style={{ fontSize: "12px", color: C.sub, marginTop: "2px" }}>{sub}</div>

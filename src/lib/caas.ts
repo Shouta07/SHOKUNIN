@@ -326,13 +326,24 @@ export interface Job extends GeoPoint {
 // 職人の出発点（自宅・倉庫）
 export const HOME_BASE = { name: "自宅・倉庫", lat: 35.6595, lng: 139.7005 };
 
-// 本日の割当現場（デモ）
+// 本日の割当現場（デモ：そうごう薬局の店舗を事例に）
 export const TODAY_JOBS: Job[] = [
-  { id: "j1", name: "渋谷店", address: "渋谷区道玄坂1-2-3", serviceId: "camera", time: "10:00", lat: 35.6580, lng: 139.7016 },
-  { id: "j2", name: "新宿東口店", address: "新宿区新宿3-1-1", serviceId: "camera_add", time: "13:00", lat: 35.6910, lng: 139.7035 },
-  { id: "j3", name: "横浜西口店", address: "横浜市西区南幸2-1-1", serviceId: "sensor", time: "15:30", lat: 35.4658, lng: 139.6220 },
-  { id: "j4", name: "大宮支店", address: "さいたま市大宮区桜木町1-1", serviceId: "camera", time: "18:00", lat: 35.9063, lng: 139.6238 },
+  { id: "j1", name: "そうごう薬局 渋谷店", address: "東京都渋谷区道玄坂2-1-1", serviceId: "camera", time: "10:00", lat: 35.6580, lng: 139.6994 },
+  { id: "j2", name: "そうごう薬局 新宿店", address: "東京都新宿区西新宿1-1-1", serviceId: "camera_add", time: "13:00", lat: 35.6896, lng: 139.6995 },
+  { id: "j3", name: "そうごう薬局 池袋店", address: "東京都豊島区南池袋1-28-1", serviceId: "sensor", time: "15:00", lat: 35.7295, lng: 139.7109 },
+  { id: "j4", name: "そうごう薬局 品川店", address: "東京都港区港南2-1-1", serviceId: "camera", time: "17:00", lat: 35.6284, lng: 139.7387 },
 ];
+
+// Google Maps 連携用のURL
+export function mapsEmbedSrc(start: GeoPoint, stops: GeoPoint[]): string {
+  const s = `${start.lat},${start.lng}`;
+  const d = stops.map((p) => `${p.lat},${p.lng}`).join("+to:");
+  return `https://www.google.com/maps?saddr=${s}&daddr=${d}&output=embed`;
+}
+export function mapsDirUrl(start: GeoPoint, stops: GeoPoint[]): string {
+  const pts = [start, ...stops].map((p) => `${p.lat},${p.lng}`).join("/");
+  return `https://www.google.com/maps/dir/${pts}`;
+}
 
 export function haversineKm(a: GeoPoint, b: GeoPoint): number {
   const R = 6371;
