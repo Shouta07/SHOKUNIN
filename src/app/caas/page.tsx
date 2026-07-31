@@ -57,61 +57,44 @@ export default function CaasBooking() {
 
         {/* ── intro ── */}
         {phase === "intro" && (
-          <div style={{ paddingTop: "6px" }}>
-            {/* HERO */}
-            <div style={{ position: "relative", borderRadius: "24px", overflow: "hidden", padding: "30px 24px 26px", color: "#fff", marginBottom: "16px",
-              background: "linear-gradient(155deg,#13224a 0%,#1e3a8a 55%,#2f6bed 100%)" }}>
-              <div className="caas-blob b1" />
-              <div className="caas-blob b2" />
-              <div style={{ position: "relative" }}>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: "7px", background: "rgba(255,255,255,0.14)", borderRadius: "100px", padding: "6px 13px" }}>
-                  <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#ff5a5f", animation: "caasPulse 1.2s infinite" }} />
-                  <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.05em" }}>現場が見える工事</span>
-                </div>
-                <h1 style={{ fontSize: "33px", fontWeight: 800, lineHeight: 1.3, letterSpacing: "-0.02em", margin: "16px 0 14px" }}>
-                  工事を、<br />
-                  <span style={{ background: "linear-gradient(90deg,#7dd3fc,#c4b5fd)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>ワクワクする体験</span>に。
-                </h1>
-                <p style={{ fontSize: "14px", lineHeight: 1.85, color: "rgba(255,255,255,0.82)", marginBottom: "22px" }}>
-                  電話も待ち時間もなし。見積は最短30秒。<br />施工はライブで見えて、完了後もずっとつながる。
-                </p>
-                <div style={{ display: "flex", gap: "18px" }}>
-                  {[{ v: "30秒", l: "で見積" }, { v: "98%", l: "満足度" }, { v: "12,800+", l: "施工実績" }].map((s) => (
-                    <div key={s.l}>
-                      <div style={{ fontSize: "20px", fontWeight: 800 }}>{s.v}</div>
-                      <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.7)", marginTop: "1px" }}>{s.l}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+          <div style={{ paddingTop: "20px" }}>
+            <div style={{ fontSize: "11px", letterSpacing: "0.22em", color: C.faint, textTransform: "uppercase" }}>Construction as a Service</div>
 
-            {/* primary CTA */}
+            <h1 style={{ fontSize: "40px", fontWeight: 700, lineHeight: 1.18, letterSpacing: "-0.035em", margin: "24px 0 22px" }}>
+              頼んで、見て、<br />また頼む。
+            </h1>
+            <p style={{ fontSize: "15px", color: C.sub, lineHeight: 2, maxWidth: "30ch", marginBottom: "34px" }}>
+              電話も、見積の待ち時間も、当日の不安も。依頼から施工、その後のつきあいまでを、一本の線にする。
+            </p>
+
             <button onClick={() => setPhase("service")}
-              style={{ width: "100%", fontSize: "16px", fontWeight: 700, letterSpacing: "0.02em", color: "#fff", background: C.accent, border: "none", borderRadius: "16px", padding: "18px", cursor: "pointer", boxShadow: "0 8px 24px rgba(47,107,237,0.28)", marginBottom: "18px" }}>
-              工事を依頼する　→
+              style={{ fontSize: "15px", fontWeight: 600, color: "#fff", background: C.ink, border: "none", borderRadius: "2px", padding: "16px 32px", cursor: "pointer" }}>
+              工事を依頼する
             </button>
+            <div style={{ fontSize: "12px", color: C.faint, marginTop: "12px" }}>最短30秒でお見積り</div>
 
-            {/* entry grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            {/* index */}
+            <div style={{ marginTop: "52px", borderTop: `1px solid ${C.line}` }}>
               {[
-                { icon: "🪄", t: "AR設置シミュ", d: "置くだけで死角ゼロ設計", href: "/caas/ar", tint: "#7c5cff" },
-                { icon: "🎥", t: "リモート現調", d: "web面談で現地を調査", href: "/caas/survey", tint: "#0ea5a4" },
-                { icon: "📊", t: "業界別の価値", d: "同業はこう使っている", href: "/caas/industries", tint: "#2f6bed" },
-                { icon: "🏢", t: "多拠点・法人", d: "一括調整＋CSV連携", href: "/caas/sites", tint: "#f59e0b" },
+                { n: "01", t: "AR設置プラン", d: "画面上に機器を置いて配置を決める", href: "/caas/ar" },
+                { n: "02", t: "リモート現調", d: "オンラインで施設を映しながら相談", href: "/caas/survey" },
+                { n: "03", t: "業界別の使われ方", d: "同じ業種の導入例と得られた価値", href: "/caas/industries" },
+                { n: "04", t: "多拠点をまとめて", d: "一括で日程調整・CSVで書き出し", href: "/caas/sites" },
               ].map((e) => (
                 <button key={e.href} onClick={() => router.push(e.href)}
-                  style={{ textAlign: "left", background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "16px", cursor: "pointer" }}>
-                  <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: `${e.tint}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", marginBottom: "10px" }}>{e.icon}</div>
-                  <div style={{ fontSize: "14px", fontWeight: 700 }}>{e.t}</div>
-                  <div style={{ fontSize: "11px", color: C.sub, marginTop: "3px", lineHeight: 1.5 }}>{e.d}</div>
+                  style={{ display: "flex", alignItems: "baseline", gap: "16px", width: "100%", textAlign: "left", background: "none", border: "none", borderBottom: `1px solid ${C.line}`, padding: "20px 2px", cursor: "pointer" }}>
+                  <span style={{ fontSize: "12px", color: C.faint, fontVariantNumeric: "tabular-nums", minWidth: "22px" }}>{e.n}</span>
+                  <span style={{ flex: 1 }}>
+                    <span style={{ fontSize: "16px", fontWeight: 600, color: C.ink, display: "block" }}>{e.t}</span>
+                    <span style={{ fontSize: "13px", color: C.sub, marginTop: "3px", display: "block" }}>{e.d}</span>
+                  </span>
+                  <span style={{ color: C.faint, fontSize: "15px" }}>→</span>
                 </button>
               ))}
             </div>
 
-            {/* trust strip */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginTop: "22px", fontSize: "12px", color: C.faint }}>
-              <span>⭐️ 4.9</span><span>·</span><span>認定職人のみ</span><span>·</span><span>1年保証</span>
+            <div style={{ marginTop: "28px", fontSize: "12px", color: C.faint, lineHeight: 1.9 }}>
+              施工実績 12,800件　·　満足度 98%　·　認定職人のみ　·　1年保証
             </div>
           </div>
         )}

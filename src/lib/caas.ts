@@ -122,6 +122,24 @@ export function priceForSlot(base: number, slotId: string): number {
   return Math.round(base * slotMultiplier(slotId));
 }
 
+// まとめ割引（アップセル）：点数が増えるほど安くなる
+export const BUNDLE_TIERS = [
+  { count: 2, rate: 0.05 },
+  { count: 3, rate: 0.12 },
+  { count: 4, rate: 0.18 },
+  { count: 5, rate: 0.22 },
+];
+export function bundleRate(n: number): number {
+  let r = 0;
+  for (const t of BUNDLE_TIERS) if (n >= t.count) r = t.rate;
+  return r;
+}
+// 次の割引ティアまであと何点 / その割引率
+export function nextBundleTier(n: number): { need: number; rate: number } | null {
+  const t = BUNDLE_TIERS.find((x) => x.count > n);
+  return t ? { need: t.count - n, rate: t.rate } : null;
+}
+
 // AI完成図書（録音→自動生成のたたき）
 export interface DocSection { title: string; items: string[]; }
 export const AI_DOC_SECTIONS: DocSection[] = [

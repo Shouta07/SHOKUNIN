@@ -5,13 +5,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { C } from "@/lib/caas";
 
 const NAV_CUSTOMER = [
-  { href: "/caas", label: "依頼", icon: "🧰" },
-  { href: "/caas/project", label: "マイ工事", icon: "📋" },
-  { href: "/caas/sites", label: "拠点", icon: "🏢" },
+  { href: "/caas", label: "依頼" },
+  { href: "/caas/project", label: "マイ工事" },
+  { href: "/caas/sites", label: "拠点" },
 ];
 const NAV_CRAFTSMAN = [
-  { href: "/caas/craftsman", label: "スケジュール", icon: "🗺" },
-  { href: "/caas/academy", label: "アカデミー", icon: "🎓" },
+  { href: "/caas/craftsman", label: "スケジュール" },
+  { href: "/caas/academy", label: "アカデミー" },
 ];
 
 function isActive(href: string, pathname: string) {
@@ -50,7 +50,6 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           <nav className="caas-nav">
             {nav.map((n) => (
               <Link key={n.href} href={n.href} className={`caas-nav-link${isActive(n.href, pathname) ? " active" : ""}`}>
-                <span className="caas-nav-icon">{n.icon}</span>
                 <span>{n.label}</span>
               </Link>
             ))}
@@ -75,7 +74,6 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       <nav className="caas-tabbar">
         {nav.map((n) => (
           <Link key={n.href} href={n.href} className={`caas-tab${isActive(n.href, pathname) ? " active" : ""}`}>
-            <span className="caas-tab-icon">{n.icon}</span>
             <span className="caas-tab-label">{n.label}</span>
           </Link>
         ))}
@@ -112,10 +110,9 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         .caas-topbar-brand { display: flex; align-items: center; gap: 9px; text-decoration: none; color: ${C.ink}; font-weight: 800; font-size: 16px; }
 
         .caas-tabbar { display: none; }
-        .caas-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 0; text-decoration: none; color: ${C.faint}; transition: color 160ms; }
-        .caas-tab.active { color: ${C.accent}; }
-        .caas-tab-icon { font-size: 19px; }
-        .caas-tab-label { font-size: 10px; font-weight: 600; }
+        .caas-tab { flex: 1; display: flex; align-items: center; justify-content: center; padding: 15px 0; text-decoration: none; color: ${C.faint}; transition: color 160ms; }
+        .caas-tab.active { color: ${C.ink}; font-weight: 700; }
+        .caas-tab-label { font-size: 13px; font-weight: 600; }
 
         @media (min-width: 900px) {
           .caas-shell { display: grid; grid-template-columns: 252px 1fr; }
