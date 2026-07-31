@@ -1,0 +1,252 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import {
+  C, SANS, SERVICES, CRAFTSMEN, SLOTS, saveProject, getProject, fmtYen,
+  type Service, type Craftsman,
+} from "@/lib/caas";
+
+type Phase = "intro" | "service" | "quote" | "slot" | "craftsman" | "confirm";
+
+export default function CaasBooking() {
+  const router = useRouter();
+  const [phase, setPhase] = useState<Phase>("intro");
+  const [service, setService] = useState<Service | null>(null);
+  const [slotId, setSlotId] = useState<string>("");
+  const [craftsman, setCraftsman] = useState<Craftsman | null>(null);
+  const [quoteReady, setQuoteReady] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [hasProject, setHasProject] = useState(false);
+
+  useEffect(() => { setMounted(true); setHasProject(!!getProject()); }, []);
+  useEffect(() => {
+    if (phase === "quote") { setQuoteReady(false); const t = setTimeout(() => setQuoteReady(true), 1100); return () => clearTimeout(t); }
+  }, [phase]);
+
+  if (!mounted) return <div style={{ minHeight: "100dvh", background: C.bg }} />;
+
+  const confirm = () => {
+    if (!service || !slotId || !craftsman) return;
+    saveProject({ id: crypto.randomUUID(), serviceId: service.id, craftsmanId: craftsman.id, slotId, stage: 0, createdAt: new Date().toISOString() });
+    router.push("/caas/project");
+  };
+
+  const btn = (label: string, onClick: () => void, primary = true, disabled = false): React.ReactNode => (
+    <button onClick={onClick} disabled={disabled}
+      style={{ width: "100%", fontSize: "15px", fontWeight: 600, letterSpacing: "0.02em",
+        background: disabled ? C.lineSoft : primary ? C.accent : C.surface, color: disabled ? C.faint : primary ? "#fff" : C.ink,
+        border: primary ? "none" : `1px solid ${C.line}`, borderRadius: "14px", padding: "16px", cursor: disabled ? "default" : "pointer", transition: "all 200ms" }}>
+      {label}
+    </button>
+  );
+
+  const Progress = ({ n }: { n: number }) => (
+    <div style={{ display: "flex", gap: "5px", marginBottom: "32px" }}>
+      {[0, 1, 2, 3].map((i) => <div key={i} style={{ flex: 1, height: "3px", borderRadius: "100px", background: i < n ? C.accent : C.line, transition: "all 300ms" }} />)}
+    </div>
+  );
+
+  return (
+    <div style={{ fontFamily: SANS, color: C.ink }}>
+      <div style={{ maxWidth: "440px", margin: "0 auto", padding: "0 20px", minHeight: "100dvh" }}>
+
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 0" }}>
+          <span style={{ fontSize: "15px", fontWeight: 700, letterSpacing: "-0.01em" }}>CaaS</span>
+          {hasProject && phase === "intro" && (
+            <button onClick={() => router.push("/caas/project")} style={{ fontSize: "13px", fontWeight: 600, color: C.accent, background: C.accentSoft, border: "none", borderRadius: "100px", padding: "8px 16px", cursor: "pointer" }}>
+              進行中の工事を見る →
+            </button>
+          )}
+        </div>
+
+        {/* ── intro ── */}
+        {phase === "intro" && (
+          <div style={{ paddingTop: "56px" }}>
+            <div style={{ fontSize: "13px", fontWeight: 600, color: C.accent, marginBottom: "16px" }}>CONSTRUCTION AS A SERVICE</div>
+            <h1 style={{ fontSize: "34px", fontWeight: 700, lineHeight: 1.35, letterSpacing: "-0.02em", marginBottom: "20px" }}>
+              工事を、<br />頼みたくなる体験に。
+            </h1>
+            <p style={{ fontSize: "15px", color: C.sub, lineHeight: 1.9, marginBottom: "40px" }}>
+              電話も、待ち時間も、不安もいらない。<br />
+              予約から施工の様子まで、すべてスマホで。
+            </p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "40px" }}>
+              {[
+                { icon: "⚡", t: "その場で見積", d: "電話待ちなし。選んで即見積。" },
+                { icon: "👷", t: "担当職人が見える", d: "顔・評価・実績を見て選べる。" },
+                { icon: "📹", t: "現場をライブで確認", d: "施工の様子をリアルタイムで。" },
+                { icon: "🔧", t: "完了後もつながる", d: "点検リマインドとワンタップ再依頼。" },
+              ].map((f) => (
+                <div key={f.t} style={{ display: "flex", gap: "14px", alignItems: "flex-start", background: C.surface, border: `1px solid ${C.line}`, borderRadius: "14px", padding: "16px 18px" }}>
+                  <span style={{ fontSize: "22px" }}>{f.icon}</span>
+                  <div>
+                    <div style={{ fontSize: "15px", fontWeight: 600 }}>{f.t}</div>
+                    <div style={{ fontSize: "13px", color: C.sub, marginTop: "3px", lineHeight: 1.6 }}>{f.d}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {btn("工事を依頼する", () => setPhase("service"))}
+          </div>
+        )}
+
+        {/* ── service ── */}
+        {phase === "service" && (
+          <div style={{ paddingTop: "8px" }}>
+            <Progress n={1} />
+            <h2 style={{ fontSize: "22px", fontWeight: 700, marginBottom: "6px" }}>どんな工事ですか？</h2>
+            <p style={{ fontSize: "14px", color: C.sub, marginBottom: "24px" }}>選ぶと、すぐに見積が出ます。</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {SERVICES.map((s) => (
+                <button key={s.id} onClick={() => { setService(s); setPhase("quote"); }}
+                  style={{ display: "flex", alignItems: "center", gap: "14px", width: "100%", textAlign: "left", background: C.surface, border: `1px solid ${C.line}`, borderRadius: "14px", padding: "16px 18px", cursor: "pointer", transition: "all 200ms" }}>
+                  <span style={{ fontSize: "26px" }}>{s.icon}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "15px", fontWeight: 600 }}>{s.label}</div>
+                    <div style={{ fontSize: "12px", color: C.faint, marginTop: "3px" }}>{s.duration}・{s.desc}</div>
+                  </div>
+                  <span style={{ color: C.faint }}>›</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── quote ── */}
+        {phase === "quote" && service && (
+          <div style={{ paddingTop: "8px" }}>
+            <Progress n={2} />
+            {!quoteReady ? (
+              <div style={{ textAlign: "center", paddingTop: "80px" }}>
+                <div style={{ display: "inline-flex", gap: "6px", marginBottom: "20px" }}>
+                  {[0, 1, 2].map((i) => <span key={i} style={{ width: "9px", height: "9px", borderRadius: "50%", background: C.accent, animation: `caasDot 1.2s ease-in-out ${i * 0.18}s infinite` }} />)}
+                </div>
+                <p style={{ fontSize: "15px", color: C.sub }}>最適な見積を計算しています…</p>
+              </div>
+            ) : (
+              <div style={{ animation: "caasUp 500ms ease both" }}>
+                <div style={{ fontSize: "13px", fontWeight: 600, color: C.accent, marginBottom: "10px" }}>お見積り（税込・目安）</div>
+                <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "18px", padding: "28px 24px", marginBottom: "20px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "22px" }}>
+                    <span style={{ fontSize: "28px" }}>{service.icon}</span>
+                    <div>
+                      <div style={{ fontSize: "16px", fontWeight: 600 }}>{service.label}</div>
+                      <div style={{ fontSize: "12px", color: C.faint }}>{service.duration}</div>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: "8px", paddingTop: "20px", borderTop: `1px solid ${C.lineSoft}` }}>
+                    <span style={{ fontSize: "40px", fontWeight: 700, letterSpacing: "-0.02em" }}>{fmtYen(service.price)}</span>
+                    <span style={{ fontSize: "13px", color: C.sub }}>〜</span>
+                  </div>
+                  <p style={{ fontSize: "12px", color: C.faint, marginTop: "10px", lineHeight: 1.7 }}>
+                    現地状況により追加が必要な場合は、施工前に必ずご確認します。勝手に増えることはありません。
+                  </p>
+                </div>
+                {btn("この内容で日程を選ぶ", () => setPhase("slot"))}
+                <div style={{ marginTop: "12px" }}>{btn("工事を選び直す", () => setPhase("service"), false)}</div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── slot ── */}
+        {phase === "slot" && (
+          <div style={{ paddingTop: "8px" }}>
+            <Progress n={3} />
+            <h2 style={{ fontSize: "22px", fontWeight: 700, marginBottom: "6px" }}>いつがご希望ですか？</h2>
+            <p style={{ fontSize: "14px", color: C.sub, marginBottom: "24px" }}>電話のやり取りは不要です。</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {SLOTS.map((s) => {
+                const sel = slotId === s.id;
+                return (
+                  <button key={s.id} onClick={() => setSlotId(s.id)}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", textAlign: "left", background: sel ? C.accentSoft : C.surface, border: `1.5px solid ${sel ? C.accent : C.line}`, borderRadius: "14px", padding: "16px 18px", cursor: "pointer", transition: "all 200ms" }}>
+                    <div>
+                      <div style={{ fontSize: "15px", fontWeight: 600 }}>{s.day}</div>
+                      <div style={{ fontSize: "13px", color: C.sub, marginTop: "2px" }}>{s.time}</div>
+                    </div>
+                    <div style={{ width: "22px", height: "22px", borderRadius: "50%", border: `2px solid ${sel ? C.accent : C.line}`, background: sel ? C.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {sel && <span style={{ color: "#fff", fontSize: "12px" }}>✓</span>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            <div style={{ marginTop: "24px" }}>{btn("担当を選ぶ", () => setPhase("craftsman"), true, !slotId)}</div>
+          </div>
+        )}
+
+        {/* ── craftsman ── */}
+        {phase === "craftsman" && (
+          <div style={{ paddingTop: "8px" }}>
+            <Progress n={4} />
+            <h2 style={{ fontSize: "22px", fontWeight: 700, marginBottom: "6px" }}>どの職人に頼みますか？</h2>
+            <p style={{ fontSize: "14px", color: C.sub, marginBottom: "24px" }}>評価・実績を見て、あなたが選べます。</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {CRAFTSMEN.map((c) => {
+                const sel = craftsman?.id === c.id;
+                return (
+                  <button key={c.id} onClick={() => setCraftsman(c)}
+                    style={{ textAlign: "left", width: "100%", background: C.surface, border: `1.5px solid ${sel ? C.accent : C.line}`, borderRadius: "16px", padding: "18px", cursor: "pointer", transition: "all 200ms" }}>
+                    <div style={{ display: "flex", gap: "14px", alignItems: "center" }}>
+                      <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: c.color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", fontWeight: 700, flexShrink: 0 }}>{c.initial}</div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <span style={{ fontSize: "15px", fontWeight: 600 }}>{c.name}</span>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "3px" }}>
+                          <span style={{ fontSize: "13px", fontWeight: 600, color: C.amber }}>★ {c.rating}</span>
+                          <span style={{ fontSize: "12px", color: C.faint }}>({c.reviews}件)・{c.area}・{c.years}年</span>
+                        </div>
+                      </div>
+                      {sel && <span style={{ color: C.accent, fontSize: "18px" }}>✓</span>}
+                    </div>
+                    <div style={{ display: "flex", gap: "6px", marginTop: "12px", flexWrap: "wrap" }}>
+                      {c.specialties.map((sp) => <span key={sp} style={{ fontSize: "11px", color: C.accent, background: C.accentSoft, borderRadius: "100px", padding: "4px 11px" }}>{sp}</span>)}
+                      <span style={{ fontSize: "12px", color: C.sub, marginLeft: "2px" }}>「{c.blurb}」</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            <div style={{ marginTop: "24px" }}>{btn("予約内容を確認", () => setPhase("confirm"), true, !craftsman)}</div>
+          </div>
+        )}
+
+        {/* ── confirm ── */}
+        {phase === "confirm" && service && craftsman && (
+          <div style={{ paddingTop: "40px", animation: "caasUp 400ms ease both" }}>
+            <h2 style={{ fontSize: "22px", fontWeight: 700, marginBottom: "24px" }}>この内容で予約します</h2>
+            <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "18px", padding: "22px 24px", marginBottom: "20px" }}>
+              {[
+                { l: "工事", v: `${service.icon} ${service.label}` },
+                { l: "日時", v: `${SLOTS.find((s) => s.id === slotId)?.day} ${SLOTS.find((s) => s.id === slotId)?.time}` },
+                { l: "担当", v: `${craftsman.name}（★${craftsman.rating}）` },
+              ].map((r, i, arr) => (
+                <div key={r.l} style={{ display: "flex", justifyContent: "space-between", gap: "16px", paddingBottom: i < arr.length - 1 ? "14px" : 0, marginBottom: i < arr.length - 1 ? "14px" : 0, borderBottom: i < arr.length - 1 ? `1px solid ${C.lineSoft}` : "none" }}>
+                  <span style={{ fontSize: "13px", color: C.faint }}>{r.l}</span>
+                  <span style={{ fontSize: "14px", fontWeight: 600, textAlign: "right" }}>{r.v}</span>
+                </div>
+              ))}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: "18px", paddingTop: "16px", borderTop: `1px solid ${C.line}` }}>
+                <span style={{ fontSize: "13px", color: C.faint }}>お支払い目安</span>
+                <span style={{ fontSize: "24px", fontWeight: 700 }}>{fmtYen(service.price)}〜</span>
+              </div>
+            </div>
+            {btn("予約を確定する", confirm)}
+            <div style={{ marginTop: "12px" }}>{btn("戻る", () => setPhase("craftsman"), false)}</div>
+          </div>
+        )}
+
+      </div>
+
+      <style>{`
+        @keyframes caasDot { 0%,100% { opacity: .25; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
+        @keyframes caasUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
+    </div>
+  );
+}
