@@ -84,9 +84,9 @@ export default function CaasBooking() {
               ))}
             </div>
             {btn("工事を依頼する", () => setPhase("service"))}
-            <button onClick={() => router.push("/caas/academy")} style={{ width: "100%", marginTop: "12px", fontSize: "13px", fontWeight: 600, color: C.sub, background: "none", border: "none", cursor: "pointer" }}>
-              職人の方はこちら（アカデミー）→
-            </button>
+            <div style={{ marginTop: "12px" }}>
+              {btn("🪄 ARで設置イメージを見る", () => router.push("/caas/ar"), false)}
+            </div>
           </div>
         )}
 
