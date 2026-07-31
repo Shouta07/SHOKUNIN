@@ -3,11 +3,16 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
-  C, SANS, SERVICES, CRAFTSMEN, SLOTS, saveProject, getProject, fmtYen,
+  C, SANS, SERVICES, CRAFTSMEN, DAYS, BANDS, AVAILABILITY, RATING_AXES, fmtSlot,
+  saveProject, getProject, fmtYen,
   type Service, type Craftsman,
 } from "@/lib/caas";
 
 type Phase = "intro" | "service" | "quote" | "slot" | "craftsman" | "confirm";
+
+function FragmentRow({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}
 
 export default function CaasBooking() {
   const router = useRouter();
@@ -90,6 +95,9 @@ export default function CaasBooking() {
               ))}
             </div>
             {btn("工事を依頼する", () => setPhase("service"))}
+            <button onClick={() => router.push("/caas/academy")} style={{ width: "100%", marginTop: "12px", fontSize: "13px", fontWeight: 600, color: C.sub, background: "none", border: "none", cursor: "pointer" }}>
+              職人の方はこちら（アカデミー）→
+            </button>
           </div>
         )}
 
@@ -152,30 +160,64 @@ export default function CaasBooking() {
           </div>
         )}
 
-        {/* ── slot ── */}
+        {/* ── slot (調整さん型・空き枠グリッド) ── */}
         {phase === "slot" && (
           <div style={{ paddingTop: "8px" }}>
             <Progress n={3} />
-            <h2 style={{ fontSize: "22px", fontWeight: 700, marginBottom: "6px" }}>いつがご希望ですか？</h2>
-            <p style={{ fontSize: "14px", color: C.sub, marginBottom: "24px" }}>電話のやり取りは不要です。</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {SLOTS.map((s) => {
-                const sel = slotId === s.id;
-                return (
-                  <button key={s.id} onClick={() => setSlotId(s.id)}
-                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", textAlign: "left", background: sel ? C.accentSoft : C.surface, border: `1.5px solid ${sel ? C.accent : C.line}`, borderRadius: "14px", padding: "16px 18px", cursor: "pointer", transition: "all 200ms" }}>
-                    <div>
-                      <div style={{ fontSize: "15px", fontWeight: 600 }}>{s.day}</div>
-                      <div style={{ fontSize: "13px", color: C.sub, marginTop: "2px" }}>{s.time}</div>
-                    </div>
-                    <div style={{ width: "22px", height: "22px", borderRadius: "50%", border: `2px solid ${sel ? C.accent : C.line}`, background: sel ? C.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {sel && <span style={{ color: "#fff", fontSize: "12px" }}>✓</span>}
-                    </div>
-                  </button>
-                );
-              })}
+            <h2 style={{ fontSize: "22px", fontWeight: 700, marginBottom: "6px" }}>職人の空き枠から選ぶ</h2>
+            <p style={{ fontSize: "14px", color: C.sub, marginBottom: "20px" }}>電話のやり取りは不要。空いている枠をタップ。</p>
+
+            {/* legend */}
+            <div style={{ display: "flex", gap: "16px", marginBottom: "14px", fontSize: "12px", color: C.sub }}>
+              <span><b style={{ color: C.ok }}>○</b> 空きあり</span>
+              <span><b style={{ color: C.amber }}>△</b> 残りわずか</span>
+              <span><b style={{ color: C.faint }}>×</b> 満枠</span>
             </div>
-            <div style={{ marginTop: "24px" }}>{btn("担当を選ぶ", () => setPhase("craftsman"), true, !slotId)}</div>
+
+            {/* grid */}
+            <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "10px", overflowX: "auto" }}>
+              <div style={{ display: "grid", gridTemplateColumns: `56px repeat(${DAYS.length}, 1fr)`, gap: "6px", minWidth: "340px" }}>
+                <div />
+                {DAYS.map((d) => (
+                  <div key={d.id} style={{ textAlign: "center", padding: "4px 0" }}>
+                    <div style={{ fontSize: "12px", fontWeight: 600 }}>{d.label}</div>
+                    <div style={{ fontSize: "10px", color: d.dow === "土" ? "#2f6bed" : d.dow === "日" ? "#e5484d" : C.faint }}>{d.dow}</div>
+                  </div>
+                ))}
+                {BANDS.map((b) => (
+                  <FragmentRow key={b.id}>
+                    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", paddingLeft: "4px" }}>
+                      <span style={{ fontSize: "12px", fontWeight: 600 }}>{b.label}</span>
+                      <span style={{ fontSize: "9px", color: C.faint }}>{b.time}</span>
+                    </div>
+                    {DAYS.map((d) => {
+                      const n = AVAILABILITY[d.id][b.id];
+                      const id = `${d.id}|${b.id}`;
+                      const sel = slotId === id;
+                      const mark = n >= 2 ? "○" : n === 1 ? "△" : "×";
+                      const col = n >= 2 ? C.ok : n === 1 ? C.amber : C.faint;
+                      const disabled = n === 0;
+                      return (
+                        <button key={id} onClick={() => !disabled && setSlotId(id)} disabled={disabled}
+                          style={{ aspectRatio: "1", borderRadius: "10px", cursor: disabled ? "default" : "pointer",
+                            background: sel ? C.accent : disabled ? C.lineSoft : C.bg,
+                            border: `1.5px solid ${sel ? C.accent : C.line}`,
+                            color: sel ? "#fff" : col, fontSize: "17px", fontWeight: 700, transition: "all 150ms" }}>
+                          {mark}
+                        </button>
+                      );
+                    })}
+                  </FragmentRow>
+                ))}
+              </div>
+            </div>
+
+            {slotId && (
+              <div style={{ marginTop: "14px", fontSize: "13px", color: C.accent, fontWeight: 600, textAlign: "center" }}>
+                選択中：{fmtSlot(slotId)}
+              </div>
+            )}
+            <div style={{ marginTop: "20px" }}>{btn("担当を選ぶ", () => setPhase("craftsman"), true, !slotId)}</div>
           </div>
         )}
 
@@ -204,10 +246,21 @@ export default function CaasBooking() {
                       </div>
                       {sel && <span style={{ color: C.accent, fontSize: "18px" }}>✓</span>}
                     </div>
-                    <div style={{ display: "flex", gap: "6px", marginTop: "12px", flexWrap: "wrap" }}>
-                      {c.specialties.map((sp) => <span key={sp} style={{ fontSize: "11px", color: C.accent, background: C.accentSoft, borderRadius: "100px", padding: "4px 11px" }}>{sp}</span>)}
-                      <span style={{ fontSize: "12px", color: C.sub, marginLeft: "2px" }}>「{c.blurb}」</span>
+                    {/* Uber型 ホスピタリティ多軸 */}
+                    <div style={{ display: "flex", gap: "6px", marginTop: "12px" }}>
+                      {RATING_AXES.map((ax) => (
+                        <div key={ax.key} style={{ flex: 1, background: C.bg, borderRadius: "10px", padding: "8px 4px", textAlign: "center" }}>
+                          <div style={{ fontSize: "13px" }}>{ax.icon}</div>
+                          <div style={{ fontSize: "12px", fontWeight: 700, color: C.ink, marginTop: "2px" }}>{c.axes[ax.key].toFixed(1)}</div>
+                          <div style={{ fontSize: "9px", color: C.faint }}>{ax.label}</div>
+                        </div>
+                      ))}
                     </div>
+                    <div style={{ display: "flex", gap: "6px", marginTop: "10px", flexWrap: "wrap", alignItems: "center" }}>
+                      <span style={{ fontSize: "10px", fontWeight: 700, color: "#fff", background: C.amber, borderRadius: "100px", padding: "3px 9px" }}>🏅 {c.level}</span>
+                      {c.badges.slice(0, 2).map((b) => <span key={b} style={{ fontSize: "10px", color: C.accent, background: C.accentSoft, borderRadius: "100px", padding: "3px 9px" }}>{b}</span>)}
+                    </div>
+                    <p style={{ fontSize: "12px", color: C.sub, marginTop: "10px" }}>{c.hospitalityQuote}</p>
                   </button>
                 );
               })}
@@ -223,7 +276,7 @@ export default function CaasBooking() {
             <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "18px", padding: "22px 24px", marginBottom: "20px" }}>
               {[
                 { l: "工事", v: `${service.icon} ${service.label}` },
-                { l: "日時", v: `${SLOTS.find((s) => s.id === slotId)?.day} ${SLOTS.find((s) => s.id === slotId)?.time}` },
+                { l: "日時", v: fmtSlot(slotId) },
                 { l: "担当", v: `${craftsman.name}（★${craftsman.rating}）` },
               ].map((r, i, arr) => (
                 <div key={r.l} style={{ display: "flex", justifyContent: "space-between", gap: "16px", paddingBottom: i < arr.length - 1 ? "14px" : 0, marginBottom: i < arr.length - 1 ? "14px" : 0, borderBottom: i < arr.length - 1 ? `1px solid ${C.lineSoft}` : "none" }}>

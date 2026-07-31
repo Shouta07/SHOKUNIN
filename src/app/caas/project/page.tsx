@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
-  C, SANS, STAGES, LIVE_TIMELINE, getProject, saveProject, clearProject,
-  getService, getCraftsman, getSlot, fmtYen, type Project,
+  C, SANS, STAGES, LIVE_TIMELINE, RATING_AXES, getProject, saveProject, clearProject,
+  getService, getCraftsman, fmtSlot, fmtYen, type Project,
 } from "@/lib/caas";
 
 export default function CaasProject() {
@@ -46,7 +46,7 @@ export default function CaasProject() {
 
   const service = getService(project.serviceId)!;
   const craftsman = getCraftsman(project.craftsmanId)!;
-  const slot = getSlot(project.slotId)!;
+  const slotLabel = fmtSlot(project.slotId);
   const stage = STAGES[project.stage];
 
   const advance = () => {
@@ -74,7 +74,7 @@ export default function CaasProject() {
             <span style={{ fontSize: "24px" }}>{service.icon}</span>
             <h1 style={{ fontSize: "20px", fontWeight: 700 }}>{service.label}</h1>
           </div>
-          <p style={{ fontSize: "13px", color: C.sub, marginTop: "6px" }}>{slot.day} {slot.time}・{fmtYen(service.price)}〜</p>
+          <p style={{ fontSize: "13px", color: C.sub, marginTop: "6px" }}>{slotLabel}・{fmtYen(service.price)}〜</p>
         </div>
 
         {/* Stage tracker */}
@@ -217,12 +217,21 @@ export default function CaasProject() {
               <p style={{ fontSize: "13px", color: C.sub, lineHeight: 1.7 }}>施工箇所の不具合は1年間無償対応。この画面からいつでも呼び出せます。</p>
             </div>
 
-            {/* review */}
+            {/* review — Uber型 ホスピタリティ査定 */}
             <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: "16px", padding: "18px 20px" }}>
-              <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "10px" }}>{craftsman.name} はいかがでしたか？</div>
-              <div style={{ display: "flex", gap: "6px" }}>
-                {[1, 2, 3, 4, 5].map((n) => <span key={n} style={{ fontSize: "28px", color: C.amber, cursor: "pointer" }}>★</span>)}
-              </div>
+              <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "4px" }}>{craftsman.name} はいかがでしたか？</div>
+              <p style={{ fontSize: "12px", color: C.faint, marginBottom: "14px" }}>技術だけでなく、来た人のホスピタリティも評価してください。</p>
+              {RATING_AXES.map((ax) => (
+                <div key={ax.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${C.lineSoft}` }}>
+                  <span style={{ fontSize: "13px" }}>{ax.icon} {ax.label}</span>
+                  <div style={{ display: "flex", gap: "4px" }}>
+                    {[1, 2, 3, 4, 5].map((n) => <span key={n} style={{ fontSize: "20px", color: C.amber, cursor: "pointer" }}>★</span>)}
+                  </div>
+                </div>
+              ))}
+              <p style={{ fontSize: "11px", color: C.faint, marginTop: "12px", lineHeight: 1.7 }}>
+                あなたの評価は職人のランクに反映され、良い職人ほど選ばれやすくなります。
+              </p>
             </div>
           </div>
         )}
