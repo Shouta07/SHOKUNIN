@@ -242,3 +242,85 @@ export const REFERRAL = {
   rewardFriend: 5000,
   message: "紹介した方・された方の双方に次回工事で使えるクーポンを進呈。",
 };
+
+// ─── ゲーミフィケーション（現地調査・施工をワクワクに） ───
+const PTS_KEY = "caas_points";
+
+export function getPoints(): number {
+  if (typeof window === "undefined") return 0;
+  try { return parseInt(localStorage.getItem(PTS_KEY) || "0", 10) || 0; } catch { return 0; }
+}
+export function addPoints(n: number): number {
+  const total = getPoints() + n;
+  try { localStorage.setItem(PTS_KEY, String(total)); } catch {}
+  return total;
+}
+
+export const LEVELS = [
+  { min: 0, name: "ビギナー" },
+  { min: 100, name: "見習い設計士" },
+  { min: 250, name: "設備マイスター" },
+  { min: 500, name: "レジェンド" },
+];
+export function levelOf(points: number) {
+  let lv = LEVELS[0];
+  for (const l of LEVELS) if (points >= l.min) lv = l;
+  const next = LEVELS.find((l) => l.min > points);
+  return { name: lv.name, next: next?.min ?? null };
+}
+
+// ─── 職人ページ：ルート最適化 × 距離計算（Google Maps連携を想定） ───
+export interface GeoPoint { lat: number; lng: number; }
+export interface Job extends GeoPoint {
+  id: string;
+  name: string;
+  address: string;
+  serviceId: string;
+  time: string;   // 予定
+}
+
+// 職人の出発点（自宅・倉庫）
+export const HOME_BASE = { name: "自宅・倉庫", lat: 35.6595, lng: 139.7005 };
+
+// 本日の割当現場（デモ）
+export const TODAY_JOBS: Job[] = [
+  { id: "j1", name: "渋谷店", address: "渋谷区道玄坂1-2-3", serviceId: "camera", time: "10:00", lat: 35.6580, lng: 139.7016 },
+  { id: "j2", name: "新宿東口店", address: "新宿区新宿3-1-1", serviceId: "camera_add", time: "13:00", lat: 35.6910, lng: 139.7035 },
+  { id: "j3", name: "横浜西口店", address: "横浜市西区南幸2-1-1", serviceId: "sensor", time: "15:30", lat: 35.4658, lng: 139.6220 },
+  { id: "j4", name: "大宮支店", address: "さいたま市大宮区桜木町1-1", serviceId: "camera", time: "18:00", lat: 35.9063, lng: 139.6238 },
+];
+
+export function haversineKm(a: GeoPoint, b: GeoPoint): number {
+  const R = 6371;
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const la1 = (a.lat * Math.PI) / 180, la2 = (b.lat * Math.PI) / 180;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(la1) * Math.cos(la2) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+export const TRAVEL_YEN_PER_KM = 40; // 交通費 目安（¥/km）
+export const AVG_KMH = 24;           // 市街地 平均速度
+
+// 最近傍法で最短ルートを組む（無駄な移動を減らす）
+export function optimizeRoute(start: GeoPoint, jobs: Job[]): { order: Job[]; totalKm: number; legs: { km: number }[] } {
+  const remaining = [...jobs];
+  const order: Job[] = [];
+  const legs: { km: number }[] = [];
+  let cur: GeoPoint = start;
+  let totalKm = 0;
+  while (remaining.length) {
+    let bi = 0, bd = Infinity;
+    remaining.forEach((j, i) => { const d = haversineKm(cur, j); if (d < bd) { bd = d; bi = i; } });
+    const next = remaining.splice(bi, 1)[0];
+    order.push(next); legs.push({ km: bd }); totalKm += bd; cur = next;
+  }
+  return { order, totalKm, legs };
+}
+
+// 元の順（割当順）の総距離 — 最適化との比較用
+export function naiveTotalKm(start: GeoPoint, jobs: Job[]): number {
+  let cur: GeoPoint = start, total = 0;
+  for (const j of jobs) { total += haversineKm(cur, j); cur = j; }
+  return total;
+}
