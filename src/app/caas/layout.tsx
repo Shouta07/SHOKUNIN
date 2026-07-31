@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Shell from "@/components/caas/Shell";
 
 export const metadata: Metadata = {
   title: "CaaS — Construction as a Service",
@@ -20,7 +21,7 @@ export default function CaasLayout({ children }: { children: React.ReactNode }) 
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet"
       />
-      <div style={{ minHeight: "100vh", background: "#f5f7fa" }}>{children}</div>
+      <Shell>{children}</Shell>
     </>
   );
 }

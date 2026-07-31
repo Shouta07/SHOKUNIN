@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   C, SANS, SERVICES, CRAFTSMEN, DAYS, BANDS, AVAILABILITY, RATING_AXES, fmtSlot,
-  saveProject, getProject, fmtYen,
+  saveProject, fmtYen,
   type Service, type Craftsman,
 } from "@/lib/caas";
 
@@ -22,9 +22,8 @@ export default function CaasBooking() {
   const [craftsman, setCraftsman] = useState<Craftsman | null>(null);
   const [quoteReady, setQuoteReady] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [hasProject, setHasProject] = useState(false);
 
-  useEffect(() => { setMounted(true); setHasProject(!!getProject()); }, []);
+  useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
     if (phase === "quote") { setQuoteReady(false); const t = setTimeout(() => setQuoteReady(true), 1100); return () => clearTimeout(t); }
   }, [phase]);
@@ -54,21 +53,11 @@ export default function CaasBooking() {
 
   return (
     <div style={{ fontFamily: SANS, color: C.ink }}>
-      <div style={{ maxWidth: "440px", margin: "0 auto", padding: "0 20px", minHeight: "100dvh" }}>
-
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 0" }}>
-          <span style={{ fontSize: "15px", fontWeight: 700, letterSpacing: "-0.01em" }}>CaaS</span>
-          {hasProject && phase === "intro" && (
-            <button onClick={() => router.push("/caas/project")} style={{ fontSize: "13px", fontWeight: 600, color: C.accent, background: C.accentSoft, border: "none", borderRadius: "100px", padding: "8px 16px", cursor: "pointer" }}>
-              進行中の工事を見る →
-            </button>
-          )}
-        </div>
+      <div style={{ maxWidth: "480px", margin: "0 auto", padding: "28px 20px 40px" }}>
 
         {/* ── intro ── */}
         {phase === "intro" && (
-          <div style={{ paddingTop: "56px" }}>
+          <div style={{ paddingTop: "24px" }}>
             <div style={{ fontSize: "13px", fontWeight: 600, color: C.accent, marginBottom: "16px" }}>CONSTRUCTION AS A SERVICE</div>
             <h1 style={{ fontSize: "34px", fontWeight: 700, lineHeight: 1.35, letterSpacing: "-0.02em", marginBottom: "20px" }}>
               工事を、<br />頼みたくなる体験に。

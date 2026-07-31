@@ -60,15 +60,12 @@ export default function CaasProject() {
 
   return (
     <div style={{ fontFamily: SANS, color: C.ink }}>
-      <div style={{ maxWidth: "440px", margin: "0 auto", padding: "0 20px 60px", minHeight: "100dvh" }}>
-
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 0" }}>
-          <button onClick={() => router.push("/caas")} style={{ fontSize: "15px", fontWeight: 700, background: "none", border: "none", cursor: "pointer", color: C.ink }}>CaaS</button>
-          <span style={{ fontSize: "12px", color: C.faint }}>予約番号 #{project.id.slice(0, 6).toUpperCase()}</span>
-        </div>
+      <div style={{ maxWidth: "480px", margin: "0 auto", padding: "28px 20px 60px" }}>
 
         {/* Title */}
+        <div style={{ marginBottom: "8px", textAlign: "right" }}>
+          <span style={{ fontSize: "12px", color: C.faint }}>予約番号 #{project.id.slice(0, 6).toUpperCase()}</span>
+        </div>
         <div style={{ marginBottom: "24px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <span style={{ fontSize: "24px" }}>{service.icon}</span>

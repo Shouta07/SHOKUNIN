@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   C, SANS, SKILL_CATEGORIES, RATING_AXES, CRAFTSMEN, skillProgress,
@@ -9,7 +8,6 @@ import {
 // 職人（施工パートナー）向けの育成・査定ダッシュボード。
 // tebiki型 動画マニュアル × skill-puzzle型 スキル可視化 × Uber型 ホスピタリティ査定。
 export default function CaasAcademy() {
-  const router = useRouter();
   const me = CRAFTSMEN[0]; // デモ：田中さん視点
   const [openCat, setOpenCat] = useState<string>(SKILL_CATEGORIES[0].id);
   const [playing, setPlaying] = useState<string | null>(null);
@@ -19,11 +17,12 @@ export default function CaasAcademy() {
 
   return (
     <div style={{ fontFamily: SANS, color: C.ink }}>
-      <div style={{ maxWidth: "440px", margin: "0 auto", padding: "0 20px 60px", minHeight: "100dvh" }}>
+      <div style={{ maxWidth: "480px", margin: "0 auto", padding: "28px 20px 60px" }}>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 0" }}>
-          <button onClick={() => router.push("/caas")} style={{ fontSize: "15px", fontWeight: 700, background: "none", border: "none", cursor: "pointer", color: C.ink }}>CaaS</button>
-          <span style={{ fontSize: "12px", color: C.faint }}>職人アカデミー</span>
+        <div style={{ marginBottom: "20px" }}>
+          <div style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.12em", color: C.accent }}>ACADEMY</div>
+          <h1 style={{ fontSize: "24px", fontWeight: 700, marginTop: "6px" }}>職人アカデミー</h1>
+          <p style={{ fontSize: "13px", color: C.sub, marginTop: "6px", lineHeight: 1.7 }}>動画マニュアルで学び、評価で磨く。</p>
         </div>
 
         {/* Me / hospitality score */}
